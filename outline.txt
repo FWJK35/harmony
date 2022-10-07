@@ -1,0 +1,81 @@
+Lol (lmfao LooOl) :(
+    XdD:("Hello World":)
+:)
+
+{ } and ( ) = :( :) ?
+" " and ' ' = <3 </3 ???
+
+to read input (System.in)
+    what
+
+output (System.out.print)
+    
+
+
+to define variable example:
+    var_name aka "value"
+
+for loop example:
+    for(int i = start; i < end; i++) { whatever }
+    for start; < end; i++ { whatever }
+
+    for (int i = 0; i < 5; i++)
+    lmfao ur mom aka 0 mom < 5 mom fat :(
+        // code
+    :)
+
+while example:
+
+keywords:
+    fat (++)
+    lmao
+    lmfao
+    lol
+    xd
+    heheheha
+    ttyl
+    hmu
+    tmrw
+    u
+    ur
+    mald (break)
+    cope
+    seeth
+    idk
+    brb
+    btw
+    cuz
+    omg
+    omfg
+    smh
+    rofl
+    tl;dr
+    tmi
+    afk
+    nvm
+    ftw
+    ff (break)
+    ily
+    yolo
+    fyi
+    asap
+    ty
+    aka (variable declaration (=))
+    np
+    tbh
+    sus
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
