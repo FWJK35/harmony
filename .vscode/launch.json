@@ -5,6 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "Launch test",
+            "request": "launch",
+            "mainClass": "test.test",
+            "projectName": "harmony_af7bd8d6"
+        },
+        {
+            "type": "java",
+            "name": "Launch Compiler",
+            "request": "launch",
+            "mainClass": "Compiler",
+            "projectName": "harmony_af7bd8d6"
+        },
+        {
             "name": "Java",
             "type": "java",
             "request": "launch",
