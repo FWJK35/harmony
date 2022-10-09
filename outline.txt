@@ -5,12 +5,18 @@ Lol (lmfao LooOl) :(
 { } and ( ) = :( :) ?
 " " and ' ' = <3 </3 ???
 
+Will only declare Variable as ArrayList so can resize as wanted
+Variable will not hold arrays, will just be an array of Variable ??
+    but then rely on the ArrayList methods for those ???? 
+    so idk if we'll include ArrayList object inside Variable object hold 
+    so that can define own methods ?? or maybe have some overloads
+
+
 to read input (System.in)
     what
 
 output (System.out.print)
     
-
 
 to define variable example:
     var_name aka "value"
@@ -27,6 +33,8 @@ for loop example:
 while example:
 
 keywords:
+    wdym (function declaration)
+    dumb (--)
     fat (++)
     lmao
     lmfao
