@@ -32,6 +32,16 @@ for loop example:
 
 while example:
 
+
+variable type:
+    int
+    str
+    dbl
+    chr
+    flt
+    boo
+    
+
 keywords:
     wdym (function declaration)
     dumb (--)
