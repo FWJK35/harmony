@@ -52,7 +52,7 @@ keywords:
     xd
     heheheha
     ttyl
-    hmu
+    hmu (input)
     tmrw
     u
     ur
@@ -72,8 +72,8 @@ keywords:
     afk
     nvm
     ftw
-    ff (break)
-    ily
+    ff
+    ily 
     yolo
     fyi
     asap
@@ -82,7 +82,10 @@ keywords:
     np
     tbh
     sus
-
+    idc
+    idfc
+    
+    
 
 
 
