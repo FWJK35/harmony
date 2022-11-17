@@ -13,7 +13,7 @@ public class Compiler {
     public static void main(String[] args) {
         test();
         
-        // file input prompt using JOptionPane 
+        // prompt file name using JOptionPane 
         Scanner input = new Scanner(System.in);
         try {
             String file = JOptionPane.showInputDialog("Input File Name: ");
