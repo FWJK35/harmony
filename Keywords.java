@@ -8,4 +8,5 @@ public class Keywords {
     public static final String PRINT_KEYWORD = "xd";
     public static final String INPUT_KEYWORD = "hmu";
     public static final String RETURN_KEYWORD = "ttyl";
+    public static final String STRING_LITERAL_KEYWORD = "#";
 }

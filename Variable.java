@@ -88,9 +88,7 @@ public class Variable {
         }
 
         return new Variable(result);
-        
     }
-
 
     public Variable slice(int start, int end) {
         return slice(start, end, 1);
