@@ -13,6 +13,39 @@ public class Variable {
         return new Variable(data);
     }
 
+
+    //TODO add the following functionality
+    /*
+     * int + int = int
+     * double + double = double
+     * string + string = string
+     * char + char = string
+     * array + array = arrays appended to each other
+     * 
+     * THE FOLLOWING OPERATIONS SHOULD WORK IN BOTH DIRECTIONS
+     * 
+     * double + int = double
+     * int + string = string
+     * double + string = string
+     * char + int = char
+     * string + char = string
+     * double + bool = double
+     * int + bool = int
+     * string + bool = string
+     * 
+     * array + any = array with other element appended
+     * 
+     */
+    public Variable addTo(Variable a) {
+        Variable out = new Variable(0);
+        if (this.data instanceof Integer) {
+            if (a.getType().equals("Integer")) {
+                data = (Integer)data + Double.parseDouble(a.toString());
+            }
+        }
+        return out;
+    }
+
     public Variable slice(int start, int end, int step) {
         ArrayList<Variable> data = new ArrayList<Variable>();
         
@@ -120,6 +153,7 @@ public class Variable {
         }
     }
 
+    @Override
     public String toString() {
         if (this.data instanceof ArrayList) {
             String result = "[";
