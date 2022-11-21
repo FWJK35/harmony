@@ -11,7 +11,11 @@ public class StaticMethods {
             throw new Error("Invalid Arguments to command: " + Keywords.PRINT_KEYWORD);
         }
         else {
-            System.out.println(line.substring(beginIndex + Keywords.STRING_LITERAL_KEYWORD.length(), endIndex));
+            System.out.println(interpretExpression(line, variables));
         }
+    }
+    private static Variable interpretExpression(String line, Map<String, Variable> variables) {
+        Variable result = new Variable();
+        List<
     }
 }

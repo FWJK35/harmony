@@ -8,9 +8,20 @@ public class Variable {
     public Variable(Object data) {
         this.data = data;
     }
+    public Variable() {
+        
+    }
 
     public Variable copy() {
         return new Variable(data);
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    public Object getData() {
+        return this.data;
     }
 
 
@@ -19,7 +30,7 @@ public class Variable {
      * int + int = int
      * double + double = double
      * string + string = string
-     * char + char = string
+     * char + char = int
      * array + array = arrays appended to each other
      * 
      * THE FOLLOWING OPERATIONS SHOULD WORK IN BOTH DIRECTIONS
@@ -36,12 +47,33 @@ public class Variable {
      * array + any = array with other element appended
      * 
      */
+     //b + a
     public Variable addTo(Variable a) {
         Variable out = new Variable(0);
         if (this.data instanceof Integer) {
-            if (a.getType().equals("Integer")) {
-                data = (Integer)data + Double.parseDouble(a.toString());
+            if (a.getData() instanceof Integer) {
+                out.setData((int) data + Integer.parseInt(a.toString()));
             }
+            if (a.getData() instanceof Double) {
+                data = (double) data + Double.parseDouble(a.toString());
+            }
+            if (a.getData() instanceof String) {
+                data = (String) data + a.toString();
+            }
+            if (a.getData() instanceof Char) {
+                data = (char) data + a.toString().charAt(0);
+            }
+            if (a.getType().equals(""))
+
+        
+
+
+
+
+
+
+
+
         }
         return out;
     }
@@ -140,6 +172,33 @@ public class Variable {
     //     }
     //     return str.split(regex).length;
     // }
+
+    // ArrayList functionality
+
+    // add to ArrayList
+    public void add(int index, Variable value) {
+        if (this.data instanceof ArrayList) {
+            if(index <= ((ArrayList<Variable>) data).size()) {
+                ((ArrayList<Variable>) data).add(index,value);
+            }
+            else {
+                throw new IndexOutOfBoundsException();
+            }
+        }
+        else {
+            throw new IllegalStateException();
+        }
+    }
+
+    // remove from ArrayList
+    public Variable remove(int index) {
+        if (this.data instanceof ArrayList<?>) {
+            return ((ArrayList<Variable>) this.data).remove(index);
+        }
+        else {
+            throw new IllegalStateException("Type must be Array");
+        }
+    }
    
     public int len() {
         if (this.data instanceof String) {
