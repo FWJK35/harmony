@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
  @SuppressWarnings("unchecked")
 public class Variable {
+
     private Object data;
     
     // constructors
@@ -21,7 +22,7 @@ public class Variable {
     }
 
     public Object getData() {
-        return this.data;
+        return data;
     }
 
 
@@ -50,30 +51,61 @@ public class Variable {
      //b + a
     public Variable addTo(Variable a) {
         Variable out = new Variable(0);
-        if (this.data instanceof Integer) {
+        if (data instanceof Integer) {
             if (a.getData() instanceof Integer) {
-                out.setData((int) data + Integer.parseInt(a.toString()));
+                out.setData((int) data + (int) a.getData());
             }
             if (a.getData() instanceof Double) {
-                data = (double) data + Double.parseDouble(a.toString());
+                data = (int) data + (double) a.getData();
+            }
+            if (a.getData() instanceof Character) {
+                data = (int) data + (char) a.getData();
             }
             if (a.getData() instanceof String) {
-                data = (String) data + a.toString();
+                data = (int) data + (String) a.getData();
             }
-            if (a.getData() instanceof Char) {
-                data = (char) data + a.toString().charAt(0);
+        }
+         if (data instanceof Double) {
+            if (a.getData() instanceof Integer) {
+                out.setData((int) data + (int) a.getData());
             }
-            if (a.getType().equals(""))
-
-        
-
-
-
-
-
-
-
-
+            if (a.getData() instanceof Double) {
+                data = (int) data + (double) a.getData();
+            }
+            if (a.getData() instanceof Character) {
+                data = (int) data + (char) a.getData();
+            }
+            if (a.getData() instanceof String) {
+                data = (int) data + (String) a.getData();
+            }
+        }
+        if (data instanceof Character) {
+            if (a.getData() instanceof Integer) {
+                out.setData((int) data + (int) a.getData());
+            }
+            if (a.getData() instanceof Double) {
+                data = (int) data + (double) a.getData();
+            }
+            if (a.getData() instanceof Character) {
+                data = (int) data + (char) a.getData();
+            }
+            if (a.getData() instanceof String) {
+                data = (int) data + (String) a.getData();
+            }
+        }
+        if (data instanceof String) {
+            if (a.getData() instanceof Integer) {
+                out.setData((int) data + (int) a.getData());
+            }
+            if (a.getData() instanceof Double) {
+                data = (int) data + (double) a.getData();
+            }
+            if (a.getData() instanceof Character) {
+                data = (int) data + (char) a.getData();
+            }
+            if (a.getData() instanceof String) {
+                data = (int) data + (String) a.getData();
+            }
         }
         return out;
     }
@@ -83,13 +115,13 @@ public class Variable {
         
         // converts Object String data into an ArrayList of Variable type char
         if (this.data instanceof String) {
-            for (char c : this.data.toString().toCharArray()) {
+            for (char c : data.toString().toCharArray()) {
                 data.add(new Variable(c));
             }
         }
 
         else if (this.data instanceof ArrayList) {
-            for (Variable v : (ArrayList<Variable>) this.data) {
+            for (Variable v : (ArrayList<Variable>) data) {
                 data.add(v.copy());
             }
         }
@@ -159,41 +191,38 @@ public class Variable {
         return slice(start, end, 1);
     }
 
-    // count function, generally to check number of nested arrays
-    // private static int count(Object data, String regex) {
-    //     String str = "";
-    //     if(data instanceof ArrayList) {
-    //         for(Object datum : (ArrayList<Object>) data) {
-    //             str += datum;
-    //         }
-    //     }
-    //     else {
-    //         str += data;
-    //     }
-    //     return str.split(regex).length;
-    // }
-
-    // ArrayList functionality
+    //count function, generally to check number of nested arrays
+    /*private static int count(Object data, String regex) {
+        String str = "";
+        if(data instanceof ArrayList) {
+            for(Object datum : (ArrayList<Object>) data) {
+                str += datum;
+            }
+        }
+        else {
+            str += data;
+        }
+        return str.split(regex).length;
+    }*/
 
     // add to ArrayList
     public void add(int index, Variable value) {
-        if (this.data instanceof ArrayList) {
-            if(index <= ((ArrayList<Variable>) data).size()) {
-                ((ArrayList<Variable>) data).add(index,value);
-            }
-            else {
-                throw new IndexOutOfBoundsException();
-            }
+        if (data instanceof ArrayList) {
+            ((ArrayList<Variable>) data).add(index,value);
         }
         else {
             throw new IllegalStateException();
         }
     }
 
+    public void add(Variable value) {
+        add(len(), value);
+    }
+
     // remove from ArrayList
     public Variable remove(int index) {
-        if (this.data instanceof ArrayList<?>) {
-            return ((ArrayList<Variable>) this.data).remove(index);
+        if (data instanceof ArrayList<?>) {
+            return ((ArrayList<Variable>) data).remove(index);
         }
         else {
             throw new IllegalStateException("Type must be Array");
@@ -201,10 +230,10 @@ public class Variable {
     }
    
     public int len() {
-        if (this.data instanceof String) {
+        if (data instanceof String) {
             return ((String) data).length();
         }
-        if (this.data instanceof ArrayList) {
+        if (data instanceof ArrayList) {
             return ((ArrayList<Variable>) data).size();
         }
         else {
@@ -214,7 +243,7 @@ public class Variable {
 
     @Override
     public String toString() {
-        if (this.data instanceof ArrayList) {
+        if (data instanceof ArrayList) {
             String result = "[";
             for (Variable v : (ArrayList<Variable>) data) {
                 result += v.toString() + ", ";
