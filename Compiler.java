@@ -12,17 +12,19 @@ public class Compiler {
     public static void main(String[] args) {
         test();
         
-        
 
     }
 
-    public static void runCode(Scanner file) {
+    public static void runCode(Scanner file, int indentation) {
         // initialize variables and stuff here
         Map<String, Variable> variables = new HashMap<String, Variable>();
-
-
+        List<String> lines = new ArrayList<String>();
         while (file.hasNextLine()) {
-            String thisLine = file.nextLine();
+            lines.add(file.nextLine());
+        }
+        int currentLine = 0;
+        while (currentLine < lines.size()) {
+            String thisLine = lines.get(currentLine);
             
             // get all tokens on the current line
             Scanner lineScanner = new Scanner(thisLine);
@@ -39,7 +41,7 @@ public class Compiler {
                     StaticMethods.print(thisLine, variables);
                 }
             }
-
+            
             // check if line is DEFINE_VARIABLE statement
             else if (tokens.size() > TokenIndex.DEFINE_VARIABLE_TOKEN) {
                 if (tokens.get(TokenIndex.DEFINE_VARIABLE_TOKEN).equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
@@ -49,6 +51,12 @@ public class Compiler {
                 }
             }
 
+            //check if line is IF_KEYWORD statement
+            if (tokens.size() > TokenIndex.IF_TOKEN) {
+                if (tokens.get(TokenIndex.IF_TOKEN).equals(Keywords.IF_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
+                    return true;
+                }
+            }
         }
     }
 
@@ -65,7 +73,7 @@ public class Compiler {
             e.getStackTrace();
         }
         
-        runCode(input);
+        runCode(input, 0);
     }
     
     

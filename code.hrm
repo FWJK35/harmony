@@ -7,3 +7,16 @@ wdym square :3 a :3 b (:
     ttyl 
 
 xd #Hello, World!#
+
+calvin aka 16
+dumb aka 16
+lmao calvin is dumb :)
+    xd #Bozo#
+
+int calvin = 16;
+int dumb = 16;
+if (calvin == dumb) {
+    System.out.println("Bozo")
+}
+
+
