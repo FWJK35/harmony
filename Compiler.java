@@ -15,9 +15,9 @@ public class Compiler {
 
     }
 
-    public static void runCode(Scanner file, int indentation) {
+    public static void runCode(Scanner file, Map<String, Variable> variables) {
         // initialize variables and stuff here
-        Map<String, Variable> variables = new HashMap<String, Variable>();
+        
         List<String> lines = new ArrayList<String>();
         while (file.hasNextLine()) {
             lines.add(file.nextLine());
@@ -52,10 +52,36 @@ public class Compiler {
             }
 
             //check if line is IF_KEYWORD statement
-            if (tokens.size() > TokenIndex.IF_TOKEN) {
-                if (tokens.get(TokenIndex.IF_TOKEN).equals(Keywords.IF_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
-                    return true;
+            else if (tokens.size() > TokenIndex.IF_STATEMENT_TOKEN) {
+                if (tokens.get(TokenIndex.IF_STATEMENT_TOKEN).equals(Keywords.IF_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
+                    String codeToRun = "";
+                    int currentIndentation = 0;
+                    while (lines.get(currentLine).charAt(currentIndentation) == ' ') {
+                        currentIndentation += 1;
+                    }
+                    currentLine++;
+                    while (true) {
+                        int lineIndentation = 0;
+                        while (lines.get(currentLine).charAt(lineIndentation) == ' ') {
+                            lineIndentation += 1;
+                        }
+                        if (lineIndentation > currentIndentation) {
+                            codeToRun += lines.get(currentLine) + "\n";
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    Variable statementValue = StaticMethods.interpretExpression("", variables);
+                    boolean shouldRun = false;
+                    if (statementValue.toBoolean
+                    runCode(new Scanner(codeToRun), variables);
+                    //ends code on the next line
                 }
+                
+            }
+            else {
+                currentLine++;
             }
         }
     }
@@ -73,7 +99,7 @@ public class Compiler {
             e.getStackTrace();
         }
         
-        runCode(input, 0);
+        runCode(input, new HashMap<String, Variable>());
     }
     
     

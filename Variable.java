@@ -257,4 +257,23 @@ public class Variable {
     public String getType() {
         return data.getClass().getSimpleName();
     }
+
+    public boolean toBoolean() {
+        if (data instanceof Integer) {
+            if ((int) data == 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        else if (data instanceof String) {
+            if (((String) data).equals("")) {
+                return false;
+            } else {
+                return true;
+            }
+        } 
+        else if (data instanceof Char)
+    }
 }

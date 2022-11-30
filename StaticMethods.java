@@ -56,7 +56,7 @@ public class StaticMethods {
     }
 
     //xd #My name is # name # and my age is # 69
-    private static Variable interpretExpression(String line, Map<String, Variable> variables) {
+    public static Variable interpretExpression(String line, Map<String, Variable> variables) {
         Variable result = new Variable();
         List<String> tokens = new ArrayList<String>();
         String currentToken = "";
@@ -72,6 +72,7 @@ public class StaticMethods {
                 gettingKeyword = true;
                 currentCharIndex++;
             }
+
             //check for end of keyword
             else if (c == Keywords.STRING_LITERAL_KEYWORD.charAt(currentCharIndex)) {
                 if (currentCharIndex == Keywords.STRING_LITERAL_KEYWORD.length() - 1) {
