@@ -61,49 +61,29 @@ public class StaticMethods {
         List<String> tokens = new ArrayList<String>();
         String currentToken = "";
         TokenType tokenType = TokenType.None;
-        boolean gettingKeyword = false;
-        int currentCharIndex = 0;
-        for (char c : line.toCharArray()) {
-            
-            //check for string start/end
-            
-            //check for beginning of keyword
-            if (c == Keywords.STRING_LITERAL_KEYWORD.charAt(0)) {
-                gettingKeyword = true;
-                currentCharIndex++;
-            }
-
-            //check for end of keyword
-            else if (c == Keywords.STRING_LITERAL_KEYWORD.charAt(currentCharIndex)) {
-                if (currentCharIndex == Keywords.STRING_LITERAL_KEYWORD.length() - 1) {
-                    currentCharIndex = 0;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            //previous char not escape character
+            if (!(i > 0 && line.charAt(i - 1) == Keywords.ESCAPE_CHARACTER_KEYWORD)) {
+                //begin or end string
+                if (c == Keywords.STRING_LITERAL_KEYWORD) {
                     if (tokenType == TokenType.None) {
-                        //begin string token
                         tokenType = TokenType.String;
                     }
                     else if (tokenType == TokenType.String) {
-                        //finish string token
                         tokenType = TokenType.None;
-                        tokens.add(currentToken);
-                        currentToken = "";
                     }
                     else {
-                        throw new Error("Incorrect syntax interpreting expression");
+                        throw new Error("Error interpreting expression!");
                     }
-                    gettingKeyword = false;
                 }
-                else {
-                    currentCharIndex++;
+                else if (tokenType == TokenType.String) {
+                    currentToken += c;
                 }
-            }
-            //cancel keyword interpretation
-            else {
-                if (gettingKeyword) {
-                    gettingKeyword = false;
+                //previous char is operator or space
+                else if (Keywords.OPERATOR_CHARACTERS.contains(Character.toString(line.charAt(i - 1)))) {
+                    
                 }
-            }
-            if (tokenType == TokenType.String) {
-                currentToken += c;
             }
             
         }

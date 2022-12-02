@@ -273,7 +273,30 @@ public class Variable {
             } else {
                 return true;
             }
-        } 
-        else if (data instanceof Char)
+        }
+        else if (data instanceof Character) {
+            if (((char) data) == ' ') {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        else if (data instanceof Integer) {
+            if (((int) data) == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        else { // (data instanceof Double) {
+            if(((double) data) == 0) {
+                return false;
+            } else {
+                return true;
+            } 
+        }
+    }
+    public int toInteger() {
+        return 0;
     }
 }

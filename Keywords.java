@@ -8,7 +8,8 @@ public class Keywords {
     public static final String PRINT_KEYWORD = "xd";
     public static final String INPUT_KEYWORD = "hmu";
     public static final String RETURN_KEYWORD = "ttyl";
-    public static final String STRING_LITERAL_KEYWORD = "#";
-    public static final String ESCAPE_CHARACTER_KEYWORD = "\\";
+    public static final char STRING_LITERAL_KEYWORD = '#';
+    public static final char ESCAPE_CHARACTER_KEYWORD = '\\';
     public static final String COLON_KEYWORD = ":)";
+    public static final String OPERATOR_CHARACTERS = "+-/*%^ ";
 }

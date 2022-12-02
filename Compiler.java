@@ -74,7 +74,6 @@ public class Compiler {
                     }
                     Variable statementValue = StaticMethods.interpretExpression("", variables);
                     boolean shouldRun = false;
-                    if (statementValue.toBoolean
                     runCode(new Scanner(codeToRun), variables);
                     //ends code on the next line
                 }
