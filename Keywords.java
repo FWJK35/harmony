@@ -10,6 +10,8 @@ public class Keywords {
     public static final String RETURN_KEYWORD = "ttyl";
     public static final char STRING_LITERAL_KEYWORD = '#';
     public static final char ESCAPE_CHARACTER_KEYWORD = '\\';
+    public static final char OPEN_PAREN_KEYWORD = '(';
+    public static final char CLOSE_PAREN_KEYWORD = ')';
     public static final String COLON_KEYWORD = ":)";
     public static final String OPERATOR_CHARACTERS = "+-/*%^ ";
 }
