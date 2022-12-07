@@ -72,7 +72,9 @@ public class Compiler {
                             break;
                         }
                     }
-                    Variable statementValue = StaticMethods.interpretExpression("", variables);
+                    String statement = thisLine.substring(thisLine.indexOf(tokens.get(TokenIndex.IF_STATEMENT_TOKEN + 1), thisLine.length() - Keywords.COLON_KEYWORD.length()));
+                    Variable statementValue = StaticMethods.interpretExpression(statement, variables);
+                    statementValue.toBoolean();
                     boolean shouldRun = false;
                     runCode(new Scanner(codeToRun), variables);
                     //ends code on the next line

@@ -18,40 +18,48 @@ public class StaticMethods {
             System.out.println(interpretExpression(line, variables));
         }
     }
-
-    // takes an List of Strings for each line of code and index of line where for loop begins
-    public static void forLoop(List<String> code, int start) {
+    
+    public static int countIndent(String line) {
         int indent = 0;
-        int temp = 0;
-        Iterator<String> itr = code.listIterator(start);
-        // checks indentation level of line containing forLoop call
-        for (char c : itr.next().toCharArray()) {
+        for (char c : line.toCharArray()) {
             if (c == ' ') {
-                temp++;
+                indent++;
             }
             else {
                 break;
             }
         }
-        // checks that there is a next line with indentation greater than forLoop call
-        if (itr.hasNext()) {
-            for (char c : itr.next().toCharArray()) {
-                if (c == ' ') {
-                    indent++;
-                }
-                else {
-                    break;
-                }
+        return indent;
+    }
+
+    public static void whileLoop(List<String> code, int start, Map<String, Variable> variables) {
+        String condition = code.get(start);
+        int indent = countIndent(condition);
+        condition = condition.substring(condition.indexOf(Keywords.WHILE_KEYWORD) + Keywords.WHILE_KEYWORD.length());
+        
+        while(interpretExpression(condition, variables).toBoolean()) {
+            for(int i = 1; indent < countIndent(code.get(start + i)); i++) {
+                Compiler.runCode(new Scanner(code.get(start + i)), variables);
             }
         }
-        if (temp < indent) {
-                while (itr.hasNext()) {
-                    String line = itr.next();
-                    // TODO: finish this lol
-                }
+    }
+
+    // takes an List of Strings for each line of code and index of line where for loop begins
+    public static void forLoop(List<String> code, int start, Map<String, Variable> variables) {
+        Iterator<String> itr = code.listIterator(start);
+        String forLine = itr.next();
+        int indent = countIndent(forLine);
+        boolean isLoop = true;
+        
+        // checks that there is a next line with indentation greater than forLoop call
+        while (itr.hasNext() && isLoop) {
+            String line = itr.next();
+            if (indent < countIndent(line)) {
+                Compiler.runCode(new Scanner(line), variables);
             }
-        else {
-            // TODO: error logging for incorrect indentation
+            else {
+                isLoop = false;
+            }
         }
     }
 
@@ -68,29 +76,63 @@ public class StaticMethods {
 
             //check for start of token
             if (tokenType == TokenType.None) {
+                //begin nested expression token
                 if (c == Keywords.OPEN_PAREN_KEYWORD) {
                     tokenType = TokenType.Expression;
+                    parenCount = 1;
+                    i++;
+                    while (true) {
+                        c = line.charAt(i);
+                        //check for parenthesis inside string
+                        if (c == Keywords.STRING_LITERAL_KEYWORD && line.charAt(i - 1) != '\\') {
+                            if (tokenType == TokenType.Expression) {
+                                tokenType = TokenType.StringInExpression;
+                            }
+                            else if (tokenType == TokenType.StringInExpression) {
+                                tokenType = TokenType.StringInExpression;
+                            }
+                        }
+                        //change number of parencount
+                        if (tokenType != TokenType.StringInExpression && (c == Keywords.OPEN_PAREN_KEYWORD || c == Keywords.CLOSE_PAREN_KEYWORD)) {
+                            parenCount += c == Keywords.OPEN_PAREN_KEYWORD? 1:-1;
+                        }
+                        if (parenCount == 0) {
+                            break;
+                        }
+                        currentToken += c;
+                        i++;
+                    }
+                    tokenValues.add(currentToken);
+                    tokenTypes.add(tokenType);
                 }
+                //begin string literal expression
                 else if (c == Keywords.STRING_LITERAL_KEYWORD) {
                     tokenType = TokenType.String;
+                    while (true) {
+                        c = line.charAt(i);
+                        //check for parenthesis inside string
+                        if (c == Keywords.STRING_LITERAL_KEYWORD && line.charAt(i - 1) != '\\') {
+                            if (tokenType == TokenType.Expression) {
+                                tokenType = TokenType.StringInExpression;
+                            }
+                            else if (tokenType == TokenType.StringInExpression) {
+                                tokenType = TokenType.StringInExpression;
+                            }
+                        }
+                        //change number of parencount
+                        if (tokenType != TokenType.StringInExpression && (c == Keywords.OPEN_PAREN_KEYWORD || c == Keywords.CLOSE_PAREN_KEYWORD)) {
+                            parenCount += c == Keywords.OPEN_PAREN_KEYWORD? 1:-1;
+                        }
+                        if (parenCount == 0) {
+                            break;
+                        }
+                        currentToken += c;
+                        i++;
+                    }
                 }
                 else {
 
                 }
-            }
-            else if (tokenType == TokenType.Expression || tokenType == TokenType.StringInExpression) {
-                if (c == Keywords.STRING_LITERAL_KEYWORD) {
-                    if (tokenType == TokenType.Expression) {
-                        tokenType = TokenType.StringInExpression;
-                    }
-                    else if (tokenType == TokenType.StringInExpression) {
-                        tokenType = TokenType.StringInExpression;
-                    }
-                }
-                if (tokenType != TokenType.StringInExpression && (c == Keywords.OPEN_PAREN_KEYWORD || c == Keywords.CLOSE_PAREN_KEYWORD)) {
-                    if
-                }
-                currentToken += c;
             }
             
         }
@@ -100,7 +142,7 @@ public class StaticMethods {
     //TODO: WRITE THIS METHOD
     //1+2*4/6^2-(6+2)
     public double interpretNumberExpression(String line, Map<String, Variable> variables) {
-        String special = "+-*/^()";
+        String special = "()^*/+-";
         int left = 0;
         int right = 0;
         for (char i : line.toCharArray()) {
