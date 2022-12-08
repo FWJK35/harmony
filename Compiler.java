@@ -15,7 +15,7 @@ public class Compiler {
 
     }
 
-    public static void runCode(Scanner file, Map<String, Variable> variables) {
+    public static Variable runCode(Scanner file, Map<String, Variable> variables, List<Function> functions) {
         // initialize variables and stuff here
         
         List<String> lines = new ArrayList<String>();
@@ -71,20 +71,57 @@ public class Compiler {
                         else {
                             break;
                         }
+                        currentLine++;
                     }
                     String statement = thisLine.substring(thisLine.indexOf(tokens.get(TokenIndex.IF_STATEMENT_TOKEN + 1), thisLine.length() - Keywords.COLON_KEYWORD.length()));
                     Variable statementValue = StaticMethods.interpretExpression(statement, variables);
                     statementValue.toBoolean();
                     boolean shouldRun = false;
-                    runCode(new Scanner(codeToRun), variables);
+                    runCode(new Scanner(codeToRun), variables, functions);
                     //ends code on the next line
                 }
-                
             }
+
+            else if (tokens.size() > TokenIndex.WHILE_STATEMENT_TOKEN) {
+                if (tokens.get(TokenIndex.WHILE_STATEMENT_TOKEN).equals(Keywords.WHILE_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
+                    String condition = code.get(start);
+                    int indent = StaticMethods.countIndent(condition);
+                    condition = condition.substring(condition.indexOf(Keywords.WHILE_KEYWORD) + Keywords.WHILE_KEYWORD.length());
+                    
+                    while(StaticMethods.interpretExpression(condition, variables).toBoolean()) {
+                        for(int i = 1; indent < countIndent(code.get(start + i)); i++) {
+                            Compiler.runCode(new Scanner(code.get(start + i)), variables);
+                        }
+                    }
+                }
+            }
+
+            else if (tokens.size() > TokenIndex.FOR_STATEMENT_TOKEN) {
+                if (tokens.get(TokenIndex.FOR_STATEMENT_TOKEN).equals(Keywords.FOR_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
+                    // takes an List of Strings for each line of code and index of line where for loop begins
+                    Iterator<String> itr = code.listIterator(start);
+                    String forLine = itr.next();
+                    int indent = countIndent(forLine);
+                    boolean isLoop = true;
+                    
+                    // checks that there is a next line with indentation greater than forLoop call
+                    while (itr.hasNext() && isLoop) {
+                        String line = itr.next();
+                        if (indent < countIndent(line)) {
+                            Compiler.runCode(new Scanner(line), variables);
+                        }
+                        else {
+                            isLoop = false;
+                        }
+                    }
+                }
+            }
+
             else {
                 currentLine++;
             }
         }
+        return null;
     }
 
     public static void getFile() {
@@ -100,7 +137,7 @@ public class Compiler {
             e.getStackTrace();
         }
         
-        runCode(input, new HashMap<String, Variable>());
+        runCode(input, new HashMap<String, Variable>(), new ArrayList<Function>());
     }
     
     
