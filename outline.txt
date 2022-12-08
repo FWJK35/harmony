@@ -53,6 +53,7 @@ keywords:
     heheheha
     ttyl
     hmu (input)
+    ofc (return)
     tmrw
     u
     ur

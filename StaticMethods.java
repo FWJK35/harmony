@@ -32,37 +32,6 @@ public class StaticMethods {
         return indent;
     }
 
-    public static void whileLoop(List<String> code, int start, Map<String, Variable> variables) {
-        String condition = code.get(start);
-        int indent = countIndent(condition);
-        condition = condition.substring(condition.indexOf(Keywords.WHILE_KEYWORD) + Keywords.WHILE_KEYWORD.length());
-        
-        while(interpretExpression(condition, variables).toBoolean()) {
-            for(int i = 1; indent < countIndent(code.get(start + i)); i++) {
-                Compiler.runCode(new Scanner(code.get(start + i)), variables);
-            }
-        }
-    }
-
-    // takes an List of Strings for each line of code and index of line where for loop begins
-    public static void forLoop(List<String> code, int start, Map<String, Variable> variables) {
-        Iterator<String> itr = code.listIterator(start);
-        String forLine = itr.next();
-        int indent = countIndent(forLine);
-        boolean isLoop = true;
-        
-        // checks that there is a next line with indentation greater than forLoop call
-        while (itr.hasNext() && isLoop) {
-            String line = itr.next();
-            if (indent < countIndent(line)) {
-                Compiler.runCode(new Scanner(line), variables);
-            }
-            else {
-                isLoop = false;
-            }
-        }
-    }
-
     //xd #My name is # name # and my age is # 69
     public static Variable interpretExpression(String line, Map<String, Variable> variables) {
         Variable result = new Variable();
@@ -104,31 +73,28 @@ public class StaticMethods {
                     }
                     tokenValues.add(currentToken);
                     tokenTypes.add(tokenType);
+                    tokenType = TokenType.None;
                 }
                 //begin string literal expression
                 else if (c == Keywords.STRING_LITERAL_KEYWORD) {
                     tokenType = TokenType.String;
+                    i++;
                     while (true) {
                         c = line.charAt(i);
                         //check for parenthesis inside string
                         if (c == Keywords.STRING_LITERAL_KEYWORD && line.charAt(i - 1) != '\\') {
-                            if (tokenType == TokenType.Expression) {
-                                tokenType = TokenType.StringInExpression;
-                            }
-                            else if (tokenType == TokenType.StringInExpression) {
-                                tokenType = TokenType.StringInExpression;
-                            }
-                        }
-                        //change number of parencount
-                        if (tokenType != TokenType.StringInExpression && (c == Keywords.OPEN_PAREN_KEYWORD || c == Keywords.CLOSE_PAREN_KEYWORD)) {
-                            parenCount += c == Keywords.OPEN_PAREN_KEYWORD? 1:-1;
-                        }
-                        if (parenCount == 0) {
                             break;
                         }
                         currentToken += c;
                         i++;
                     }
+                    tokenValues.add(currentToken);
+                    tokenTypes.add(tokenType);
+                    tokenType = TokenType.None;
+                }
+                //begin number expression
+                else if (c >= 48 && c <= 57) {
+
                 }
                 else {
 
