@@ -8,16 +8,22 @@ import javax.swing.*;
  * Compiler
  */
 public class Compiler {
-
+    public static Map<String, Variable> variables = new HashMap<String, Variable>();
+    public static List<Function> functions = new ArrayList<Function>();
     public static void main(String[] args) {
         test();
-        
-
     }
 
-    public static Variable runCode(Scanner file, Map<String, Variable> variables, List<Function> functions) {
+
+    public static Variable runCode(Scanner file) {
+        return runCode(file, variables);
+    }
+    public static Variable runCode(Scanner file, Map<String, Variable> tempVariables) {
         // initialize variables and stuff here
-        
+        Map<String, Variable> vari = new HashMap<String, Variable>();
+        vari.putAll(variables);
+        vari.putAll(tempVariables);
+
         List<String> lines = new ArrayList<String>();
         while (file.hasNextLine()) {
             lines.add(file.nextLine());
@@ -38,7 +44,7 @@ public class Compiler {
             if (tokens.size() > TokenIndex.PRINT_TOKEN) {
                 if (tokens.get(TokenIndex.PRINT_TOKEN).equals(Keywords.PRINT_KEYWORD)) {
                     // print the current line command
-                    StaticMethods.print(thisLine, variables);
+                    StaticMethods.print(thisLine, vari);
                 }
             }
             
@@ -48,6 +54,7 @@ public class Compiler {
                     // put new variable in map
                     //TODO get both literal and expressions
                     variables.put(tokens.get(TokenIndex.VARIABLE_NAME_TOKEN), null); 
+                    vari.put(tokens.get(TokenIndex.VARIABLE_NAME_TOKEN), null); 
                 }
             }
 
@@ -59,56 +66,51 @@ public class Compiler {
                     while (lines.get(currentLine).charAt(currentIndentation) == ' ') {
                         currentIndentation += 1;
                     }
-                    currentLine++;
-                    while (true) {
-                        int lineIndentation = 0;
-                        while (lines.get(currentLine).charAt(lineIndentation) == ' ') {
-                            lineIndentation += 1;
-                        }
-                        if (lineIndentation > currentIndentation) {
-                            codeToRun += lines.get(currentLine) + "\n";
-                        }
-                        else {
-                            break;
-                        }
+                    for(int i = 1; currentIndentation < StaticMethods.countIndent(lines.get(currentLine + 1)); i++) {
                         currentLine++;
+                        codeToRun += lines.get(currentLine) + "\n";
                     }
                     String statement = thisLine.substring(thisLine.indexOf(tokens.get(TokenIndex.IF_STATEMENT_TOKEN + 1), thisLine.length() - Keywords.COLON_KEYWORD.length()));
-                    Variable statementValue = StaticMethods.interpretExpression(statement, variables);
-                    statementValue.toBoolean();
-                    boolean shouldRun = false;
-                    runCode(new Scanner(codeToRun), variables, functions);
+                    if (StaticMethods.interpretExpression(statement, vari).toBoolean()) {
+                        runCode(new Scanner(codeToRun));
+                    }
                     //ends code on the next line
                 }
             }
 
             else if (tokens.size() > TokenIndex.WHILE_STATEMENT_TOKEN) {
                 if (tokens.get(TokenIndex.WHILE_STATEMENT_TOKEN).equals(Keywords.WHILE_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
-                    String condition = code.get(start);
-                    int indent = StaticMethods.countIndent(condition);
+                    String condition = lines.get(currentLine);
+                    int currentIndentation = StaticMethods.countIndent(condition);
                     condition = condition.substring(condition.indexOf(Keywords.WHILE_KEYWORD) + Keywords.WHILE_KEYWORD.length());
-                    
-                    while(StaticMethods.interpretExpression(condition, variables).toBoolean()) {
-                        for(int i = 1; indent < countIndent(code.get(start + i)); i++) {
-                            Compiler.runCode(new Scanner(code.get(start + i)), variables);
-                        }
+                    String codeToRun = "";
+                    for (int i = 1; currentIndentation < StaticMethods.countIndent(lines.get(currentLine + 1)); i++) {
+                        currentLine++;
+                        codeToRun += lines.get(currentLine) + "\n";
                     }
+
+                    while (StaticMethods.interpretExpression(condition, vari).toBoolean()) {
+                        runCode(new Scanner(codeToRun));
+                    }
+                    
                 }
             }
 
             else if (tokens.size() > TokenIndex.FOR_STATEMENT_TOKEN) {
                 if (tokens.get(TokenIndex.FOR_STATEMENT_TOKEN).equals(Keywords.FOR_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
                     // takes an List of Strings for each line of code and index of line where for loop begins
-                    Iterator<String> itr = code.listIterator(start);
+                    Iterator<String> itr = lines.listIterator(currentLine);
                     String forLine = itr.next();
-                    int indent = countIndent(forLine);
+                    currentLine++;
+                    int indent = StaticMethods.countIndent(forLine);
                     boolean isLoop = true;
                     
                     // checks that there is a next line with indentation greater than forLoop call
                     while (itr.hasNext() && isLoop) {
                         String line = itr.next();
-                        if (indent < countIndent(line)) {
-                            Compiler.runCode(new Scanner(line), variables);
+                        currentLine++;
+                        if (indent < StaticMethods.countIndent(line)) {
+                            runCode(new Scanner(line));
                         }
                         else {
                             isLoop = false;
@@ -137,7 +139,7 @@ public class Compiler {
             e.getStackTrace();
         }
         
-        runCode(input, new HashMap<String, Variable>(), new ArrayList<Function>());
+        runCode(input);
     }
     
     
