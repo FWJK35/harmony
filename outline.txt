@@ -30,7 +30,10 @@ for loop example:
         // code
     :)
 
-while example:
+add(int a, int b)
+    return a+b
+
+xd add(1, 2)
 
 
 variable type:

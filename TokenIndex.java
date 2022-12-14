@@ -14,4 +14,5 @@ public class TokenIndex {
     public static final int IF_STATEMENT_TOKEN = 0;
     public static final int WHILE_STATEMENT_TOKEN = 0;
     public static final int FOR_STATEMENT_TOKEN = 0;
+    public static final int RETURN_TOKEN = 0;
 }

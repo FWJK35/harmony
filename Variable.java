@@ -50,7 +50,7 @@ public class Variable {
      */
      //b + a
     public Variable addTo(Variable a) {
-        Variable out = new Variable(0);
+        Variable out = new Variable();
         if (data instanceof Integer) {
             if (a.getData() instanceof Integer) {
                 out.setData((int) data + (int) a.getData());

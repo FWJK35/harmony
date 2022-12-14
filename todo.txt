@@ -1,0 +1,7 @@
+Function:
+    finish class
+StaticMethods:
+    interpretExpression
+    interpretNumberExpression
+Compiler:
+    identify variables vs functions

@@ -71,7 +71,7 @@ public class Compiler {
                         codeToRun += lines.get(currentLine) + "\n";
                     }
                     String statement = thisLine.substring(thisLine.indexOf(tokens.get(TokenIndex.IF_STATEMENT_TOKEN + 1), thisLine.length() - Keywords.COLON_KEYWORD.length()));
-                    if (StaticMethods.interpretExpression(statement, vari).toBoolean()) {
+                    if (StaticMethods.interpretExpression(statement, vari, functions).toBoolean()) {
                         runCode(new Scanner(codeToRun));
                     }
                     //ends code on the next line
@@ -89,7 +89,7 @@ public class Compiler {
                         codeToRun += lines.get(currentLine) + "\n";
                     }
 
-                    while (StaticMethods.interpretExpression(condition, vari).toBoolean()) {
+                    while (StaticMethods.interpretExpression(condition, vari, functions).toBoolean()) {
                         runCode(new Scanner(codeToRun));
                     }
                     

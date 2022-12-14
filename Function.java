@@ -5,7 +5,10 @@ public class Function {
     Map<String, String> params;
     List<String> paramTypes;
     String returnType;
-    public Function(String code, Map<String, String> params, List<String> paramTypes, String returnType) {
+    String name;
+    
+    public Function(String code, Map<String, String> params, List<String> paramTypes, String returnType, String name) {
+        this.name = name;
         this.code = code;
         this.params = params;
         this.paramTypes = paramTypes;
@@ -24,6 +27,10 @@ public class Function {
         return returnType;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public Variable run(Map<String, Variable> params) {
         Variable result = new Variable();
         
@@ -36,12 +43,17 @@ public class Function {
 
     public static Function getFunction(List<Function> functions, String name, List<Variable> inputs) {
         for (Function possible : functions) {
-            boolean inputsMatch = true;
-            if (possible.getParamTypes().size() == inputs.size()) {
-
-            }
-            else {
-                
+            if (name.equals(possible.getName()) && inputs.size() == possible.getParamTypes().size()) {
+                boolean match = true;
+                for (int i = 0; i < inputs.size(); i++) {
+                    if (!(inputs.get(i).getType().equals(possible.getParamTypes().get(i)))) {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) {
+                    return possible;
+                }
             }
         }
         return null;

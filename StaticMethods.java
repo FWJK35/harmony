@@ -1,11 +1,12 @@
 import java.util.*;
 
 public class StaticMethods {
+    
     private enum TokenType {
         None, Variable, Number, String, Array, Expression, StringInExpression
     };
 
-    public static void print(String line, Map<String, Variable> variables) {
+    public static void print(String line, Map<String, Variable> variables, List<Function> functions) {
         // get beginning of string literal and trim line
         int beginIndex = line.indexOf(Keywords.STRING_LITERAL_KEYWORD);
         int endIndex = line.indexOf(Keywords.STRING_LITERAL_KEYWORD, beginIndex + 1);
@@ -15,7 +16,7 @@ public class StaticMethods {
             throw new Error("Invalid Arguments to command: " + Keywords.PRINT_KEYWORD);
         }
         else {
-            System.out.println(interpretExpression(line, variables));
+            System.out.println(interpretExpression(line, variables, functions));
         }
     }
     
@@ -32,11 +33,23 @@ public class StaticMethods {
         return indent;
     }
 
+    public static Variable getTokenVariable(String token) {
+        try {
+            return new Variable(Integer.parseInt(token));
+        } catch (Exception e) {}
+        try {
+            return new Variable(Double.parseDouble(token));
+        } catch (Exception e) {}
+        return new Variable(token);
+    }
+
     //xd #My name is # name # and my age is # 69
-    public static Variable interpretExpression(String line, Map<String, Variable> variables) {
+    public static Variable interpretExpression(String line, Map<String, Variable> variables, List<Function> functions) {
         Variable result = new Variable();
         List<String> tokenValues = new ArrayList<String>();
         List<TokenType> tokenTypes = new ArrayList<TokenType>();
+        List<Variable> tokenVariables = new ArrayList<Variable>();
+
         String currentToken = "";
         TokenType tokenType = TokenType.None;
         int parenCount = 0;
@@ -90,11 +103,8 @@ public class StaticMethods {
                     }
                     tokenValues.add(currentToken);
                     tokenTypes.add(tokenType);
+                    currentToken = "";
                     tokenType = TokenType.None;
-                }
-                //begin number expression
-                else if (c >= 48 && c <= 57) {
-
                 }
                 else {
 
@@ -102,26 +112,83 @@ public class StaticMethods {
             }
             
         }
+        for (int t = 0; t < tokenValues.size(); t++) {
+            String currentValue = tokenValues.get(t);
+            TokenType currentType = tokenTypes.get(t);
+
+            if (currentType == TokenType.Expression) {
+                tokenVariables.add(interpretExpression(currentValue, variables, functions));
+            }
+            else if (tokenTypes.get(t) == TokenType.String) {
+                tokenVariables.add(new Variable(tokenValues));
+            }
+            else {
+
+            }
+        }
+        if (tokenValues.size() > 1) {
+            System.out.println(tokenValues);
+            for (Variable token : tokenVariables) {
+                System.out.println(token);
+                result = result.addTo(token);
+            }
+        }
         return result;
     }
 
     //TODO: WRITE THIS METHOD
     //1+2*4/6^2-(6+2)
-    public double interpretNumberExpression(String line, Map<String, Variable> variables) {
+
+    //1+getlen(#Calvin#)
+    public double interpretNumberExpression(String line, Map<String, Variable> variables, List<Function> functions) {
         String special = "()^*/+-";
-        int left = 0;
-        int right = 0;
-        for (char i : line.toCharArray()) {
-            right++;
-            if(special.contains(i + "")) {
-                if (i=='+') {
-                    return Integer.parseInt(line.substring(left,right)) * interpretNumberExpression(line.substring(right), variables);
-                }
-                else if (i=='(') {
-                }
+        String expression = line;
+        
+        while (expression.contains("(") || expression.contains("")) {
+            int open = expression.indexOf("(");
+            int close = expression.indexOf(")");
+            if (open < close && open != -1) {
+                expression = expression.substring(0, open) + interpretNumberExpression(expression.substring(open + 1, close), variables, functions) + expression.substring(close);
+            }
+            else {
+                // TODO: throw some error here
             }
         }
-        return 0.0;
         
+
+        // int left = 0;
+        // int right = 0;
+        // for (char i : line.toCharArray()) {
+        //     right++;
+        //     if(special.contains(i + "")) {
+        //         if (i=='+') {
+        //             return Integer.parseInt(line.substring(left,right)) + interpretNumberExpression(line.substring(right), variables, functions);
+        //         }
+        //         else if (i=='-') {
+        //             return Integer.parseInt(line.substring(left,right)) - interpretNumberExpression(line.substring(right), variables, functions);
+        //         }
+        //         else if (i=='*') {
+        //             return Integer.parseInt(line.substring(left,right)) * interpretNumberExpression(line.substring(right), variables, functions);
+        //         }
+        //         else if (i=='/') {
+        //             return Integer.parseInt(line.substring(left,right)) / interpretNumberExpression(line.substring(right), variables, functions);
+        //         }
+        //         else if (i=='-') {
+        //             return Math.pow(Integer.parseInt(line.substring(left,right)), interpretNumberExpression(line.substring(right), variables, functions));
+        //         }
+        //         else if (i=='(') {
+        //             left = right;
+        //             right = line.indexOf(")");
+                    
+        //         }
+        //     }
+        // }
+        return 0.0;
+    }
+    
+    // replaces all variable and functions with proper bits
+    private String preprocessing(String line) {
+        String[] separate = line.replace(ESCAPE_CHARACTER_KEYWORD + Keywords.STRING_LITERAL_KEYWORD, ).split("#");
+
     }
 }
