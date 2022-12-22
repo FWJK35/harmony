@@ -1,28 +1,27 @@
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.awt.*;
 import javax.swing.*;
 
 /**
  * Compiler
  */
+
 public class Compiler {
-    public static Map<String, Variable> variables = new HashMap<String, Variable>();
-    public static List<Function> functions = new ArrayList<Function>();
+    public static Environment env;
+    public static List<Function> functions = env.getFunctions();
     public static void main(String[] args) {
         test();
     }
 
 
     public static Variable runCode(Scanner file) {
-        return runCode(file, variables);
+        return runCode(file, env);
     }
-    public static Variable runCode(Scanner file, Map<String, Variable> tempVariables) {
+
+    public static Variable runCode(Scanner file, Environment env) {
         // initialize variables and stuff here
-        Map<String, Variable> vari = new HashMap<String, Variable>();
-        vari.putAll(variables);
-        vari.putAll(tempVariables);
+        Map<String, Variable> vari = env.getVariables();
 
         List<String> lines = new ArrayList<String>();
         while (file.hasNextLine()) {
@@ -44,7 +43,7 @@ public class Compiler {
             if (tokens.size() > TokenIndex.PRINT_TOKEN) {
                 if (tokens.get(TokenIndex.PRINT_TOKEN).equals(Keywords.PRINT_KEYWORD)) {
                     // print the current line command
-                    StaticMethods.print(thisLine, vari);
+                    // StaticMethods.print(thisLine, vari);
                 }
             }
             
@@ -53,7 +52,6 @@ public class Compiler {
                 if (tokens.get(TokenIndex.DEFINE_VARIABLE_TOKEN).equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
                     // put new variable in map
                     //TODO get both literal and expressions
-                    variables.put(tokens.get(TokenIndex.VARIABLE_NAME_TOKEN), null); 
                     vari.put(tokens.get(TokenIndex.VARIABLE_NAME_TOKEN), null); 
                 }
             }
@@ -71,11 +69,10 @@ public class Compiler {
                         codeToRun += lines.get(currentLine) + "\n";
                     }
                     String statement = thisLine.substring(thisLine.indexOf(tokens.get(TokenIndex.IF_STATEMENT_TOKEN + 1), thisLine.length() - Keywords.COLON_KEYWORD.length()));
-                    if (StaticMethods.interpretExpression(statement, vari, functions).toBoolean()) {
-                        runCode(new Scanner(codeToRun));
-                    }
+
                     //ends code on the next line
                 }
+                
             }
 
             else if (tokens.size() > TokenIndex.WHILE_STATEMENT_TOKEN) {
@@ -89,7 +86,7 @@ public class Compiler {
                         codeToRun += lines.get(currentLine) + "\n";
                     }
 
-                    while (StaticMethods.interpretExpression(condition, vari, functions).toBoolean()) {
+                    while (StaticMethods.interpretExpression(condition, env).toBoolean()) {
                         runCode(new Scanner(codeToRun));
                     }
                     

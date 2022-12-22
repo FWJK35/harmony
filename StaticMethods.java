@@ -6,7 +6,7 @@ public class StaticMethods {
         None, Variable, Number, String, Array, Expression, StringInExpression
     };
 
-    public static void print(String line, Map<String, Variable> variables, List<Function> functions) {
+    public static void print(String line, Environment env) {
         // get beginning of string literal and trim line
         int beginIndex = line.indexOf(Keywords.STRING_LITERAL_KEYWORD);
         int endIndex = line.indexOf(Keywords.STRING_LITERAL_KEYWORD, beginIndex + 1);
@@ -16,7 +16,7 @@ public class StaticMethods {
             throw new Error("Invalid Arguments to command: " + Keywords.PRINT_KEYWORD);
         }
         else {
-            System.out.println(interpretExpression(line, variables, functions));
+            System.out.println(interpretExpression(line, env));
         }
     }
     
@@ -44,7 +44,7 @@ public class StaticMethods {
     }
 
     //xd #My name is # name # and my age is # 69
-    public static Variable interpretExpression(String line, Map<String, Variable> variables, List<Function> functions) {
+    public static Variable interpretExpression(String line, Environment env) {
         Variable result = new Variable();
         List<String> tokenValues = new ArrayList<String>();
         List<TokenType> tokenTypes = new ArrayList<TokenType>();
@@ -71,7 +71,7 @@ public class StaticMethods {
                                 tokenType = TokenType.StringInExpression;
                             }
                             else if (tokenType == TokenType.StringInExpression) {
-                                tokenType = TokenType.StringInExpression;
+                                tokenType = TokenType.Expression;
                             }
                         }
                         //change number of parencount
@@ -117,19 +117,17 @@ public class StaticMethods {
             TokenType currentType = tokenTypes.get(t);
 
             if (currentType == TokenType.Expression) {
-                tokenVariables.add(interpretExpression(currentValue, variables, functions));
+                tokenVariables.add(interpretExpression(currentValue, env));
             }
             else if (tokenTypes.get(t) == TokenType.String) {
-                tokenVariables.add(new Variable(tokenValues));
+                tokenVariables.add(new Variable(currentValue));
             }
             else {
 
             }
         }
         if (tokenValues.size() > 1) {
-            System.out.println(tokenValues);
             for (Variable token : tokenVariables) {
-                System.out.println(token);
                 result = result.addTo(token);
             }
         }
@@ -187,8 +185,8 @@ public class StaticMethods {
     }
     
     // replaces all variable and functions with proper bits
-    private String preprocessing(String line) {
-        String[] separate = line.replace(ESCAPE_CHARACTER_KEYWORD + Keywords.STRING_LITERAL_KEYWORD, ).split("#");
+    // private String preprocessing(String line) {
+    //     String[] separate = line.replace(Keywords.ESCAPE_CHARACTER_KEYWORD + Keywords.STRING_LITERAL_KEYWORD).split("#");
 
-    }
+    // }
 }

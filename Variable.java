@@ -51,60 +51,68 @@ public class Variable {
      //b + a
     public Variable addTo(Variable a) {
         Variable out = new Variable();
+        if (data == null) {
+            out = a;
+            return out;
+        }
+        if (a.getData() == null) {
+            out = this;
+            return out;
+        }
         if (data instanceof Integer) {
             if (a.getData() instanceof Integer) {
-                out.setData((int) data + (int) a.getData());
+                return new Variable((int) data + (int) a.getData());
             }
             if (a.getData() instanceof Double) {
-                data = (int) data + (double) a.getData();
+                return new Variable((int) data + (double) a.getData());
             }
             if (a.getData() instanceof Character) {
-                data = (int) data + (char) a.getData();
+                return new Variable((int) data + (char) a.getData());
             }
             if (a.getData() instanceof String) {
-                data = (int) data + (String) a.getData();
+                return new Variable((int) data + (String) a.getData());
             }
         }
-         if (data instanceof Double) {
+        if (data instanceof Double) {
             if (a.getData() instanceof Integer) {
-                out.setData((int) data + (int) a.getData());
+                return new Variable((double) data + (int) a.getData());
             }
             if (a.getData() instanceof Double) {
-                data = (int) data + (double) a.getData();
+                return new Variable((double) data + (double) a.getData());
             }
             if (a.getData() instanceof Character) {
-                data = (int) data + (char) a.getData();
+                return new Variable((double) data + (char) a.getData());
             }
             if (a.getData() instanceof String) {
-                data = (int) data + (String) a.getData();
+                return new Variable((double) data + (String) a.getData());
             }
         }
         if (data instanceof Character) {
             if (a.getData() instanceof Integer) {
-                out.setData((int) data + (int) a.getData());
+                return new Variable((char) data + (int) a.getData());
             }
             if (a.getData() instanceof Double) {
-                data = (int) data + (double) a.getData();
+                return new Variable((char) data + (double) a.getData());
             }
             if (a.getData() instanceof Character) {
-                data = (int) data + (char) a.getData();
+                return new Variable((char) data + (char) a.getData());
             }
             if (a.getData() instanceof String) {
-                data = (int) data + (String) a.getData();
+                return new Variable((char) data + (String) a.getData());
             }
         }
         if (data instanceof String) {
             if (a.getData() instanceof Integer) {
-                out.setData((int) data + (int) a.getData());
+                return new Variable((String) data + (int) a.getData());
             }
             if (a.getData() instanceof Double) {
-                data = (int) data + (double) a.getData();
+                return new Variable((String) data + (double) a.getData());
             }
             if (a.getData() instanceof Character) {
-                data = (int) data + (char) a.getData();
+                return new Variable((String) data + (char) a.getData());
             }
             if (a.getData() instanceof String) {
-                data = (int) data + (String) a.getData();
+                return new Variable((String) data + (String) a.getData());
             }
         }
         return out;
@@ -243,7 +251,7 @@ public class Variable {
 
     @Override
     public String toString() {
-        if (data instanceof ArrayList) {
+         if (data instanceof ArrayList) {
             String result = "[";
             for (Variable v : (ArrayList<Variable>) data) {
                 result += v.toString() + ", ";

@@ -5,3 +5,6 @@ StaticMethods:
     interpretNumberExpression
 Compiler:
     identify variables vs functions
+Environment:
+x    get / put functionalities
+x    copy Environment static method

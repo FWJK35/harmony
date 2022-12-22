@@ -9,6 +9,13 @@
             "name": "Launch test",
             "request": "launch",
             "mainClass": "test",
+            "projectName": "harmony_d214cc26"
+        },
+        {
+            "type": "java",
+            "name": "Launch test",
+            "request": "launch",
+            "mainClass": "test",
             "projectName": "harmony_d33e92aa"
         },
         {

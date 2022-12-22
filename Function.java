@@ -31,12 +31,6 @@ public class Function {
         return name;
     }
 
-    public Variable run(Map<String, Variable> params) {
-        Variable result = new Variable();
-        
-        return result;
-    }
-
     public Variable runFunction(String[] localParam) {
         return Compiler.runCode(new Scanner(code));
     }
@@ -57,5 +51,15 @@ public class Function {
             }
         }
         return null;
+    }
+
+    public static List<Function> getFunction(List<Function> functions, String name) {
+        List<Function> result = new ArrayList<Function>();
+        for (Function possible : functions) {
+            if (name.equals(possible.getName())) {
+                result.add(possible);
+            }
+        }
+        return result;
     }
 }
