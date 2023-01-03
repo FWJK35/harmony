@@ -1,3 +1,5 @@
+Variable:
+    boolean addition (True + True = 2)
 Function:
     finish class
 StaticMethods:
@@ -8,3 +10,9 @@ Compiler:
 Environment:
 x    get / put functionalities
 x    copy Environment static method
+ForLoop:
+    finish class
+    figure out what is wanted
+        how to initialize temporary variable and increment through iterations
+        structure of the statement: ie. typically for(initialization; conditional; iteration) 
+    finish runCode

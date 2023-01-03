@@ -1,6 +1,19 @@
-import java.util.ArrayList;
+/*
+ * Variable class is a universal variable
+ * Can by any of following types
+ * Int - Integer
+ * Dbl - Double
+ * Chr - Character
+ * Str - String
+ * Boo - Boolean
+ * Arr - Array
+ */
 
- @SuppressWarnings("unchecked")
+
+import java.util.ArrayList;
+import java.util.List;
+
+@SuppressWarnings("unchecked")
 public class Variable {
 
     private Object data;
@@ -63,55 +76,55 @@ public class Variable {
             if (a.getData() instanceof Integer) {
                 return new Variable((int) data + (int) a.getData());
             }
-            if (a.getData() instanceof Double) {
+            else if (a.getData() instanceof Double) {
                 return new Variable((int) data + (double) a.getData());
             }
-            if (a.getData() instanceof Character) {
+            else if (a.getData() instanceof Character) {
                 return new Variable((int) data + (char) a.getData());
             }
-            if (a.getData() instanceof String) {
+            else if (a.getData() instanceof String) {
                 return new Variable((int) data + (String) a.getData());
             }
         }
-        if (data instanceof Double) {
+        else if (data instanceof Double) {
             if (a.getData() instanceof Integer) {
                 return new Variable((double) data + (int) a.getData());
             }
-            if (a.getData() instanceof Double) {
+            else if (a.getData() instanceof Double) {
                 return new Variable((double) data + (double) a.getData());
             }
-            if (a.getData() instanceof Character) {
+            else if (a.getData() instanceof Character) {
                 return new Variable((double) data + (char) a.getData());
             }
-            if (a.getData() instanceof String) {
+            else if (a.getData() instanceof String) {
                 return new Variable((double) data + (String) a.getData());
             }
         }
-        if (data instanceof Character) {
+        else if (data instanceof Character) {
             if (a.getData() instanceof Integer) {
                 return new Variable((char) data + (int) a.getData());
             }
-            if (a.getData() instanceof Double) {
+            else if (a.getData() instanceof Double) {
                 return new Variable((char) data + (double) a.getData());
             }
-            if (a.getData() instanceof Character) {
+            else if (a.getData() instanceof Character) {
                 return new Variable((char) data + (char) a.getData());
             }
-            if (a.getData() instanceof String) {
+            else if (a.getData() instanceof String) {
                 return new Variable((char) data + (String) a.getData());
             }
         }
-        if (data instanceof String) {
+        else if (data instanceof String) {
             if (a.getData() instanceof Integer) {
                 return new Variable((String) data + (int) a.getData());
             }
-            if (a.getData() instanceof Double) {
+            else if (a.getData() instanceof Double) {
                 return new Variable((String) data + (double) a.getData());
             }
-            if (a.getData() instanceof Character) {
+            else if (a.getData() instanceof Character) {
                 return new Variable((String) data + (char) a.getData());
             }
-            if (a.getData() instanceof String) {
+            else if (a.getData() instanceof String) {
                 return new Variable((String) data + (String) a.getData());
             }
         }
@@ -127,7 +140,6 @@ public class Variable {
                 data.add(new Variable(c));
             }
         }
-
         else if (this.data instanceof ArrayList) {
             for (Variable v : (ArrayList<Variable>) data) {
                 data.add(v.copy());
@@ -304,7 +316,59 @@ public class Variable {
             } 
         }
     }
+
     public int toInteger() {
         return 0;
+    }
+
+
+    //method that sees if stuff equal
+    public boolean equals(Variable v) {
+        if (getType().equals(v.getType())) {
+            if (data instanceof String) {
+                if (((String) data).equals((String) v.getData())) {
+                    return true;
+                }
+                return false;
+            }
+            if (data instanceof Integer) {
+                if ((int) data == (int) v.getData()) {
+                    return true;
+                }
+                return false;
+            }
+            if (data instanceof Double) {
+                if ((double) data == (double) v.getData()) {
+                    return true;
+                }
+                return false;
+            }
+            if (data instanceof Boolean) {
+                if ((boolean) data == (boolean) v.getData()) {
+                    return true;
+                }
+                return false;
+            }
+            if (data instanceof Character) {
+                if (((Character) data).equals((Character) v.getData())) {
+                    return true;
+                }
+                return false;
+            }
+            if (data instanceof List<?>) {
+                // ((ArrayList<Variable>) data)
+                if (((ArrayList<Variable>) data).size() == ((ArrayList<Variable>) v.getData()).size()) {
+                    for (int i = 0; i < ((ArrayList<Variable>) data).size(); i++) {
+                        if (!((ArrayList<Variable>) data).get(i).equals(((ArrayList<Variable>) v.getData()).get(i))) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+        return false;
     }
 }

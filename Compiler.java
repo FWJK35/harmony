@@ -75,24 +75,6 @@ public class Compiler {
                 
             }
 
-            else if (tokens.size() > TokenIndex.WHILE_STATEMENT_TOKEN) {
-                if (tokens.get(TokenIndex.WHILE_STATEMENT_TOKEN).equals(Keywords.WHILE_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
-                    String condition = lines.get(currentLine);
-                    int currentIndentation = StaticMethods.countIndent(condition);
-                    condition = condition.substring(condition.indexOf(Keywords.WHILE_KEYWORD) + Keywords.WHILE_KEYWORD.length());
-                    String codeToRun = "";
-                    for (int i = 1; currentIndentation < StaticMethods.countIndent(lines.get(currentLine + 1)); i++) {
-                        currentLine++;
-                        codeToRun += lines.get(currentLine) + "\n";
-                    }
-
-                    while (StaticMethods.interpretExpression(condition, env).toBoolean()) {
-                        runCode(new Scanner(codeToRun));
-                    }
-                    
-                }
-            }
-
             else if (tokens.size() > TokenIndex.FOR_STATEMENT_TOKEN) {
                 if (tokens.get(TokenIndex.FOR_STATEMENT_TOKEN).equals(Keywords.FOR_KEYWORD) && tokens.get(tokens.size() - 1).equals(Keywords.COLON_KEYWORD)) {
                     // takes an List of Strings for each line of code and index of line where for loop begins

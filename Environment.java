@@ -52,4 +52,18 @@ public class Environment {
     public Environment copyEnvironment() {
         return new Environment(new HashMap<String, Variable>(variables), new ArrayList<Function>(functions));
     }
+
+    // returns true if environment has a variable/function corresponding to name
+    public boolean containsVariable(String name) {
+        return variables.containsKey(name);
+    }
+    
+    public boolean containsFunction(String name) {
+        for (Function function : functions) {
+            if (function.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

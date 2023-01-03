@@ -13,6 +13,9 @@ public class Keywords {
     public static final char ESCAPE_CHARACTER_KEYWORD = '\\';
     public static final char OPEN_PAREN_KEYWORD = '(';
     public static final char CLOSE_PAREN_KEYWORD = ')';
+    public static final char OPEN_ARRAY_KEYWORD = '[';
+    public static final char CLOSE_ARRAY_KEYWORD = ']';
     public static final String COLON_KEYWORD = ":)";
-    public static final String OPERATOR_CHARACTERS = "+-/*%^ ";
+    public static final String SEPARATOR_KEYWORD = ":3";
+    public static final String OPERATOR_CHARACTERS = "+-/*%^";
 }

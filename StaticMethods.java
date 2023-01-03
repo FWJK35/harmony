@@ -3,8 +3,8 @@ import java.util.*;
 public class StaticMethods {
     
     private enum TokenType {
-        None, Variable, Number, String, Array, Expression, StringInExpression
-    };
+        None, Variable, Function, Integer, Double, String, Array, Expression, StringInExpression, VarFunc, Number
+    }
 
     public static void print(String line, Environment env) {
         // get beginning of string literal and trim line
@@ -102,12 +102,64 @@ public class StaticMethods {
                         i++;
                     }
                     tokenValues.add(currentToken);
-                    tokenTypes.add(tokenType);
+                    tokenTypes.add(TokenType.String);
                     currentToken = "";
                     tokenType = TokenType.None;
                 }
+                // must be variable, function, or int
                 else {
+                    // character is alphabet character
+                    if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
+                        tokenType = TokenType.VarFunc;
+                        
+                        while ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
+                            currentToken += c;
+                            i++;
+                            c = line.charAt(i);
+                            
+                        }
+                        // function name
+                        if (c == Keywords.OPEN_PAREN_KEYWORD) {
 
+                        }
+                        // array index
+                        else if (c == Keywords.OPEN_ARRAY_KEYWORD) {
+
+                        }
+                        // probably a variable (not array)
+                        else {
+                            tokenValues.add(currentToken);
+                            tokenTypes.add(TokenType.Variable);
+                            tokenType = TokenType.None;
+                        }
+                    }
+                    //character is digit
+                    else if (c >= 48 && c <= 57 || c == '-') {
+                        tokenType = TokenType.Number;
+                        while (c >= 48 && c <= 57) {
+                            currentToken += c;
+                            i++;
+                            c = line.charAt(i);
+                        }
+                        //is double
+                        if (c == '.') {
+                            i++;
+                            c = line.charAt(i);
+                            while (c >= 48 && c <= 57) {
+                                currentToken += c;
+                                i++;
+                                c = line.charAt(i);
+                            }
+                        }
+                        //get next non-space character
+                        while (c == ' ') {
+                            i++;
+                            c = line.charAt(i);
+                        }
+
+
+
+                    }
                 }
             }
             
@@ -119,8 +171,16 @@ public class StaticMethods {
             if (currentType == TokenType.Expression) {
                 tokenVariables.add(interpretExpression(currentValue, env));
             }
-            else if (tokenTypes.get(t) == TokenType.String) {
+            else if (currentType == TokenType.String) {
                 tokenVariables.add(new Variable(currentValue));
+            }
+            else if (currentType == TokenType.Variable) {
+                if (env.containsVariable(currentValue)) {
+                    tokenVariables.add(env.getVariable(currentValue));
+                }
+                else {
+                    throw new Error("Variable name not found");
+                }
             }
             else {
 
@@ -134,12 +194,31 @@ public class StaticMethods {
         return result;
     }
 
-    //TODO: WRITE THIS METHOD
-    //1+2*4/6^2-(6+2)
+    /* TODO read this
+     * interpretNumberExpression
+     * should take a string containing numbers, variables, and functions
+     * containing NO SPACES and use order of operations
+     * you can put any expression within parenthesis back into interpretExpression
+     * same with really anything between operators
+     * for example:
+     * 3.5*sqrt(9)+6/(3/2)
+     *     |||||||   |||||
+     * you can put these sections into interpretExpression
+     * have fun :)
+     * 
+     */
 
-    //1+getlen(#Calvin#)
-    public double interpretNumberExpression(String line, Map<String, Variable> variables, List<Function> functions) {
-        String special = "()^*/+-";
+    //you can use interpretExpression on each segment of the expression
+    //for example
+    //1+2*3-(sqrt(9)/2)
+    //| | | ||||||||||| <- this 
+
+    public double interpretNumberExpression(String line, Environment env) {
+        if (line.contains(" ")) {
+            // TODO: throw some error here
+        }
+        
+        String special = "()^/*+-";
         String expression = line;
         
         while (expression.contains("(") || expression.contains("")) {
@@ -189,4 +268,5 @@ public class StaticMethods {
     //     String[] separate = line.replace(Keywords.ESCAPE_CHARACTER_KEYWORD + Keywords.STRING_LITERAL_KEYWORD).split("#");
 
     // }
+    
 }
