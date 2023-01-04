@@ -12,6 +12,7 @@ public class WhileLoop {
     public void runCode() {
         while (StaticMethods.interpretExpression(condition, env).toBoolean()) {
             code.runFunction(null);
+            
         }
     }
 }

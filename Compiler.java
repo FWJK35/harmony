@@ -12,6 +12,27 @@ public class Compiler {
     public static List<Function> functions = env.getFunctions();
     public static void main(String[] args) {
         test();
+
+        // prompt file name using JOptionPane 
+        Scanner input = new Scanner(System.in);
+        try {
+            String fileName = JOptionPane.showInputDialog("Input File Name: ");
+            fileName = fileName.trim();
+            File file = new File(fileName);
+            if (file.createNewFile()) {
+                writeFile(file);
+            }
+            else {
+                runCode(new Scanner(file));
+            }
+        } catch (IOException e) {
+            e.getStackTrace();
+            System.out.println("Error: Invalid File");
+        }
+    }
+
+    public static void writeFile(File file) {
+        
     }
 
 

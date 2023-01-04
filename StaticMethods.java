@@ -44,6 +44,7 @@ public class StaticMethods {
     }
 
     //xd #My name is # name # and my age is # 69
+    //ASSUME NO STRINGS OR CHARACTERS CONTAIN '#', '(', or ')'
     public static Variable interpretExpression(String line, Environment env) {
         Variable result = new Variable();
         List<String> tokenValues = new ArrayList<String>();
@@ -65,18 +66,12 @@ public class StaticMethods {
                     i++;
                     while (true) {
                         c = line.charAt(i);
-                        //check for parenthesis inside string
-                        if (c == Keywords.STRING_LITERAL_KEYWORD && line.charAt(i - 1) != '\\') {
-                            if (tokenType == TokenType.Expression) {
-                                tokenType = TokenType.StringInExpression;
-                            }
-                            else if (tokenType == TokenType.StringInExpression) {
-                                tokenType = TokenType.Expression;
-                            }
-                        }
                         //change number of parencount
-                        if (tokenType != TokenType.StringInExpression && (c == Keywords.OPEN_PAREN_KEYWORD || c == Keywords.CLOSE_PAREN_KEYWORD)) {
-                            parenCount += c == Keywords.OPEN_PAREN_KEYWORD? 1:-1;
+                        if (c == Keywords.OPEN_PAREN_KEYWORD) {
+                            parenCount++;
+                        }
+                        if (c == Keywords.CLOSE_PAREN_KEYWORD) {
+                            parenCount--;
                         }
                         if (parenCount == 0) {
                             break;
@@ -95,7 +90,7 @@ public class StaticMethods {
                     while (true) {
                         c = line.charAt(i);
                         //check for parenthesis inside string
-                        if (c == Keywords.STRING_LITERAL_KEYWORD && line.charAt(i - 1) != '\\') {
+                        if (c == Keywords.STRING_LITERAL_KEYWORD) {
                             break;
                         }
                         currentToken += c;
@@ -109,10 +104,10 @@ public class StaticMethods {
                 // must be variable, function, or int
                 else {
                     // character is alphabet character
-                    if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
+                    if (isAlpha(c)) {
                         tokenType = TokenType.VarFunc;
                         
-                        while ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)) {
+                        while (isAlpha(c)) {
                             currentToken += c;
                             i++;
                             c = line.charAt(i);
@@ -120,11 +115,28 @@ public class StaticMethods {
                         }
                         // function name
                         if (c == Keywords.OPEN_PAREN_KEYWORD) {
-
+                            tokenType = TokenType.Function;
+                            parenCount = 1;
+                            i++;
+                            while (true) {
+                                c = line.charAt(i);
+                                //change number of parencount
+                                if (c == Keywords.OPEN_PAREN_KEYWORD) {
+                                    parenCount++;
+                                }
+                                if (c == Keywords.CLOSE_PAREN_KEYWORD) {
+                                    parenCount--;
+                                }
+                                if (parenCount == 0) {
+                                    break;
+                                }
+                                currentToken += c;
+                                i++;
+                            }
                         }
                         // array index
                         else if (c == Keywords.OPEN_ARRAY_KEYWORD) {
-
+                            
                         }
                         // probably a variable (not array)
                         else {
@@ -134,9 +146,9 @@ public class StaticMethods {
                         }
                     }
                     //character is digit
-                    else if (c >= 48 && c <= 57 || c == '-') {
+                    else if (isDigit(c) || c == '-') {
                         tokenType = TokenType.Number;
-                        while (c >= 48 && c <= 57) {
+                        while (isDigit(c)) {
                             currentToken += c;
                             i++;
                             c = line.charAt(i);
@@ -145,7 +157,7 @@ public class StaticMethods {
                         if (c == '.') {
                             i++;
                             c = line.charAt(i);
-                            while (c >= 48 && c <= 57) {
+                            while (isDigit(c)) {
                                 currentToken += c;
                                 i++;
                                 c = line.charAt(i);
@@ -194,6 +206,25 @@ public class StaticMethods {
         return result;
     }
 
+
+    //ily calvin
+    //calvin++
+
+    //ily calvin 3000
+    //           ||||                                                        number
+    //env.getVariable("i").setData(env.getVariable("i").addTo(new Variable(          )).getData());
+    //calvin += 3000
+
+    //ily = Keywords.INCREMENT_KEYWORD
+    public void increment(Environment env, String line) {
+        int index = 0;
+        for (int i = 0; i < line.length() - 1; i++) {
+            if (line.charAt(i))
+            variableIndex = line.subString(Keywords.INCREMENT_KEYWORD.length() + 1, )
+        }
+
+    } 
+
     /* TODO read this
      * interpretNumberExpression
      * should take a string containing numbers, variables, and functions
@@ -212,6 +243,7 @@ public class StaticMethods {
     //for example
     //1+2*3-(sqrt(9)/2)
     //| | | ||||||||||| <- this 
+    
 
     public double interpretNumberExpression(String line, Environment env) {
         if (line.contains(" ")) {
@@ -225,7 +257,7 @@ public class StaticMethods {
             int open = expression.indexOf("(");
             int close = expression.indexOf(")");
             if (open < close && open != -1) {
-                expression = expression.substring(0, open) + interpretNumberExpression(expression.substring(open + 1, close), variables, functions) + expression.substring(close);
+                expression = expression.substring(0, open) + interpretNumberExpression(expression.substring(open + 1, close), env) + expression.substring(close);
             }
             else {
                 // TODO: throw some error here
@@ -268,5 +300,27 @@ public class StaticMethods {
     //     String[] separate = line.replace(Keywords.ESCAPE_CHARACTER_KEYWORD + Keywords.STRING_LITERAL_KEYWORD).split("#");
 
     // }
-    
+    public static boolean isAlpha(char c) {
+        String alpha = "abcdefghijklmnopqrstuvwxyz";
+        return (alpha.contains(c + "") || alpha.toUpperCase().contains(c + ""));
+    }
+    public static boolean isDigit(char c) {
+        if ("0123456789".contains(c + "")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String preprocess(String line) {
+        return line;
+        // int i = 0;
+        // String out = "";
+        // while (i < line.length()) {
+        //     char c = line.charAt(i);
+        //     if (c == Keywords.ESCAPE_CHARACTER_KEYWORD) {
+        //         i++;
+        //         c = line.charAt(i);
+        //     }
+        // }
+    }
 }
