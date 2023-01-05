@@ -6,7 +6,7 @@ public class test {
         System.out.println('a'+'a');
         System.out.println(StaticMethods.interpretExpression("#test: # (##name# # #R#)", env));
 
-        
+        System.out.println(1*-3);
         
     }
 }

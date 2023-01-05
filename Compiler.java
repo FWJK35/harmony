@@ -9,7 +9,7 @@ import javax.swing.*;
 
 public class Compiler {
     public static Environment env;
-    public static List<Function> functions = env.getFunctions();
+    // public static List<Function> functions = env.getFunctions();
     public static void main(String[] args) {
         test();
 
@@ -17,7 +17,7 @@ public class Compiler {
         Scanner input = new Scanner(System.in);
         try {
             String fileName = JOptionPane.showInputDialog("Input File Name: ");
-            fileName = fileName.trim();
+            fileName = fileName.trim(); 
             File file = new File(fileName);
             if (file.createNewFile()) {
                 writeFile(file);
@@ -32,7 +32,7 @@ public class Compiler {
     }
 
     public static void writeFile(File file) {
-        
+        new Notepad(file.getName());
     }
 
 

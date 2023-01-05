@@ -44,7 +44,7 @@ public class StaticMethods {
     }
 
     //xd #My name is # name # and my age is # 69
-    //ASSUME NO STRINGS OR CHARACTERS CONTAIN '#', '(', or ')'
+    //ASSUME NO STRINGS OR CHARACTERS CONTAIN '#', '[', ']', '(', or ')'
     public static Variable interpretExpression(String line, Environment env) {
         Variable result = new Variable();
         List<String> tokenValues = new ArrayList<String>();
@@ -80,7 +80,8 @@ public class StaticMethods {
                         i++;
                     }
                     tokenValues.add(currentToken);
-                    tokenTypes.add(tokenType);
+                    tokenTypes.add(TokenType.Expression);
+                    currentToken = "";
                     tokenType = TokenType.None;
                 }
                 //begin string literal expression
@@ -89,7 +90,6 @@ public class StaticMethods {
                     i++;
                     while (true) {
                         c = line.charAt(i);
-                        //check for parenthesis inside string
                         if (c == Keywords.STRING_LITERAL_KEYWORD) {
                             break;
                         }
@@ -105,13 +105,10 @@ public class StaticMethods {
                 else {
                     // character is alphabet character
                     if (isAlpha(c)) {
-                        tokenType = TokenType.VarFunc;
-                        
                         while (isAlpha(c)) {
                             currentToken += c;
                             i++;
                             c = line.charAt(i);
-                            
                         }
                         // function name
                         if (c == Keywords.OPEN_PAREN_KEYWORD) {
@@ -127,6 +124,11 @@ public class StaticMethods {
                                 if (c == Keywords.CLOSE_PAREN_KEYWORD) {
                                     parenCount--;
                                 }
+
+                                //separation between arguments SAVE FOR EVALUATION AT THE END
+                                // if (parenCount == 1 && line.substring(i-Keywords.SEPARATOR_KEYWORD.length() + 1, i + 1).equals(Keywords.SEPARATOR_KEYWORD))
+
+                                //break out of loop
                                 if (parenCount == 0) {
                                     break;
                                 }
@@ -217,13 +219,31 @@ public class StaticMethods {
 
     //ily = Keywords.INCREMENT_KEYWORD
     public void increment(Environment env, String line) {
-        int index = 0;
-        for (int i = 0; i < line.length() - 1; i++) {
-            if (line.charAt(i))
-            variableIndex = line.subString(Keywords.INCREMENT_KEYWORD.length() + 1, )
-        }
-
+        String variableName = line.split(" ")[1];
+        String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 
+        Variable incrementBy = interpretExpression(afterVariable, env);
+        env.getVariable(variableName).setData(env.getVariable(variableName).addTo(incrementBy));
     } 
+    public void decrement(Environment env, String line) {
+        String variableName = line.split(" ")[1];
+        String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 
+        Variable incrementBy = interpretExpression(afterVariable, env);
+        //get data of variable from interpret expression chec kif integer cast to integer and make the integer negative then add to and then
+        if (incrementBy.getData() instanceof Integer) {
+            int decrementValue = (int) incrementBy.getData()
+            env.getVariable(variableName).setData(env.getVariable(variableName).addTo(new Variable(-decrementValue)));
+        } else {
+            throwNewError("type has to be double or integer");
+        }
+        if (incrementBy.getData() instanceof Double) {
+            double decrementValue = (double) incrementBy.getData()
+            env.getVariable(variableName).setData(env.getVariable(variableName).addTo(new Variable(-decrementValue)));
+        } else {
+            throwNewError("type has to be double or integer");
+        }
+        
+        
+    }
 
     /* TODO read this
      * interpretNumberExpression

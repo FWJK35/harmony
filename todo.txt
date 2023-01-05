@@ -1,15 +1,14 @@
 Variable:
     boolean addition (True + True = 2)
 Function:
+    get return statements working
+    write test functions
     finish class
 StaticMethods:
     interpretExpression
     interpretNumberExpression
 Compiler:
     identify variables vs functions
-Environment:
-x    get / put functionalities
-x    copy Environment static method
 ForLoop:
     finish class
     figure out what is wanted
