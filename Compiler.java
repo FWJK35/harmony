@@ -14,7 +14,6 @@ public class Compiler {
         test();
 
         // prompt file name using JOptionPane 
-        Scanner input = new Scanner(System.in);
         try {
             String fileName = JOptionPane.showInputDialog("Input File Name: ");
             fileName = fileName.trim(); 
@@ -23,8 +22,9 @@ public class Compiler {
                 writeFile(file);
             }
             else {
-                runCode(new Scanner(file));
+                // runCode(new Scanner(file));
             }
+            new Notepad(fileName);
         } catch (IOException e) {
             e.getStackTrace();
             System.out.println("Error: Invalid File");

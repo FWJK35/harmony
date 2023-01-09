@@ -1,4 +1,4 @@
-// Source Code : https://www.c-sharpcorner.com/UploadFile/fd0172/how-to-create-editable-notepad-in-java/
+
 import java.io.*;
 import java.util.*;
 import java.awt.event.*;  
@@ -6,6 +6,7 @@ import javax.swing.*;
 
 public class Notepad implements ActionListener  
 {  
+    File file;
     JFrame frm;  
     JMenuBar mnubr;  
     JMenu fileMenu, editMenu;  
@@ -29,14 +30,17 @@ public class Notepad implements ActionListener
         fileMenu.add(runItem);
 
         editMenu = new JMenu("Edit");
-        editMenu.add(cutItem);  
-        editMenu.add(copyItem);  
-        editMenu.add(pasteItem);  
-        editMenu.add(selectAll);  
+        
         cutItem = new JMenuItem("cutItem");  
         copyItem = new JMenuItem("copyItem");  
         pasteItem = new JMenuItem("pasteItem");  
         selectAll = new JMenuItem("selectAllItem");  
+
+        editMenu.add(cutItem);  
+        editMenu.add(copyItem);  
+        editMenu.add(pasteItem);  
+        editMenu.add(selectAll);  
+        
         copyItem.addActionListener(this);  
         cutItem.addActionListener(this);  
         selectAll.addActionListener(this);  
@@ -56,7 +60,7 @@ public class Notepad implements ActionListener
         try {
             scan = new Scanner(new File(fileName));
             while(scan.hasNextLine()) {
-                txtarea.append(scan.nextLine());
+                txtarea.append(scan.nextLine() + "\n");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,14 +70,47 @@ public class Notepad implements ActionListener
     }  
     
     public void actionPerformed(ActionEvent ae)  
-    {  
-        if (ae.getSource() == cutItem)  
+    {   
+        if (ae.getSource() == cutItem) {
             txtarea.cut();  
-        else if (ae.getSource() == pasteItem)  
-            txtarea.paste();  
-        else if (ae.getSource() == copyItem)  
-            txtarea.copy();  
-        else if (ae.getSource() == selectAll)  
+        }
+        else if (ae.getSource() == pasteItem) {    
+            txtarea.paste();
+        }
+        else if (ae.getSource() == copyItem) {
+            txtarea.copy();
+        }
+        else if (ae.getSource() == selectAll) {
             txtarea.selectAll();  
+        }
+
+
+        else if (ae.getSource() == openItem) {
+
+        }
+        else if (ae.getSource() == saveItem || ae.getSource() == runItem) {
+            try {
+                Scanner in = new Scanner(txtarea.getText());
+                PrintStream out = new PrintStream(file);
+                
+                while (in.hasNextLine()) {
+                    out.println(in.nextLine());
+                }
+
+                in.close();
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("idk what happened this should've been fine");
+            }
+        }
+        if (ae.getSource() == runItem) {
+            try {
+                Compiler.runCode(new Scanner(file));
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("idk what happened this should've been fine x2");
+            }
+        }
     }
 }  

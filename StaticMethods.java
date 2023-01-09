@@ -5,6 +5,9 @@ public class StaticMethods {
     private enum TokenType {
         None, Variable, Function, Integer, Double, String, Array, Expression, StringInExpression, VarFunc, Number
     }
+    private enum ExpressionType {
+        Expression, ArrayIndex, FunctionParams, String, 
+    }
 
     public static void print(String line, Environment env) {
         // get beginning of string literal and trim line
@@ -41,6 +44,61 @@ public class StaticMethods {
             return new Variable(Double.parseDouble(token));
         } catch (Exception e) {}
         return new Variable(token);
+    }
+
+    public static Variable eval(String line, Environment env) {
+        Variable result = new Variable();
+        List<TokenType> tokenTypes = new ArrayList<TokenType>();
+        List<Variable> tokenVariables = new ArrayList<Variable>();
+        Stack<ExpressionType> tokenStack = new Stack<ExpressionType>();
+        String currentToken = "";
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            boolean skip = false;
+            if (c == Keywords.ESCAPE_CHARACTER_KEYWORD) {
+                //skip next character
+                skip = true;
+                i++;
+            }
+            if (!skip) {
+                if (c == Keywords.STRING_LITERAL_KEYWORD) {
+                    tokenStack.add(ExpressionType.String);
+                }
+                else if (c == Keywords.OPEN_PAREN_KEYWORD) {
+                    tokenStack.add(ExpressionType.Expression);
+                }
+                else if (c == Keywords.CLOSE_ARRAY_KEYWORD) {
+                    if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.Expression) {
+                        tokenStack.pop();
+                    }
+                    else {
+                        throw new Error("No opening parenthesis!");
+                    }
+                }
+
+                else if (c == Keywords.OPEN_ARRAY_KEYWORD) {
+                    tokenStack.add(ExpressionType.ArrayIndex);
+                }
+                else if (c == Keywords.CLOSE_ARRAY_KEYWORD) {
+                    if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.ArrayIndex) {
+                        tokenStack.pop();
+                    }
+                    else {
+                        throw new Error("No opening square bracket!");
+                    }
+                }
+                
+                else if (tokenStack.isEmpty()) {
+                    currentToken += c;
+                }
+                else if (tokenStack.size() == 1) {
+                    if (tokenStack.peek() == ExpressionType.String) {}
+                }
+            }
+        }
+
+
+        return result;
     }
 
     //xd #My name is # name # and my age is # 69
@@ -230,16 +288,16 @@ public class StaticMethods {
         Variable incrementBy = interpretExpression(afterVariable, env);
         //get data of variable from interpret expression chec kif integer cast to integer and make the integer negative then add to and then
         if (incrementBy.getData() instanceof Integer) {
-            int decrementValue = (int) incrementBy.getData()
+            int decrementValue = (int) incrementBy.getData();
             env.getVariable(variableName).setData(env.getVariable(variableName).addTo(new Variable(-decrementValue)));
         } else {
-            throwNewError("type has to be double or integer");
+            throw new Error("type has to be double or integer");
         }
         if (incrementBy.getData() instanceof Double) {
-            double decrementValue = (double) incrementBy.getData()
+            double decrementValue = (double) incrementBy.getData();
             env.getVariable(variableName).setData(env.getVariable(variableName).addTo(new Variable(-decrementValue)));
         } else {
-            throwNewError("type has to be double or integer");
+            throw new Error("type has to be double or integer");
         }
         
         
