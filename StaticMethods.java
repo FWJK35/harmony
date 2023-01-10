@@ -3,10 +3,10 @@ import java.util.*;
 public class StaticMethods {
     
     private enum TokenType {
-        None, Variable, Function, Integer, Double, String, Array, Expression, StringInExpression, VarFunc, Number
+        None, Number, String, Expression, Array, Identifier, Operator, Joiner
     }
     private enum ExpressionType {
-        None, Expression, ArrayIndex, FunctionParams, String, 
+        None, Expression, Array, String, Identifier
     }
 
     public static void print(String line, Environment env) {
@@ -47,15 +47,19 @@ public class StaticMethods {
     }
 
     public static Variable eval(String line, Environment env) {
+
         Variable result = new Variable();
         List<TokenType> tokenTypes = new ArrayList<TokenType>();
         List<Variable> tokenVariables = new ArrayList<Variable>();
         Stack<ExpressionType> tokenStack = new Stack<ExpressionType>();
         String currentToken = "";
+
         for (int i = 0; i < line.length(); i++) {
+
             char c = line.charAt(i);
             boolean skip = false;
             ExpressionType currentType = ExpressionType.None;
+
             if (!tokenStack.isEmpty()) {
                 currentType = tokenStack.peek();
             }
@@ -65,232 +69,215 @@ public class StaticMethods {
                 skip = true;
                 i++;
             }
+
             if (!skip) {
                 //begin/end string expression
                 if (c == Keywords.STRING_LITERAL_KEYWORD) {
-                    //end expression
-                    if (tokenStack.peek() == ExpressionType.String) {
+                    //check for end string
+                    if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.String) {
+                        //end string
                         tokenStack.pop();
+                        //don't add this character if it isn't inside any expression
+                        if (tokenStack.isEmpty()) {
+                            Variable strVar = new Variable(currentToken);
+                            tokenVariables.add(strVar);
+                            tokenTypes.add(TokenType.String);
+                            currentToken = "";
+                            skip = true;
+                        }
                     }
-                    //begin expression
+                    //check for begin string
                     else {
+                        //don't add this character if it isn't inside any expression
+                        if (tokenStack.isEmpty()) {
+                            skip = true;
+                        }
+                        //begin string
                         tokenStack.add(ExpressionType.String);
                     }
-                    skip = true;
                 }
-                else if (c == Keywords.OPEN_PAREN_KEYWORD) {
-                    tokenStack.add(ExpressionType.Expression);
-                    skip = true;
-                }
-                else if (c == Keywords.CLOSE_ARRAY_KEYWORD) {
-                    if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.Expression) {
-                        tokenStack.pop();
-                    }
-                    else {
-                        throw new Error("No opening parenthesis!");
-                    }
-                    skip = true;
-                }
-
-                else if (c == Keywords.OPEN_ARRAY_KEYWORD) {
-                    tokenStack.add(ExpressionType.ArrayIndex);
-                    skip = true;
-                }
-                else if (c == Keywords.CLOSE_ARRAY_KEYWORD) {
-                    if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.ArrayIndex) {
-                        tokenStack.pop();
-                    }
-                    else {
-                        throw new Error("No opening square bracket!");
-                    }
-                    skip = true;
-                }
-                
-                if (tokenStack.isEmpty()) {
-                    currentToken += c;
-                }
-                else if (tokenStack.size() == 1) {
-                    //within first layer and it is string
-                    if (tokenStack.peek() == ExpressionType.String && !) {
-                        currentToken += c;
-                    }
-                }
-                else {
-                    if 
-                }
-            }
-        }
-
-
-        return result;
-    }
-
-    //xd #My name is # name # and my age is # 69
-    //ASSUME NO STRINGS OR CHARACTERS CONTAIN '#', '[', ']', '(', or ')'
-    public static Variable interpretExpression(String line, Environment env) {
-        Variable result = new Variable();
-        List<String> tokenValues = new ArrayList<String>();
-        List<TokenType> tokenTypes = new ArrayList<TokenType>();
-        List<Variable> tokenVariables = new ArrayList<Variable>();
-
-        String currentToken = "";
-        TokenType tokenType = TokenType.None;
-        int parenCount = 0;
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
-
-            //check for start of token
-            if (tokenType == TokenType.None) {
-                //begin nested expression token
-                if (c == Keywords.OPEN_PAREN_KEYWORD) {
-                    tokenType = TokenType.Expression;
-                    parenCount = 1;
-                    i++;
-                    while (true) {
-                        c = line.charAt(i);
-                        //change number of parencount
-                        if (c == Keywords.OPEN_PAREN_KEYWORD) {
-                            parenCount++;
+                //if not currently in a string
+                else if (currentType != ExpressionType.String) {
+                    //check for begin expression
+                    if (c == Keywords.OPEN_PAREN_KEYWORD) {
+                        //don't add this character if it isn't inside any expression
+                        if (tokenStack.isEmpty()) {
+                            skip = true;
                         }
-                        if (c == Keywords.CLOSE_PAREN_KEYWORD) {
-                            parenCount--;
-                        }
-                        if (parenCount == 0) {
-                            break;
-                        }
-                        currentToken += c;
-                        i++;
+                        //begin expression
+                        tokenStack.add(ExpressionType.Expression);
                     }
-                    tokenValues.add(currentToken);
-                    tokenTypes.add(TokenType.Expression);
-                    currentToken = "";
-                    tokenType = TokenType.None;
-                }
-                //begin string literal expression
-                else if (c == Keywords.STRING_LITERAL_KEYWORD) {
-                    tokenType = TokenType.String;
-                    i++;
-                    while (true) {
-                        c = line.charAt(i);
-                        if (c == Keywords.STRING_LITERAL_KEYWORD) {
-                            break;
-                        }
-                        currentToken += c;
-                        i++;
-                    }
-                    tokenValues.add(currentToken);
-                    tokenTypes.add(TokenType.String);
-                    currentToken = "";
-                    tokenType = TokenType.None;
-                }
-                // must be variable, function, or int
-                else {
-                    // character is alphabet character
-                    if (isAlpha(c)) {
-                        while (isAlpha(c)) {
-                            currentToken += c;
-                            i++;
-                            c = line.charAt(i);
-                        }
-                        // function name
-                        if (c == Keywords.OPEN_PAREN_KEYWORD) {
-                            tokenType = TokenType.Function;
-                            parenCount = 1;
-                            i++;
-                            while (true) {
-                                c = line.charAt(i);
-                                //change number of parencount
-                                if (c == Keywords.OPEN_PAREN_KEYWORD) {
-                                    parenCount++;
-                                }
-                                if (c == Keywords.CLOSE_PAREN_KEYWORD) {
-                                    parenCount--;
-                                }
 
-                                //separation between arguments SAVE FOR EVALUATION AT THE END
-                                // if (parenCount == 1 && line.substring(i-Keywords.SEPARATOR_KEYWORD.length() + 1, i + 1).equals(Keywords.SEPARATOR_KEYWORD))
-
-                                //break out of loop
-                                if (parenCount == 0) {
-                                    break;
-                                }
-                                currentToken += c;
-                                i++;
+                    //check for end expression
+                    else if (c == Keywords.CLOSE_PAREN_KEYWORD) {
+                        //check that closing parenthesis is valid
+                        if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.Expression) {
+                            //end expression
+                            tokenStack.pop();
+                            if (tokenStack.isEmpty()) {
+                                Variable expVar = new Variable(currentToken);
+                                tokenVariables.add(expVar);
+                                tokenTypes.add(TokenType.Expression);
+                                currentToken = "";
+                                skip = true;
                             }
                         }
-                        // array index
-                        else if (c == Keywords.OPEN_ARRAY_KEYWORD) {
-                            
-                        }
-                        // probably a variable (not array)
+                        //does not have matching parenthesis
                         else {
-                            tokenValues.add(currentToken);
-                            tokenTypes.add(TokenType.Variable);
-                            tokenType = TokenType.None;
+                            if (tokenStack.isEmpty()) {
+                                throw new Error("No opening parenthesis");
+                            }
+                            else {
+                                throw new Error("Must close previous expression");
+                            }
+                        }
+                        //don't add this character if it isn't inside any expression
+                        if (tokenStack.isEmpty()) {
+                            skip = true;
                         }
                     }
-                    //character is digit
-                    else if (isDigit(c) || c == '-') {
-                        tokenType = TokenType.Number;
-                        while (isDigit(c)) {
-                            currentToken += c;
-                            i++;
-                            c = line.charAt(i);
+
+                    //check for beginning of array
+                    else if (c == Keywords.OPEN_ARRAY_KEYWORD) {
+                        //don't add this character if it isn't inside any expression
+                        if (tokenStack.isEmpty()) {
+                            skip = true;
                         }
-                        //is double
-                        if (c == '.') {
-                            i++;
-                            c = line.charAt(i);
+                        //begin array index or definition
+                        tokenStack.add(ExpressionType.Array);
+                    }
+
+                    //check for end of array
+                    else if (c == Keywords.CLOSE_ARRAY_KEYWORD) {
+                        //check that closing parenthesis is valid
+                        if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.Array) {
+                            //end expression
+                            tokenStack.pop();
+                            if (tokenStack.isEmpty()) {
+                                Variable arrVar = new Variable(currentToken);
+                                tokenVariables.add(arrVar);
+                                tokenTypes.add(TokenType.Array);
+                                currentToken = "";
+                                skip = true;
+                            }
+                        }
+                        //does not have matching parenthesis
+                        else {
+                            if (tokenStack.isEmpty()) {
+                                throw new Error("No opening square bracket");
+                            }
+                            else {
+                                throw new Error("Must close previous expression");
+                            }
+                        }
+                        //don't add this character if it isn't inside any expression
+                        if (tokenStack.isEmpty()) {
+                            skip = true;
+                        }
+                    }
+                    
+                    //check for beginning of identifier
+                    else if (isAlpha(c)) {
+                        //will need to be evaluated
+                        if (tokenStack.isEmpty()) {
+                            while (isIdentifierChar(c)) {
+                                currentToken += c;
+                                i++;
+                                c = line.charAt(i);
+                            }
+                            //end by setting current character to last one of identifier
+                            i--;
+                            skip = true;
+                            //currentToken is now the name of the identifier
+                            tokenTypes.add(TokenType.Identifier);
+                            tokenVariables.add(new Variable(currentToken));
+                            currentToken = "";
+                        }
+                    }
+                
+                    //check for explicitly defined number
+                    else if (isDigit(c)) {
+                        //will need to be evaluated
+                        if (tokenStack.isEmpty()) {
                             while (isDigit(c)) {
                                 currentToken += c;
                                 i++;
                                 c = line.charAt(i);
                             }
+                            Variable numVar;
+                            if (c == '.') {
+                                do {
+                                    currentToken += c;
+                                    i++;
+                                    c = line.charAt(i);
+                                } while (isIdentifierChar(c));
+                                numVar = new Variable(Double.parseDouble(currentToken));
+                            }
+                            else {
+                                numVar = new Variable(Integer.parseInt(currentToken));
+                            }
+                            //end by setting current character to last one of identifier
+                            i--;
+                            skip = true;
+                            //currentToken is now the value of number
+                            tokenTypes.add(TokenType.Number);
+                            tokenVariables.add(numVar);
+                            currentToken = "";
                         }
-                        //get next non-space character
-                        while (c == ' ') {
-                            i++;
-                            c = line.charAt(i);
-                        }
-
-
-
                     }
+
+                    //check for operator character
+                    else if (Keywords.OPERATOR_CHARACTERS.indexOf(c) > -1) {
+                        if (tokenStack.isEmpty()) {
+                            tokenTypes.add(TokenType.Operator);
+                            tokenVariables.add(new Variable(c));
+                            skip = true;
+                        }
+                    }
+                
+                    //check for joiner keyword
+                    else if (c == ' ') {
+                        if (tokenStack.isEmpty()) {
+                            tokenTypes.add(TokenType.Joiner);
+                            tokenVariables.add(new Variable());
+                            skip = true;
+                        }
+                    }
+                
+                    //must be unexpected character, throw error
+                    else {
+                        throw new Error("Unexpected symbol at position: " + i);
+                    }
+                
+                }
+                //first-level expression has not begun or ended
+                if (!skip) {
+                    currentToken += c;
                 }
             }
-            
         }
-        for (int t = 0; t < tokenValues.size(); t++) {
-            String currentValue = tokenValues.get(t);
+        //process token combinations
+        List<Variable> finalVariables = new ArrayList<Variable>();
+        for (int t = 0; t < tokenTypes.size(); t++) {
             TokenType currentType = tokenTypes.get(t);
+            System.out.println(tokenTypes.get(t) + ": " + tokenVariables.get(t));
+            if (currentType == TokenType.Identifier) {
+                //there is another token after it
+                if (t + 1 < tokenTypes.size()) {
+                    TokenType nextType = tokenTypes.get(t + 1);
 
-            if (currentType == TokenType.Expression) {
-                tokenVariables.add(interpretExpression(currentValue, env));
-            }
-            else if (currentType == TokenType.String) {
-                tokenVariables.add(new Variable(currentValue));
-            }
-            else if (currentType == TokenType.Variable) {
-                if (env.containsVariable(currentValue)) {
-                    tokenVariables.add(env.getVariable(currentValue));
-                }
-                else {
-                    throw new Error("Variable name not found");
+                    //TODO figure out what identifier is
                 }
             }
-            else {
+        }
 
-            }
-        }
-        if (tokenValues.size() > 1) {
-            for (Variable token : tokenVariables) {
-                result = result.addTo(token);
-            }
-        }
         return result;
     }
 
-
+    
+    public static Variable interpretExpression(String line, Environment env) {
+        return eval(line, env);
+    }
     //ily calvin
     //calvin++
 
@@ -352,7 +339,6 @@ public class StaticMethods {
             // TODO: throw some error here
         }
         
-        String special = "()^/*+-";
         String expression = line;
         
         while (expression.contains("(") || expression.contains("")) {
@@ -396,12 +382,7 @@ public class StaticMethods {
         // }
         return 0.0;
     }
-    
-    // replaces all variable and functions with proper bits
-    // private String preprocessing(String line) {
-    //     String[] separate = line.replace(Keywords.ESCAPE_CHARACTER_KEYWORD + Keywords.STRING_LITERAL_KEYWORD).split("#");
 
-    // }
     public static boolean isAlpha(char c) {
         String alpha = "abcdefghijklmnopqrstuvwxyz";
         return (alpha.contains(c + "") || alpha.toUpperCase().contains(c + ""));
@@ -412,17 +393,7 @@ public class StaticMethods {
         }
         return false;
     }
-
-    public static String preprocess(String line) {
-        return line;
-        // int i = 0;
-        // String out = "";
-        // while (i < line.length()) {
-        //     char c = line.charAt(i);
-        //     if (c == Keywords.ESCAPE_CHARACTER_KEYWORD) {
-        //         i++;
-        //         c = line.charAt(i);
-        //     }
-        // }
+    public static boolean isIdentifierChar(char c) {
+        return (isAlpha(c) || isDigit(c) || c == '_');
     }
 }

@@ -263,12 +263,15 @@ public class Variable {
 
     @Override
     public String toString() {
-         if (data instanceof ArrayList) {
+        if (data instanceof ArrayList) {
             String result = "[";
             for (Variable v : (ArrayList<Variable>) data) {
                 result += v.toString() + ", ";
             }
             return (new Variable(result)).slice(0, -2).toString() + "]";
+        }
+        if (data == null) {
+            return "null";
         }
         return data.toString();
     }
