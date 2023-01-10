@@ -6,7 +6,7 @@ public class StaticMethods {
         None, Variable, Function, Integer, Double, String, Array, Expression, StringInExpression, VarFunc, Number
     }
     private enum ExpressionType {
-        Expression, ArrayIndex, FunctionParams, String, 
+        None, Expression, ArrayIndex, FunctionParams, String, 
     }
 
     public static void print(String line, Environment env) {
@@ -55,17 +55,32 @@ public class StaticMethods {
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
             boolean skip = false;
+            ExpressionType currentType = ExpressionType.None;
+            if (!tokenStack.isEmpty()) {
+                currentType = tokenStack.peek();
+            }
+
             if (c == Keywords.ESCAPE_CHARACTER_KEYWORD) {
                 //skip next character
                 skip = true;
                 i++;
             }
             if (!skip) {
+                //begin/end string expression
                 if (c == Keywords.STRING_LITERAL_KEYWORD) {
-                    tokenStack.add(ExpressionType.String);
+                    //end expression
+                    if (tokenStack.peek() == ExpressionType.String) {
+                        tokenStack.pop();
+                    }
+                    //begin expression
+                    else {
+                        tokenStack.add(ExpressionType.String);
+                    }
+                    skip = true;
                 }
                 else if (c == Keywords.OPEN_PAREN_KEYWORD) {
                     tokenStack.add(ExpressionType.Expression);
+                    skip = true;
                 }
                 else if (c == Keywords.CLOSE_ARRAY_KEYWORD) {
                     if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.Expression) {
@@ -74,10 +89,12 @@ public class StaticMethods {
                     else {
                         throw new Error("No opening parenthesis!");
                     }
+                    skip = true;
                 }
 
                 else if (c == Keywords.OPEN_ARRAY_KEYWORD) {
                     tokenStack.add(ExpressionType.ArrayIndex);
+                    skip = true;
                 }
                 else if (c == Keywords.CLOSE_ARRAY_KEYWORD) {
                     if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.ArrayIndex) {
@@ -86,13 +103,20 @@ public class StaticMethods {
                     else {
                         throw new Error("No opening square bracket!");
                     }
+                    skip = true;
                 }
                 
-                else if (tokenStack.isEmpty()) {
+                if (tokenStack.isEmpty()) {
                     currentToken += c;
                 }
                 else if (tokenStack.size() == 1) {
-                    if (tokenStack.peek() == ExpressionType.String) {}
+                    //within first layer and it is string
+                    if (tokenStack.peek() == ExpressionType.String && !) {
+                        currentToken += c;
+                    }
+                }
+                else {
+                    if 
                 }
             }
         }
