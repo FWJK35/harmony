@@ -2,9 +2,11 @@ import java.util.*;
 
 public class StaticMethods {
     
+    //types of expressions used in token types
     private enum TokenType {
         None, Number, String, Expression, Array, Identifier, Operator, Joiner
     }
+    //types of expressions used in expression stack
     private enum ExpressionType {
         None, Expression, Array, String, Identifier
     }
@@ -267,6 +269,25 @@ public class StaticMethods {
                     TokenType nextType = tokenTypes.get(t + 1);
 
                     //TODO figure out what identifier is
+
+                    //identifies function
+                    if (nextType == TokenType.Expression) {
+
+                    }
+                    
+                    //identifies array index or slice
+                    else if (nextType == TokenType.Array) {
+
+                    }
+
+                    else {
+                        throw new Error("Incorrect token found!");
+                    }
+                }
+
+                //just a variable
+                else {
+                    
                 }
             }
         }
