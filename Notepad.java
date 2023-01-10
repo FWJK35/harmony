@@ -1,4 +1,3 @@
-
 import java.io.*;
 import java.util.*;
 import java.awt.event.*;  
@@ -6,17 +5,20 @@ import javax.swing.*;
 
 public class Notepad implements ActionListener  
 {  
-    File file;
-    JFrame frm;  
-    JMenuBar mnubr;  
-    JMenu fileMenu, editMenu;  
-    JMenuItem openItem, saveItem, runItem;
-    JMenuItem cutItem, copyItem, pasteItem, selectAll;
-    JTextArea txtarea;  
+    public static int windows = 0;
+    private File file;
+    private JFrame frm;
+    private JMenuBar mnubr;  
+    private JMenu fileMenu, editMenu;  
+    private JMenuItem openItem, saveItem, runItem;
+    private JMenuItem cutItem, copyItem, pasteItem, selectAll;
+    private JTextArea txtarea;  
     Notepad(String fileName) {
-        frm = new JFrame();  
+        windows++;
+
+        frm = new JFrame();
         mnubr = new JMenuBar();  
-        mnubr.setBounds(5, 5, 400, 20);  
+        mnubr.setBounds(5, 5, 500, 20);  
         
         fileMenu = new JMenu("File");  
         openItem = new JMenuItem("openItem");
@@ -50,15 +52,21 @@ public class Notepad implements ActionListener
         mnubr.add(editMenu);
         txtarea = new JTextArea();  
         txtarea.setBounds(5, 30, 460, 460);  
+        JScrollPane scroll = new JScrollPane (txtarea);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
         frm.add(mnubr);  
-        frm.add(txtarea);  
+        frm.add(txtarea);
         frm.setLayout(null);  
-        frm.setSize(500, 500);  
-        frm.setVisible(true);  
+        frm.setSize(500, 500);
+        frm.setResizable(true);
+        frm.setVisible(true);
 
         Scanner scan = new Scanner(System.in);
         try {
-            scan = new Scanner(new File(fileName));
+            file = new File(fileName);
+            scan = new Scanner(file);
             while(scan.hasNextLine()) {
                 txtarea.append(scan.nextLine() + "\n");
             }
@@ -67,6 +75,8 @@ public class Notepad implements ActionListener
             System.out.println("Error: Invalid File");
         }
         scan.close();
+
+        
     }  
     
     public void actionPerformed(ActionEvent ae)  
@@ -86,8 +96,39 @@ public class Notepad implements ActionListener
 
 
         else if (ae.getSource() == openItem) {
-
+            try {
+                String fileName = JOptionPane.showInputDialog("Input File Name: ");
+                fileName = fileName.trim();
+                if (fileName.isEmpty()) {
+                    int i = 1;
+                    while(new File(fileName).exists()) {
+                        fileName = "Untitled " + i; 
+                        i++;
+                    }
+                }
+                File file = new File(fileName);
+                if (file.createNewFile()) {
+                    if (JOptionPane.showConfirmDialog(null, "Create new file named \"" + fileName + "\"?", "Error: File not found", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        new Notepad(fileName);
+                    }
+                    else {
+                        file.delete();
+                    }
+                }
+                else {
+                    try {
+                        new Notepad(fileName);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.out.println("Bad file name");
+                    }
+                }
+            } catch (IOException e) {
+                e.getStackTrace();
+                System.out.println("Error: Invalid File");
+            }
         }
+
         else if (ae.getSource() == saveItem || ae.getSource() == runItem) {
             try {
                 Scanner in = new Scanner(txtarea.getText());

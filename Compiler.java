@@ -11,24 +11,9 @@ public class Compiler {
     public static Environment env;
     // public static List<Function> functions = env.getFunctions();
     public static void main(String[] args) {
-        test();
+        // test();
 
-        // prompt file name using JOptionPane 
-        try {
-            String fileName = JOptionPane.showInputDialog("Input File Name: ");
-            fileName = fileName.trim(); 
-            File file = new File(fileName);
-            if (file.createNewFile()) {
-                writeFile(file);
-            }
-            else {
-                // runCode(new Scanner(file));
-            }
-            new Notepad(fileName);
-        } catch (IOException e) {
-            e.getStackTrace();
-            System.out.println("Error: Invalid File");
-        }
+        new Notepad("");
     }
 
     public static void writeFile(File file) {
