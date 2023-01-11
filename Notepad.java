@@ -13,14 +13,15 @@ public class Notepad implements ActionListener
     private JMenuItem openItem, saveItem, runItem;
     private JMenuItem cutItem, copyItem, pasteItem, selectAll;
     private JTextArea txtarea;  
-    Notepad(String fileName) {
+
+    public Notepad(String fileName) {
         windows++;
 
-        frm = new JFrame();
-        mnubr = new JMenuBar();  
-        mnubr.setBounds(5, 5, 500, 20);  
+        frm = new JFrame(fileName);
+        mnubr = new JMenuBar();
+        mnubr.setBounds(5, 5, 500, 20);
         
-        fileMenu = new JMenu("File");  
+        fileMenu = new JMenu("File");
         openItem = new JMenuItem("openItem");
         openItem.addActionListener(this);
         fileMenu.add(openItem);
@@ -32,51 +33,47 @@ public class Notepad implements ActionListener
         fileMenu.add(runItem);
 
         editMenu = new JMenu("Edit");
-        
-        cutItem = new JMenuItem("cutItem");  
-        copyItem = new JMenuItem("copyItem");  
-        pasteItem = new JMenuItem("pasteItem");  
-        selectAll = new JMenuItem("selectAllItem");  
-
-        editMenu.add(cutItem);  
-        editMenu.add(copyItem);  
-        editMenu.add(pasteItem);  
+        cutItem = new JMenuItem("cutItem");
+        editMenu.add(cutItem);
+        cutItem.addActionListener(this); 
+        copyItem = new JMenuItem("copyItem");
+        copyItem.addActionListener(this);
+        editMenu.add(copyItem); 
+        pasteItem = new JMenuItem("pasteItem");
+        editMenu.add(pasteItem);
+        pasteItem.addActionListener(this);
+        selectAll = new JMenuItem("selectAllItem");
+        selectAll.addActionListener(this);  
         editMenu.add(selectAll);  
         
-        copyItem.addActionListener(this);  
-        cutItem.addActionListener(this);  
-        selectAll.addActionListener(this);  
-        pasteItem.addActionListener(this);
-
         mnubr.add(fileMenu);  
         mnubr.add(editMenu);
-        txtarea = new JTextArea();  
-        txtarea.setBounds(5, 30, 460, 460);  
-        JScrollPane scroll = new JScrollPane (txtarea);
-        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        txtarea = new JTextArea(400, 400);  
+        txtarea.setBounds(5,30,460,460);
 
-        frm.add(mnubr);  
-        frm.add(txtarea);
+        JScrollPane scroll = new JScrollPane(txtarea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
+
+        frm.add(mnubr);
+        frm.add(scroll);
         frm.setLayout(null);  
         frm.setSize(500, 500);
+        scroll.setSize(100, 100);
         frm.setResizable(true);
         frm.setVisible(true);
+        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Scanner scan = new Scanner(System.in);
         try {
             file = new File(fileName);
-            scan = new Scanner(file);
+            Scanner scan = new Scanner(file);
             while(scan.hasNextLine()) {
                 txtarea.append(scan.nextLine() + "\n");
             }
+            scan.close();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Error: Invalid File");
+            System.out.println("the file tastes bad :(");
         }
-        scan.close();
-
-        
     }  
     
     public void actionPerformed(ActionEvent ae)  

@@ -35,6 +35,10 @@ public class Function {
         return Compiler.runCode(new Scanner(code));
     }
 
+    public Variable run(List<Variable> args) {
+        return new Variable();
+    }
+
     public static Function getFunction(List<Function> functions, String name, List<Variable> inputs) {
         for (Function possible : functions) {
             if (name.equals(possible.getName()) && inputs.size() == possible.getParamTypes().size()) {

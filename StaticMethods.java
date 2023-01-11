@@ -262,6 +262,7 @@ public class StaticMethods {
         List<Variable> finalVariables = new ArrayList<Variable>();
         for (int t = 0; t < tokenTypes.size(); t++) {
             TokenType currentType = tokenTypes.get(t);
+            Variable currentVariable = tokenVariables.get(t);
             System.out.println(tokenTypes.get(t) + ": " + tokenVariables.get(t));
             if (currentType == TokenType.Identifier) {
                 //there is another token after it
@@ -272,12 +273,34 @@ public class StaticMethods {
 
                     //identifies function
                     if (nextType == TokenType.Expression) {
-
+                        t++;
+                        List<Variable> arguments = new ArrayList<Variable>();
+                        Variable nextVariable = tokenVariables.get(t);
+                        //adds arguments to function parameters
+                        for (String arg : separate((String) currentVariable.getData())) {
+                            arguments.add(eval(arg, env));
+                        }
+                        Function func = env.getFunction(currentToken, arguments);
+                        if (func != null) {
+                            finalVariables.add(func.run(arguments));
+                        }
                     }
                     
                     //identifies array index or slice
                     else if (nextType == TokenType.Array) {
+                        //TODO do something
+                    }
 
+                    //variable OR operator
+                    else if (nextType == TokenType.Joiner) {
+                        while (nextType == TokenType.Joiner) {
+                            t++;
+                            nextType = tokenTypes.get(t);
+                        }
+                        //number expression
+                        if (nextType == TokenType.Operator) {
+
+                        }
                     }
 
                     else {
@@ -295,7 +318,101 @@ public class StaticMethods {
         return result;
     }
 
-    
+    public static List<String> separate(String line) {
+        List<String> args = new ArrayList<String>();
+        Stack<ExpressionType> tokenStack = new Stack<ExpressionType>();
+        String currentArg = "";
+        for (int i = 0; i < line.length(); i++)  {
+            char c = line.charAt(i);
+            boolean skip = false;
+            if (c == Keywords.ESCAPE_CHARACTER_KEYWORD) {
+                //skip next character
+                skip = true;
+                i++;
+            }
+
+            if (!skip) {
+                //begin/end string expression
+                if (c == Keywords.STRING_LITERAL_KEYWORD) {
+                    //check for end string
+                    if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.String) {
+                        //end string
+                        tokenStack.pop();
+                    }
+                    //check for begin string
+                    else {
+                        //don't add this character if it isn't inside any expression
+                        //begin string
+                        tokenStack.add(ExpressionType.String);
+                    }
+                }
+                //if not currently in a string
+                else if (tokenStack.isEmpty() || tokenStack.peek() != ExpressionType.String) {
+                    //check for begin expression
+                    if (c == Keywords.OPEN_PAREN_KEYWORD) {
+                        //begin expression
+                        tokenStack.add(ExpressionType.Expression);
+                    }
+
+                    //check for end expression
+                    else if (c == Keywords.CLOSE_PAREN_KEYWORD) {
+                        //check that closing parenthesis is valid
+                        if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.Expression) {
+                            //end expression
+                            tokenStack.pop();
+                        }
+                        //does not have matching parenthesis
+                        else {
+                            if (tokenStack.isEmpty()) {
+                                throw new Error("No opening parenthesis");
+                            }
+                            else {
+                                throw new Error("Must close previous expression");
+                            }
+                        }
+                    }
+
+                    //check for beginning of array
+                    else if (c == Keywords.OPEN_ARRAY_KEYWORD) {
+                        //begin array index or definition
+                        tokenStack.add(ExpressionType.Array);
+                    }
+
+                    //check for end of array
+                    else if (c == Keywords.CLOSE_ARRAY_KEYWORD) {
+                        //check that closing parenthesis is valid
+                        if (!tokenStack.isEmpty() && tokenStack.peek() == ExpressionType.Array) {
+                            //end expression
+                            tokenStack.pop();
+                        }
+                        //does not have matching parenthesis
+                        else {
+                            if (tokenStack.isEmpty()) {
+                                throw new Error("No opening square bracket");
+                            }
+                            else {
+                                throw new Error("Must close previous expression");
+                            }
+                        }
+                    }
+                    
+                }
+            }
+
+            if (c == Keywords.SEPARATOR_KEYWORD && tokenStack.isEmpty()) {
+                args.add(currentArg);
+                currentArg = "";
+            }
+            else {
+                currentArg += c;
+            }
+        }
+        args.add(currentArg);
+
+        return args;
+    }
+
+
     public static Variable interpretExpression(String line, Environment env) {
         return eval(line, env);
     }

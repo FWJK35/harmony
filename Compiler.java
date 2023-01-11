@@ -8,13 +8,16 @@ import javax.swing.*;
  */
 
 public class Compiler {
-    public static Environment env;
+    private Environment env;
     // public static List<Function> functions = env.getFunctions();
     public static void main(String[] args) {
         // test();
 
-        new Notepad("");
+        new Notepad("code.hrm");
     }
+
+    //TODO write compile method
+    //adds global variables and all functions
 
     public static void writeFile(File file) {
         new Notepad(file.getName());

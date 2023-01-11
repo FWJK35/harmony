@@ -1,0 +1,45 @@
+public static main(String[] args) {
+
+}
+
+wdym non main str[] args :)
+
+public static int square(int a) {
+
+}
+
+wdym int square int :)
+
+System.out.println(10);
+
+xd 10
+
+int calvin = 10
+
+calvin aka 10
+
+calvin++;
+
+ily calvin
+
+calvin--;
+
+kys calvin
+
+if (calvin == 11) {
+
+}
+
+lmao calvin is 11 :)
+
+for (int i = 0; i < 5; i++) {
+
+}
+
+lmfao i aka 10 ? i < 5 ? ily i :)
+
+while (f < 10) {
+
+}
+
+cope f < 10 :)
