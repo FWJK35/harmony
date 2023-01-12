@@ -424,14 +424,35 @@ public class StaticMethods {
     //env.getVariable("i").setData(env.getVariable("i").addTo(new Variable(          )).getData());
     //calvin += 3000
 
-    //ily = Keywords.INCREMENT_KEYWORD
-    public void increment(Environment env, String line) {
+    public static void defineVariable(Environment env, String line) {
+        String[] tokens = line.split(" ");
+        if (line.length() >= 3) {
+            boolean validName = true;
+            if (!isAlpha(tokens[0].charAt(0))) {
+                validName = false;
+            }
+            for (char c : tokens[0].toCharArray()) {
+                if (!isIdentifierChar(c)) {
+                    validName = false;
+                }
+            }
+            if (!validName) {
+                throw new Error("Invalid identifier name");
+            }
+            
+        }
+        else {
+            throw new Error("Could not read variable definition");
+        }
+    }
+
+    public static void increment(Environment env, String line) {
         String variableName = line.split(" ")[1];
         String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 
         Variable incrementBy = interpretExpression(afterVariable, env);
         env.getVariable(variableName).setData(env.getVariable(variableName).addTo(incrementBy));
     } 
-    public void decrement(Environment env, String line) {
+    public static void decrement(Environment env, String line) {
         String variableName = line.split(" ")[1];
         String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 
         Variable incrementBy = interpretExpression(afterVariable, env);
@@ -448,8 +469,6 @@ public class StaticMethods {
         } else {
             throw new Error("type has to be double or integer");
         }
-        
-        
     }
 
     /* TODO read this

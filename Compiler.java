@@ -9,22 +9,50 @@ import javax.swing.*;
 
 public class Compiler {
     private Environment env;
+    private File file;
     // public static List<Function> functions = env.getFunctions();
-    public static void main(String[] args) {
-        // test();
-
-        new Notepad("code.hrm");
+    
+    public Compiler(File file) {
+        this.file = file;
     }
-
+    
     //TODO write compile method
     //adds global variables and all functions
+    public void compile() {
+        env = new Environment();
+        try {
+            Scanner fileScanner = new Scanner(file);
+            String currentFunc = "";
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                String[] tokens = line.split(" ");
+                //least indentation
+                if (StaticMethods.countIndent(line) == 0) {
+                    //first token is define token
+                    if (tokens.length > TokenIndex.DEFINE_TOKEN) {
+                        if (tokens.length - TokenIndex.MIN_DEFINE_LEN >= 0 && (tokens.length - TokenIndex.MIN_DEFINE_LEN) % 2 == 0) {
+
+                        }
+                    }
+                    
+                }
+                else {
+
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+    }
 
     public static void writeFile(File file) {
         new Notepad(file.getName());
     }
 
 
-    public static Variable runCode(Scanner file) {
+    public Variable runCode(Scanner file) {
         return runCode(file, env);
     }
 

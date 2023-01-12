@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.awt.*;
 import java.awt.event.*;  
 import javax.swing.*;  
 
@@ -7,6 +8,7 @@ public class Notepad implements ActionListener
 {  
     public static int windows = 0;
     private File file;
+    private Compiler compiler;
     private JFrame frm;
     private JMenuBar mnubr;  
     private JMenu fileMenu, editMenu;  
@@ -14,12 +16,51 @@ public class Notepad implements ActionListener
     private JMenuItem cutItem, copyItem, pasteItem, selectAll;
     private JTextArea txtarea;  
 
+    public static void main(String[] args) {
+        Main.main(null);
+    }
+
+    public Notepad() {
+        try {
+                String fileName = JOptionPane.showInputDialog("Input File Name: ");
+                fileName = fileName.trim();
+                if (fileName.isEmpty()) {
+                    int i = 1;
+                    while(new File(fileName).exists()) {
+                        fileName = "Untitled " + i; 
+                        i++;
+                    }
+                }
+                File file = new File(fileName);
+                if (file.createNewFile()) {
+                    if (JOptionPane.showConfirmDialog(null, "Create new file named \"" + fileName + "\"?", "Error: File not found", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        new Notepad(fileName);
+                    }
+                    else {
+                        file.delete();
+                    }
+                }
+                else {
+                    try {
+                        new Notepad(fileName);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.out.println("Bad file name");
+                    }
+                }
+        } catch (IOException e) {
+            e.getStackTrace();
+            System.out.println("Error: Invalid File");
+        }
+    }
+
     public Notepad(String fileName) {
         windows++;
 
+        compiler = new Compiler(file);
         frm = new JFrame(fileName);
         mnubr = new JMenuBar();
-        mnubr.setBounds(5, 5, 500, 20);
+        mnubr.setBounds(0, 0, 500, 20);
         
         fileMenu = new JMenu("File");
         openItem = new JMenuItem("openItem");
@@ -52,16 +93,24 @@ public class Notepad implements ActionListener
         txtarea.setBounds(5,30,460,460);
 
         JScrollPane scroll = new JScrollPane(txtarea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        
+        scroll.setBounds(0, 20, 500, 500);
+        scroll.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
+        scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 10));
 
         frm.add(mnubr);
         frm.add(scroll);
         frm.setLayout(null);  
         frm.setSize(500, 500);
-        scroll.setSize(100, 100);
         frm.setResizable(true);
         frm.setVisible(true);
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        frm.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent componentEvent) {
+                scroll.setBounds(0, 20, frm.getWidth()-20, frm.getHeight()-40);
+                mnubr.setBounds(0, 0, frm.getWidth(), 20);
+            }
+        }); 
 
         try {
             file = new File(fileName);
@@ -144,10 +193,10 @@ public class Notepad implements ActionListener
         }
         if (ae.getSource() == runItem) {
             try {
-                Compiler.runCode(new Scanner(file));
+                compiler.runCode(new Scanner(file));
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("idk what happened this should've been fine x2");
+                System.out.println("lol code bad");
             }
         }
     }
