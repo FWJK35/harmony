@@ -16,5 +16,5 @@ public class TokenIndex {
     public static final int FOR_STATEMENT_TOKEN = 0;
     public static final int RETURN_TOKEN = 0;
     public static final int DEFINE_TOKEN = 0;
-    public static final int MIN_DEFINE_LEN = 3;
+    public static final int MIN_DEFINE_LEN = 4;
 }

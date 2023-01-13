@@ -29,10 +29,15 @@ public class Compiler {
                 //least indentation
                 if (StaticMethods.countIndent(line) == 0) {
                     //first token is define token
-                    if (tokens.length > TokenIndex.DEFINE_TOKEN) {
+                    if (tokens.length >= TokenIndex.DEFINE_TOKEN && tokens[TokenIndex.DEFINE_TOKEN].equals(Keywords.DEFINE_FUNCTION_KEYWORD)) {
+                        //at least has min number of tokens in definition
                         if (tokens.length - TokenIndex.MIN_DEFINE_LEN >= 0 && (tokens.length - TokenIndex.MIN_DEFINE_LEN) % 2 == 0) {
-
+                            
                         }
+                    }
+                    else if (tokens.length >= TokenIndex.DEFINE_VARIABLE_TOKEN + 1 && 
+                            tokens[TokenIndex.DEFINE_VARIABLE_TOKEN].equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
+                        StaticMethods.defineVariable(env, line);
                     }
                     
                 }

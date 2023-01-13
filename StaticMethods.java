@@ -439,10 +439,20 @@ public class StaticMethods {
             if (!validName) {
                 throw new Error("Invalid identifier name");
             }
-            
+            String expression = line.substring(line.indexOf(Keywords.DEFINE_VARIABLE_KEYWORD) + Keywords.DEFINE_VARIABLE_KEYWORD.length());
+            env.putVariable(tokens[0], eval(expression, env));
         }
         else {
             throw new Error("Could not read variable definition");
+        }
+    }
+
+    // wdym TYPE NAME type1 name1 type2 name2 :)
+    public static void defineFunction(Environment env, String defLine) {
+        String[] tokens = defLine.split(" ");
+        Map<String, String> params = 
+        for (int t = TokenIndex.MIN_DEFINE_LEN; t < tokens.length; t += 2) {
+
         }
     }
 
