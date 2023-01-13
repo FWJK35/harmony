@@ -450,8 +450,12 @@ public class StaticMethods {
     // wdym TYPE NAME type1 name1 type2 name2 :)
     public static void defineFunction(Environment env, String defLine) {
         String[] tokens = defLine.split(" ");
-        Map<String, String> params = 
-        for (int t = TokenIndex.MIN_DEFINE_LEN; t < tokens.length; t += 2) {
+        String returnType = tokens[TokenIndex.DEFINE_FUNCTION_TYPE_TOKEN];
+        String funcName = tokens[TokenIndex.DEFINE_FUNCTION_NAME_TOKEN];
+        List<String> paramTypes = new ArrayList<String>();
+        List<String> paramNames = new ArrayList<String>();
+
+        for (int t = TokenIndex.MIN_DEFINE_LEN - 1; t < tokens.length; t += 2) {
 
         }
     }

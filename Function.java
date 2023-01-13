@@ -2,21 +2,17 @@ import java.util.*;
 
 public class Function {
     String code;
-    Map<String, String> params;
+    List<String> paramNames;
     List<String> paramTypes;
     String returnType;
     String name;
     
-    public Function(String code, Map<String, String> params, List<String> paramTypes, String returnType, String name) {
+    public Function(String code, List<String> paramNames, List<String> paramTypes, String returnType, String name) {
         this.name = name;
         this.code = code;
-        this.params = params;
+        this.paramNames = paramNames;
         this.paramTypes = paramTypes;
         this.returnType = returnType;
-    }
-
-    public Map<String, String> getParams() {
-        return params;
     }
 
     public List<String> getParamTypes() {
@@ -31,8 +27,9 @@ public class Function {
         return name;
     }
 
+    //TODO IMPORT COMPILER CODE HERE
     public Variable runFunction(String[] localParam) {
-        return Compiler.runCode(new Scanner(code));
+        return new Variable();
     }
 
     public Variable run(List<Variable> args) {

@@ -15,6 +15,9 @@ public class TokenIndex {
     public static final int WHILE_STATEMENT_TOKEN = 0;
     public static final int FOR_STATEMENT_TOKEN = 0;
     public static final int RETURN_TOKEN = 0;
-    public static final int DEFINE_TOKEN = 0;
+    
+    public static final int DEFINE_FUNCTION_TOKEN = 0;
+    public static final int DEFINE_FUNCTION_TYPE_TOKEN = 1;
+    public static final int DEFINE_FUNCTION_NAME_TOKEN = 2;
     public static final int MIN_DEFINE_LEN = 4;
 }
