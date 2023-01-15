@@ -32,10 +32,11 @@ public class StaticMethods {
                 indent++;
             }
             else {
-                break;
+                return indent;
             }
         }
-        return indent;
+        //gets to end of line without any characters, could be ambiguous.
+        return -1;
     }
 
     public static Variable getTokenVariable(String token) {
@@ -424,7 +425,7 @@ public class StaticMethods {
     //env.getVariable("i").setData(env.getVariable("i").addTo(new Variable(          )).getData());
     //calvin += 3000
 
-    public static void defineVariable(Environment env, String line) {
+    public static Variable defineVariable(Environment env, String line) {
         String[] tokens = line.split(" ");
         if (line.length() >= 3) {
             boolean validName = true;
@@ -440,7 +441,9 @@ public class StaticMethods {
                 throw new Error("Invalid identifier name");
             }
             String expression = line.substring(line.indexOf(Keywords.DEFINE_VARIABLE_KEYWORD) + Keywords.DEFINE_VARIABLE_KEYWORD.length());
-            env.putVariable(tokens[0], eval(expression, env));
+            Variable evaluated = eval(expression, env)
+            env.putVariable(tokens[0], evaluated);
+            return evaluated;
         }
         else {
             throw new Error("Could not read variable definition");
@@ -448,7 +451,7 @@ public class StaticMethods {
     }
 
     // wdym TYPE NAME type1 name1 type2 name2 :)
-    public static void defineFunction(Environment env, String defLine) {
+    public static Function defineFunction(Environment env, String defLine) {
         String[] tokens = defLine.split(" ");
         String returnType = tokens[TokenIndex.DEFINE_FUNCTION_TYPE_TOKEN];
         String funcName = tokens[TokenIndex.DEFINE_FUNCTION_NAME_TOKEN];
@@ -456,8 +459,13 @@ public class StaticMethods {
         List<String> paramNames = new ArrayList<String>();
 
         for (int t = TokenIndex.MIN_DEFINE_LEN - 1; t < tokens.length; t += 2) {
-
+            paramTypes.add(tokens[t]);
+            paramTypes.add(tokens[t + 1]);
         }
+
+        Function func = new Function("", paramNames, paramTypes, returnType, funcName);
+        env.putFunction(func);
+        return func;
     }
 
     public static void increment(Environment env, String line) {
@@ -466,6 +474,7 @@ public class StaticMethods {
         Variable incrementBy = interpretExpression(afterVariable, env);
         env.getVariable(variableName).setData(env.getVariable(variableName).addTo(incrementBy));
     } 
+
     public static void decrement(Environment env, String line) {
         String variableName = line.split(" ")[1];
         String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 

@@ -22,17 +22,19 @@ public class Compiler {
         env = new Environment();
         try {
             Scanner fileScanner = new Scanner(file);
-            String currentFunc = "";
+            Function currentFunc;
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] tokens = line.split(" ");
+                
                 //least indentation
                 if (StaticMethods.countIndent(line) == 0) {
                     //first token is define token
-                    if (tokens.length >= TokenIndex.DEFINE_TOKEN && tokens[TokenIndex.DEFINE_TOKEN].equals(Keywords.DEFINE_FUNCTION_KEYWORD)) {
+                    if (tokens.length >= TokenIndex.DEFINE_FUNCTION_TOKEN && 
+                            tokens[TokenIndex.DEFINE_FUNCTION_TOKEN].equals(Keywords.DEFINE_FUNCTION_KEYWORD)) {
                         //at least has min number of tokens in definition
                         if (tokens.length - TokenIndex.MIN_DEFINE_LEN >= 0 && (tokens.length - TokenIndex.MIN_DEFINE_LEN) % 2 == 0) {
-                            
+                            Function currentFunc = StaticMethods.defineFunction(env, line);
                         }
                     }
                     else if (tokens.length >= TokenIndex.DEFINE_VARIABLE_TOKEN + 1 && 

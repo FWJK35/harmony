@@ -27,6 +27,10 @@ public class Function {
         return name;
     }
 
+    public void setCode(String newCode) {
+        this.code = newCode;
+    }
+
     //TODO IMPORT COMPILER CODE HERE
     public Variable runFunction(String[] localParam) {
         return new Variable();
