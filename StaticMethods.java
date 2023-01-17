@@ -285,6 +285,8 @@ public class StaticMethods {
                 finalVariables.add(eval(currentVariable.toString(), env));
                 finalTypes.add(FinalType.Evaluated);
             }
+
+            //identifier (function, variable, etc)
             else if (currentType == TokenType.Identifier) {
                 //there is another token after it
                 if (t + 1 < tokenTypes.size()) {
@@ -366,7 +368,7 @@ public class StaticMethods {
 
             //possibly new array
             else if (currentType == TokenType.Array) {
-
+                //TODO work this out
             }
 
             //operator
@@ -374,6 +376,14 @@ public class StaticMethods {
                 finalVariables.add(currentVariable);
                 finalTypes.add(FinalType.Operator);
             }
+        }
+
+        //check for number expressions
+        if (finalTypes.size() >= 3) {
+
+        }
+        for (int f = 0; f < finalTypes.size(); f++) {
+
         }
 
         return result;
@@ -554,73 +564,12 @@ public class StaticMethods {
         }
     }
 
-    /* TODO read this
-     * interpretNumberExpression
-     * should take a string containing numbers, variables, and functions
-     * containing NO SPACES and use order of operations
-     * you can put any expression within parenthesis back into interpretExpression
-     * same with really anything between operators
-     * for example:
-     * 3.5*sqrt(9)+6/(3/2)
-     *     |||||||   |||||
-     * you can put these sections into interpretExpression
-     * have fun :)
-     * 
-     */
+   
 
-    //you can use interpretExpression on each segment of the expression
-    //for example
-    //1+2*3-(sqrt(9)/2)
-    //| | | ||||||||||| <- this 
-    
-
-    public double interpretNumberExpression(String line, Environment env) {
-        if (line.contains(" ")) {
-            // TODO: throw some error here
-        }
-        
-        String expression = line;
-        
-        while (expression.contains("(") || expression.contains("")) {
-            int open = expression.indexOf("(");
-            int close = expression.indexOf(")");
-            if (open < close && open != -1) {
-                expression = expression.substring(0, open) + interpretNumberExpression(expression.substring(open + 1, close), env) + expression.substring(close);
-            }
-            else {
-                // TODO: throw some error here
-            }
-        }
-        
-
-        // int left = 0;
-        // int right = 0;
-        // for (char i : line.toCharArray()) {
-        //     right++;
-        //     if(special.contains(i + "")) {
-        //         if (i=='+') {
-        //             return Integer.parseInt(line.substring(left,right)) + interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='-') {
-        //             return Integer.parseInt(line.substring(left,right)) - interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='*') {
-        //             return Integer.parseInt(line.substring(left,right)) * interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='/') {
-        //             return Integer.parseInt(line.substring(left,right)) / interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='-') {
-        //             return Math.pow(Integer.parseInt(line.substring(left,right)), interpretNumberExpression(line.substring(right), variables, functions));
-        //         }
-        //         else if (i=='(') {
-        //             left = right;
-        //             right = line.indexOf(")");
-                    
-        //         }
-        //     }
-        // }
-        return 0.0;
+    //TODO esther this is ur job
+    //just make it do pemdas assume every variable is an int or double, make it work like java
+    public static Variable interpretNumberExpression(List<Variable> vars, List<Character> ops) {
+        return new Variable();
     }
 
     public static boolean isAlpha(char c) {
