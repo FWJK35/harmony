@@ -1,7 +1,6 @@
 Variable:
     boolean addition (True + True = 2)
 Function:
-    IMPORTANT GET 
     get return statements working
     write test functions
     finish class

@@ -10,6 +10,7 @@ public class Keywords {
     public static final String PRINT_KEYWORD = "xd";
     public static final String INPUT_KEYWORD = "hmu";
     public static final String RETURN_KEYWORD = "ttyl";
+    public static final String EQUALS_KEYWORD = "is";
     public static final char STRING_LITERAL_KEYWORD = '#';
     public static final char ESCAPE_CHARACTER_KEYWORD = '\\';
     public static final char OPEN_PAREN_KEYWORD = '(';
