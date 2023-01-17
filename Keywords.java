@@ -19,4 +19,24 @@ public class Keywords {
     public static final String COLON_KEYWORD = ":)";
     public static final char SEPARATOR_KEYWORD = '?';
     public static final String OPERATOR_CHARACTERS = "+-/*%^";
+
+    //TYPES
+    public static final String NULL_TYPE = "non";
+    public static final String INTEGER_TYPE = "int";
+    public static final String DOUBLE_TYPE = "dbl";
+    public static final String STRING_TYPE = "str";
+    public static final String ARRAY_TYPE = "arr";
+
+    //ILLEGAL IDENTIFIERS
+    public static final String[] ILLEGAL_IDENTIFIERS = {
+        "lmfao", "lmao"
+    };
+    public static boolean isIllegalIdentifier(String s) {
+        for (String id : ILLEGAL_IDENTIFIERS) {
+            if (s.equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

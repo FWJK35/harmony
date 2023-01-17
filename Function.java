@@ -15,6 +15,14 @@ public class Function {
         this.returnType = returnType;
     }
 
+    public Function() {
+        this.name = "";
+        this.code = "";
+        this.paramNames = new ArrayList<String>();
+        this.paramTypes = new ArrayList<String>();
+        this.returnType = "";
+    }
+
     public List<String> getParamTypes() {
         return paramTypes;
     }
@@ -66,5 +74,15 @@ public class Function {
             }
         }
         return result;
+    }
+    public String toString() {
+        String out = "";
+        out += "wdym " + returnType + " " + name + " ";
+        for (int p = 0; p < paramTypes.size(); p++) {
+            out += paramTypes.get(p) + " " + paramNames + " ";
+        }
+        out += ":)\n";
+        out += code;
+        return out;
     }
 }

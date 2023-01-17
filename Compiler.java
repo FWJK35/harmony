@@ -14,29 +14,45 @@ public class Compiler {
     
     public Compiler(File file) {
         this.file = file;
+        this.env = new Environment();
+    }
+
+    public Environment getEnvironment() {
+        return env;
     }
     
     //TODO write compile method
     //adds global variables and all functions
     public void compile() {
         env = new Environment();
-        try {
-            Scanner fileScanner = new Scanner(file);
-            Function currentFunc;
+        try (Scanner fileScanner = new Scanner(file);) {
+
+            boolean defining = false;
+            String code = "";
+            Function currentFunc = new Function();
+
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] tokens = line.split(" ");
-                
+
+
                 //least indentation
-                if (StaticMethods.countIndent(line) == 0) {
-                    //first token is define token
+                if (StaticMethods.countIndent(line) <= 0) {
+                    //check for end of function definition
+                    if (defining) {
+                        defining = false;
+                        currentFunc.setCode(code);
+                    }
+                    //define function token
                     if (tokens.length >= TokenIndex.DEFINE_FUNCTION_TOKEN && 
                             tokens[TokenIndex.DEFINE_FUNCTION_TOKEN].equals(Keywords.DEFINE_FUNCTION_KEYWORD)) {
                         //at least has min number of tokens in definition
                         if (tokens.length - TokenIndex.MIN_DEFINE_LEN >= 0 && (tokens.length - TokenIndex.MIN_DEFINE_LEN) % 2 == 0) {
-                            Function currentFunc = StaticMethods.defineFunction(env, line);
+                            currentFunc = StaticMethods.defineFunction(env, line);
+                            defining = true;
                         }
                     }
+                    //define variable token
                     else if (tokens.length >= TokenIndex.DEFINE_VARIABLE_TOKEN + 1 && 
                             tokens[TokenIndex.DEFINE_VARIABLE_TOKEN].equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
                         StaticMethods.defineVariable(env, line);
@@ -44,14 +60,23 @@ public class Compiler {
                     
                 }
                 else {
-
+                    if (defining) {
+                        code += line + "\n";
+                    }
+                    else {
+                        throw new Error("Incorrect indentation!");
+                    }
                 }
             }
+            //get to end, finish defining
+            if (defining) {
+                currentFunc.setCode(code);
+            }
+            fileScanner.close();
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        
     }
 
     public static void writeFile(File file) {
@@ -133,7 +158,7 @@ public class Compiler {
                         String line = itr.next();
                         currentLine++;
                         if (indent < StaticMethods.countIndent(line)) {
-                            runCode(new Scanner(line));
+                            // runCode(new Scanner(line));
                         }
                         else {
                             isLoop = false;
@@ -162,7 +187,7 @@ public class Compiler {
             e.getStackTrace();
         }
         
-        runCode(input);
+        // runCode(input);
     }
     
     

@@ -6,6 +6,10 @@ public class StaticMethods {
     private enum TokenType {
         None, Number, String, Expression, Array, Identifier, Operator, Joiner
     }
+    //types of expressions used in final list
+    private enum FinalType {
+        Evaluated, Array, Operator
+    }
     //types of expressions used in expression stack
     private enum ExpressionType {
         None, Expression, Array, String, Identifier
@@ -50,7 +54,7 @@ public class StaticMethods {
     }
 
     public static Variable eval(String line, Environment env) {
-
+        line = line.strip();
         Variable result = new Variable();
         List<TokenType> tokenTypes = new ArrayList<TokenType>();
         List<Variable> tokenVariables = new ArrayList<Variable>();
@@ -183,7 +187,7 @@ public class StaticMethods {
                     else if (isAlpha(c)) {
                         //will need to be evaluated
                         if (tokenStack.isEmpty()) {
-                            while (isIdentifierChar(c)) {
+                            while (isIdentifierChar(c) && i + 1 < line.length()) {
                                 currentToken += c;
                                 i++;
                                 c = line.charAt(i);
@@ -202,10 +206,12 @@ public class StaticMethods {
                     else if (isDigit(c)) {
                         //will need to be evaluated
                         if (tokenStack.isEmpty()) {
-                            while (isDigit(c)) {
+                            while (isDigit(c) && i < line.length()) {
                                 currentToken += c;
                                 i++;
-                                c = line.charAt(i);
+                                if (i < line.length()) {
+                                    c = line.charAt(i);
+                                }
                             }
                             Variable numVar;
                             if (c == '.') {
@@ -259,18 +265,30 @@ public class StaticMethods {
                 }
             }
         }
+
+        //remove double joiners
+        for (int t = tokenTypes.size() - 2; t > 0; t--) {
+            if (tokenTypes.get(t) == tokenTypes.get(t + 1) && tokenTypes.get(t) == TokenType.Joiner) {
+                tokenTypes.remove(t);
+                tokenVariables.remove(t);
+            }
+        }
+        
         //process token combinations
         List<Variable> finalVariables = new ArrayList<Variable>();
+        List<FinalType> finalTypes = new ArrayList<FinalType>();
         for (int t = 0; t < tokenTypes.size(); t++) {
             TokenType currentType = tokenTypes.get(t);
             Variable currentVariable = tokenVariables.get(t);
             System.out.println(tokenTypes.get(t) + ": " + tokenVariables.get(t));
-            if (currentType == TokenType.Identifier) {
+            if (currentType == TokenType.Expression) {
+                finalVariables.add(eval(currentVariable.toString(), env));
+                finalTypes.add(FinalType.Evaluated);
+            }
+            else if (currentType == TokenType.Identifier) {
                 //there is another token after it
                 if (t + 1 < tokenTypes.size()) {
                     TokenType nextType = tokenTypes.get(t + 1);
-
-                    //TODO figure out what identifier is
 
                     //identifies function
                     if (nextType == TokenType.Expression) {
@@ -278,12 +296,16 @@ public class StaticMethods {
                         List<Variable> arguments = new ArrayList<Variable>();
                         Variable nextVariable = tokenVariables.get(t);
                         //adds arguments to function parameters
-                        for (String arg : separate((String) currentVariable.getData())) {
+                        for (String arg : separate(nextVariable.toString())) {
                             arguments.add(eval(arg, env));
                         }
-                        Function func = env.getFunction(currentToken, arguments);
+                        Function func = env.getFunction(currentVariable.toString(), arguments);
                         if (func != null) {
                             finalVariables.add(func.run(arguments));
+                            finalTypes.add(FinalType.Evaluated);
+                        }
+                        else {
+                            throw new Error("Function not found");
                         }
                     }
                     
@@ -292,16 +314,12 @@ public class StaticMethods {
                         //TODO do something
                     }
 
-                    //variable OR operator
-                    else if (nextType == TokenType.Joiner) {
-                        while (nextType == TokenType.Joiner) {
-                            t++;
-                            nextType = tokenTypes.get(t);
-                        }
-                        //number expression
-                        if (nextType == TokenType.Operator) {
-
-                        }
+                    //just a variable
+                    else if (nextType == TokenType.Joiner || nextType == TokenType.Operator) {
+                        //add the value of that variable
+                        finalVariables.add(env.getVariable(currentVariable.toString()));
+                        finalTypes.add(FinalType.Evaluated);
+                        //do nothing, just figure out at next step
                     }
 
                     else {
@@ -311,8 +329,50 @@ public class StaticMethods {
 
                 //just a variable
                 else {
-                    
+                    finalVariables.add(env.getVariable(currentVariable.toString()));
+                    finalTypes.add(FinalType.Evaluated);
                 }
+            }
+
+            //string
+            else if (currentType == TokenType.String) {
+                if (t + 1 < tokenTypes.size()) {
+                    TokenType nextType = tokenTypes.get(t + 1);
+                    if (nextType == TokenType.Array) {
+                        //TODO slice the string
+                    }
+                    //regular string
+                    else if (nextType == TokenType.Joiner) {
+                        finalVariables.add(currentVariable);
+                        finalTypes.add(FinalType.Evaluated);
+                    }
+                    else {
+                        throw new Error("Incorrect token found!");
+                    }
+                }
+                //regular string
+                else {
+                    finalVariables.add(currentVariable);
+                    finalTypes.add(FinalType.Evaluated);
+                }
+                
+            }
+
+            //regular number
+            else if (currentType == TokenType.Number) {
+                finalVariables.add(currentVariable);
+                finalTypes.add(FinalType.Evaluated);
+            }
+
+            //possibly new array
+            else if (currentType == TokenType.Array) {
+
+            }
+
+            //operator
+            else if (currentType == TokenType.Operator) {
+                finalVariables.add(currentVariable);
+                finalTypes.add(FinalType.Operator);
             }
         }
 
@@ -441,7 +501,7 @@ public class StaticMethods {
                 throw new Error("Invalid identifier name");
             }
             String expression = line.substring(line.indexOf(Keywords.DEFINE_VARIABLE_KEYWORD) + Keywords.DEFINE_VARIABLE_KEYWORD.length());
-            Variable evaluated = eval(expression, env)
+            Variable evaluated = eval(expression, env);
             env.putVariable(tokens[0], evaluated);
             return evaluated;
         }
@@ -458,7 +518,7 @@ public class StaticMethods {
         List<String> paramTypes = new ArrayList<String>();
         List<String> paramNames = new ArrayList<String>();
 
-        for (int t = TokenIndex.MIN_DEFINE_LEN - 1; t < tokens.length; t += 2) {
+        for (int t = TokenIndex.MIN_DEFINE_LEN - 1; t < tokens.length - 1; t += 2) {
             paramTypes.add(tokens[t]);
             paramTypes.add(tokens[t + 1]);
         }

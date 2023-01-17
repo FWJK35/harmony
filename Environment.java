@@ -66,4 +66,15 @@ public class Environment {
         }
         return false;
     }
+
+    public String toString() {
+        String out = "";
+        for (String var : variables.keySet()) {
+            out += var + " = " + variables.get(var).toString() + "\n"; 
+        }
+        for (Function func : functions) {
+            out += func.toString() + "\n";
+        }
+        return out;
+    }
 }
