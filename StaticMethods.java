@@ -8,7 +8,7 @@ public class StaticMethods {
     }
     //types of expressions used in final list
     private enum FinalType {
-        Evaluated, Array, Operator
+        Evaluated, Number, Array, Operator, Negative
     }
     //types of expressions used in expression stack
     private enum ExpressionType {
@@ -203,7 +203,7 @@ public class StaticMethods {
                     }
                 
                     //check for explicitly defined number
-                    else if (isDigit(c)) {
+                    else if (isDigit(c) || c == '.') {
                         //will need to be evaluated
                         if (tokenStack.isEmpty()) {
                             while (isDigit(c) && i < line.length()) {
@@ -368,7 +368,7 @@ public class StaticMethods {
 
             //possibly new array
             else if (currentType == TokenType.Array) {
-                //TODO work this out
+
             }
 
             //operator
@@ -377,13 +377,43 @@ public class StaticMethods {
                 finalTypes.add(FinalType.Operator);
             }
         }
-
-        //check for number expressions
-        if (finalTypes.size() >= 3) {
-
+        if (finalTypes.get(finalTypes.size() - 1) == FinalType.Operator) {
+            throw new Error("Must have expression after operator");
         }
+        //parse for number expressions
+        List<Variable> vars = new ArrayList<Variable>();
+        List<Character> ops = new ArrayList<Character>();
+        boolean isNumberExpression = false;
+        int expStart = 0;
         for (int f = 0; f < finalTypes.size(); f++) {
+            //beginning of number expression or just regular expression
+            if (!isNumberExpression && finalTypes.get(f) == FinalType.Evaluated) {
+                isNumberExpression = true;
+                expStart = f;
+            }
+            //same parity as beginning index and variable
+            if (isNumberExpression && f % 2 == expStart % 2 && finalTypes.get(f) == FinalType.Evaluated) {
+                vars.add(finalVariables.get(f));
+            }
+            //different parity as beginning index and operator
+            else if (isNumberExpression && f % 2 == expStart % 2 && finalTypes.get(f) == FinalType.Operator) {
+                ops.add((char) finalVariables.get(f).getData());
+            }
+            //end number expression 
+            else {
+                //just join them
+                if (finalTypes.get(f) == FinalType.Evaluated) {
+                    //single variable, leave as is
+                    if (vars.size() == 1) {
 
+                    }
+                    //longer, number expression
+                    else {
+                        Variable evaluatedNumber = interpretNumberExpression(vars, ops);
+                    }
+                }
+                //throw error (OR NEGATIVE)
+            }
         }
 
         return result;
@@ -563,13 +593,59 @@ public class StaticMethods {
             throw new Error("type has to be double or integer");
         }
     }
-
-   
-
-    //TODO esther this is ur job
-    //just make it do pemdas assume every variable is an int or double, make it work like java
+    
+    //TODO Esther do this method
     public static Variable interpretNumberExpression(List<Variable> vars, List<Character> ops) {
         return new Variable();
+    }
+
+    public double interpretNumberExpression(String line, Environment env) {
+        if (line.contains(" ")) {
+            // TODO: throw some error here
+        }
+        
+        String expression = line;
+        
+        while (expression.contains("(") || expression.contains("")) {
+            int open = expression.indexOf("(");
+            int close = expression.indexOf(")");
+            if (open < close && open != -1) {
+                expression = expression.substring(0, open) + interpretNumberExpression(expression.substring(open + 1, close), env) + expression.substring(close);
+            }
+            else {
+                // TODO: throw some error here
+            }
+        }
+        
+
+        // int left = 0;
+        // int right = 0;
+        // for (char i : line.toCharArray()) {
+        //     right++;
+        //     if(special.contains(i + "")) {
+        //         if (i=='+') {
+        //             return Integer.parseInt(line.substring(left,right)) + interpretNumberExpression(line.substring(right), variables, functions);
+        //         }
+        //         else if (i=='-') {
+        //             return Integer.parseInt(line.substring(left,right)) - interpretNumberExpression(line.substring(right), variables, functions);
+        //         }
+        //         else if (i=='*') {
+        //             return Integer.parseInt(line.substring(left,right)) * interpretNumberExpression(line.substring(right), variables, functions);
+        //         }
+        //         else if (i=='/') {
+        //             return Integer.parseInt(line.substring(left,right)) / interpretNumberExpression(line.substring(right), variables, functions);
+        //         }
+        //         else if (i=='-') {
+        //             return Math.pow(Integer.parseInt(line.substring(left,right)), interpretNumberExpression(line.substring(right), variables, functions));
+        //         }
+        //         else if (i=='(') {
+        //             left = right;
+        //             right = line.indexOf(")");
+                    
+        //         }
+        //     }
+        // }
+        return 0.0;
     }
 
     public static boolean isAlpha(char c) {
