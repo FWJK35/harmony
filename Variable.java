@@ -85,6 +85,11 @@ public class Variable {
             else if (a.getData() instanceof String) {
                 return new Variable((int) data + (String) a.getData());
             }
+            else if (a.getData() instanceof ArrayList){
+                Variable output = this.copy();
+                output.add(0, a);
+                return output;
+            } 
         }
         else if (data instanceof Double) {
             if (a.getData() instanceof Integer) {
@@ -99,6 +104,11 @@ public class Variable {
             else if (a.getData() instanceof String) {
                 return new Variable((double) data + (String) a.getData());
             }
+            else if (a.getData() instanceof ArrayList){
+                Variable output = this.copy();
+                output.add(0, a);
+                return output;
+            } 
         }
         else if (data instanceof Character) {
             if (a.getData() instanceof Integer) {
@@ -113,6 +123,11 @@ public class Variable {
             else if (a.getData() instanceof String) {
                 return new Variable((char) data + (String) a.getData());
             }
+            else if (a.getData() instanceof ArrayList){
+                Variable output = this.copy();
+                output.add(0, a);
+                return output;
+            } 
         }
         else if (data instanceof String) {
             if (a.getData() instanceof Integer) {
@@ -127,6 +142,25 @@ public class Variable {
             else if (a.getData() instanceof String) {
                 return new Variable((String) data + (String) a.getData());
             }
+            else if (a.getData() instanceof ArrayList){
+                Variable output = this.copy();
+                output.add(0, a);
+                return output;
+            } 
+        }
+        else if (data instanceof ArrayList) {
+            if (a.getData() instanceof ArrayList) {
+                ArrayList<Variable> output = new ArrayList<Variable>();
+                output.addAll((ArrayList<Variable>) data);
+                output.addAll((ArrayList<Variable>) a.getData());
+                return new Variable(output);
+            }
+            else {
+                Variable output = this.copy();
+                output.add(a);
+                return output;
+            }
+            
         }
         return out;
     }
@@ -235,6 +269,7 @@ public class Variable {
         }
     }
 
+    //if is ArrayList
     public void add(Variable value) {
         add(len(), value);
     }

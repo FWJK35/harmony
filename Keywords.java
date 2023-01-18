@@ -19,7 +19,7 @@ public class Keywords {
     public static final char CLOSE_ARRAY_KEYWORD = ']';
     public static final String COLON_KEYWORD = ":)";
     public static final char SEPARATOR_KEYWORD = '?';
-    public static final String OPERATOR_CHARACTERS = "+-/*%^";
+    public static final String OPERATOR_CHARACTERS = "+-*/%^";
 
     //TYPES
     public static final String NULL_TYPE = "non";
@@ -30,7 +30,11 @@ public class Keywords {
 
     //ILLEGAL IDENTIFIERS
     public static final String[] ILLEGAL_IDENTIFIERS = {
-        "lmfao", "lmao"
+        FOR_KEYWORD, IF_KEYWORD, ELSE_KEYWORD, WHILE_KEYWORD, DEFINE_VARIABLE_KEYWORD, DEFINE_FUNCTION_KEYWORD, 
+        DECREMENT_KEYWORD, INCREMENT_KEYWORD, PRINT_KEYWORD, INPUT_KEYWORD, RETURN_KEYWORD, EQUALS_KEYWORD, 
+        STRING_LITERAL_KEYWORD, ESCAPE_CHARACTER_KEYWORD, OPEN_PAREN_KEYWORD, CLOSE_PAREN_KEYWORD, OPEN_ARRAY_KEYWORD,
+        CLOSE_ARRAY_KEYWORD, COLON_KEYWORD, SEPARATOR_KEYWORD, OPERATOR_CHARACTERS, NULL_TYPE, INTEGER_TYPE,
+        DOUBLE_TYPE, STRING_TYPE, ARRAY_TYPE
     };
     public static boolean isIllegalIdentifier(String s) {
         for (String id : ILLEGAL_IDENTIFIERS) {

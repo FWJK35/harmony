@@ -125,8 +125,7 @@ public class Notepad implements ActionListener
         }
     }  
     
-    public void actionPerformed(ActionEvent ae)  
-    {   
+    public void actionPerformed(ActionEvent ae) {   
         if (ae.getSource() == cutItem) {
             txtarea.cut();  
         }

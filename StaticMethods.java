@@ -405,14 +405,45 @@ public class StaticMethods {
                 if (finalTypes.get(f) == FinalType.Evaluated) {
                     //single variable, leave as is
                     if (vars.size() == 1) {
-
+                        
                     }
                     //longer, number expression
                     else {
+                        System.out.println(vars);
+                        System.out.println(ops);
                         Variable evaluatedNumber = interpretNumberExpression(vars, ops);
+                        while (f != expStart) {
+                            finalTypes.remove(f);
+                            finalVariables.remove(f);
+                            f--;
+                        }
+                        finalVariables.set(f, evaluatedNumber);
+                        vars.clear();
+                        ops.clear();
+                        isNumberExpression = false;
                     }
                 }
-                //throw error (OR NEGATIVE)
+                //TODO throw error
+            }
+        }
+        if (isNumberExpression) {
+            if (vars.size() > ops.size()) {
+                System.out.println(vars);
+                System.out.println(ops);
+                Variable evaluatedNumber = interpretNumberExpression(vars, ops);
+                int f = finalTypes.size();
+                while (f != expStart) {
+                    finalTypes.remove(f);
+                    finalVariables.remove(f);
+                    f--;
+                }
+                finalVariables.set(f, evaluatedNumber);
+                vars.clear();
+                ops.clear();
+                isNumberExpression = false;
+            }
+            else {
+                throw new Error("Must have expression after operator");
             }
         }
 
@@ -517,14 +548,7 @@ public class StaticMethods {
     public static Variable interpretExpression(String line, Environment env) {
         return eval(line, env);
     }
-    //ily calvin
-    //calvin++
-
-    //ily calvin 3000
-    //           ||||                                                        number
-    //env.getVariable("i").setData(env.getVariable("i").addTo(new Variable(          )).getData());
-    //calvin += 3000
-
+    
     public static Variable defineVariable(Environment env, String line) {
         String[] tokens = line.split(" ");
         if (line.length() >= 3) {
@@ -593,59 +617,49 @@ public class StaticMethods {
             throw new Error("type has to be double or integer");
         }
     }
+
     
     //TODO Esther do this method
-    public static Variable interpretNumberExpression(List<Variable> vars, List<Character> ops) {
-        return new Variable();
-    }
+    public static Variable interpretNumberExpression(List<Variable> variables, List<Character> operators) {
+        List<Variable> vars = new ArrayList<Variable>(variables);
+        List<Character> ops = new ArrayList<Character>(operators);
 
-    public double interpretNumberExpression(String line, Environment env) {
-        if (line.contains(" ")) {
-            // TODO: throw some error here
+        char pow = Keywords.OPERATOR_CHARACTERS.charAt(5),
+            mod = Keywords.OPERATOR_CHARACTERS.charAt(4),
+            divide = Keywords.OPERATOR_CHARACTERS.charAt(3),
+            times = Keywords.OPERATOR_CHARACTERS.charAt(2),
+            subtract = Keywords.OPERATOR_CHARACTERS.charAt(1),
+            add = Keywords.OPERATOR_CHARACTERS.charAt(0);
+
+        while (ops.contains(pow)) {
+            int index = ops.indexOf(pow);
+            vars.set(index, new Variable(Math.pow((double) vars.get(index).getData(), (double) vars.get(index + 1).getData())));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(times || divide || )) {
+            
+            vars.set(index, new Variable((double) vars.get(index).getData() % (double) vars.get(index + 1).getData()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(subtract)) {
+            int index = ops.indexOf(pow);
+            vars.set(index, new Variable((double) vars.get(index).getData() - (double) vars.get(index + 1).getData()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(add)) {
+            int index = ops.indexOf(pow);
+            vars.set(index, new Variable(vars.get(index).addTo(vars.get(index + 1))));
+            vars.remove(index + 1);
+            ops.remove(index);
         }
         
-        String expression = line;
-        
-        while (expression.contains("(") || expression.contains("")) {
-            int open = expression.indexOf("(");
-            int close = expression.indexOf(")");
-            if (open < close && open != -1) {
-                expression = expression.substring(0, open) + interpretNumberExpression(expression.substring(open + 1, close), env) + expression.substring(close);
-            }
-            else {
-                // TODO: throw some error here
-            }
+        if (vars.size() != 1 || ops.size() != 0) {
+            System.out.println("this is bad");
         }
-        
-
-        // int left = 0;
-        // int right = 0;
-        // for (char i : line.toCharArray()) {
-        //     right++;
-        //     if(special.contains(i + "")) {
-        //         if (i=='+') {
-        //             return Integer.parseInt(line.substring(left,right)) + interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='-') {
-        //             return Integer.parseInt(line.substring(left,right)) - interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='*') {
-        //             return Integer.parseInt(line.substring(left,right)) * interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='/') {
-        //             return Integer.parseInt(line.substring(left,right)) / interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='-') {
-        //             return Math.pow(Integer.parseInt(line.substring(left,right)), interpretNumberExpression(line.substring(right), variables, functions));
-        //         }
-        //         else if (i=='(') {
-        //             left = right;
-        //             right = line.indexOf(")");
-                    
-        //         }
-        //     }
-        // }
-        return 0.0;
+        return vars.get(0);
     }
 
     public static boolean isAlpha(char c) {
@@ -660,5 +674,17 @@ public class StaticMethods {
     }
     public static boolean isIdentifierChar(char c) {
         return (isAlpha(c) || isDigit(c) || c == '_');
+    }
+    
+    //method that removes all spaces from the start and end of the string
+    public static String stripSpaces(String input) {
+        String output = input;
+        while (output.charAt(0) == ' ') {
+            output = output.substring(1);
+        }
+        while (output.charAt(output.length() - 1) == ' ') {
+            output = output.substring(0, output.length() - 1);
+        }
+        return output;
     }
 }

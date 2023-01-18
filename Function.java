@@ -41,10 +41,19 @@ public class Function {
 
     //TODO IMPORT COMPILER CODE HERE
     public Variable runFunction(String[] localParam) {
+        Scanner codeScanner = new Scanner(code);
+        while (codeScanner.hasNext()) {
+            String line = codeScanner.nextLine();
+        }
+        codeScanner.close();
         return new Variable();
     }
 
     public Variable run(List<Variable> args) {
+        return new Variable();
+    }
+
+    public Variable runHelper(List<Variable> args) {
         return new Variable();
     }
 
