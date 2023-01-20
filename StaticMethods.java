@@ -431,7 +431,7 @@ public class StaticMethods {
                 System.out.println(vars);
                 System.out.println(ops);
                 Variable evaluatedNumber = interpretNumberExpression(vars, ops);
-                int f = finalTypes.size();
+                int f = finalTypes.size() - 1;
                 while (f != expStart) {
                     finalTypes.remove(f);
                     finalVariables.remove(f);
@@ -446,7 +446,15 @@ public class StaticMethods {
                 throw new Error("Must have expression after operator");
             }
         }
-
+        if (finalVariables.size() == 0) {
+            return new Variable();
+        }
+        if (finalVariables.size() == 1) {
+            return finalVariables.get(0);
+        }
+        for (Variable fv : finalVariables) {
+            result = result.addTo(new Variable(fv.toString()));
+        }
         return result;
     }
 
@@ -637,8 +645,9 @@ public class StaticMethods {
             vars.remove(index + 1);
             ops.remove(index);
         }
-        while (ops.contains(times || divide || )) {
-            
+        //TODO ESTHERRRRRRRRR
+        while (ops.contains(times)) {
+            int index = 0;
             vars.set(index, new Variable((double) vars.get(index).getData() % (double) vars.get(index + 1).getData()));
             vars.remove(index + 1);
             ops.remove(index);
