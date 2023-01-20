@@ -193,6 +193,7 @@ public class StaticMethods {
                                 c = line.charAt(i);
                             }
                             //end by setting current character to last one of identifier
+                            //TODO HANDLE END OF LINE
                             if (i == line.length())
                                 i--;
                             skip = true;
