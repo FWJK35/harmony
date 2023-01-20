@@ -7,6 +7,10 @@ public class test {
         Compiler comp = new Compiler(new File("test.hrm"));
         comp.compile();
         System.out.println(comp.getEnvironment());
+
+        // Variable hm = new Variable(3);
+        // double ah = (double) (int) hm.getData();
+        // System.out.println(ah);
         //env.putVariable("name", new Variable("claving"));
         //System.out.println(StaticMethods.interpretExpression("#test: # (##name# # #R#)", env));
         //System.out.println(StaticMethods.separate("mult(10 ? 4) ? calvin"));

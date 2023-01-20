@@ -388,4 +388,11 @@ public class Variable {
         }
         return false;
     }
+
+    public double toDouble() {
+        if (data instanceof Integer) {
+            return (double) (int) data;
+        }
+        return (double) data;
+    }
 }

@@ -54,7 +54,7 @@ public class StaticMethods {
     }
 
     public static Variable eval(String line, Environment env) {
-        line = line.strip();
+        line = stripSpaces(line);
         Variable result = new Variable();
         List<TokenType> tokenTypes = new ArrayList<TokenType>();
         List<Variable> tokenVariables = new ArrayList<Variable>();
@@ -667,20 +667,38 @@ public class StaticMethods {
             ops.remove(index);
         }
         //TODO ESTHERRRRRRRRR
+        // while (ops.contains(divide)) {
+        //     int index = 0;
+        //     vars.set(index, new Variable((double) vars.get(index).getData() % (double) vars.get(index + 1).getData()));
+        //     vars.remove(index + 1);
+        //     ops.remove(index);
+        // }
+        while (ops.contains(mod)) {
+            int index = ops.indexOf(mod);
+            vars.set(index, new Variable(vars.get(index).toDouble() % vars.get(index + 1).toDouble()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(divide)) {
+            int index = ops.indexOf(divide);
+            vars.set(index, new Variable(vars.get(index).toDouble() / vars.get(index + 1).toDouble()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
         while (ops.contains(times)) {
-            int index = 0;
-            vars.set(index, new Variable((double) vars.get(index).getData() % (double) vars.get(index + 1).getData()));
+            int index = ops.indexOf(times);
+            vars.set(index, new Variable(vars.get(index).toDouble() * vars.get(index + 1).toDouble()));
             vars.remove(index + 1);
             ops.remove(index);
         }
         while (ops.contains(subtract)) {
-            int index = ops.indexOf(pow);
-            vars.set(index, new Variable((double) vars.get(index).getData() - (double) vars.get(index + 1).getData()));
+            int index = ops.indexOf(subtract);
+            vars.set(index, new Variable(vars.get(index).toDouble() - vars.get(index + 1).toDouble()));
             vars.remove(index + 1);
             ops.remove(index);
         }
         while (ops.contains(add)) {
-            int index = ops.indexOf(pow);
+            int index = ops.indexOf(add);
             vars.set(index, Variable.combine(vars.get(index), vars.get(index + 1)));
             vars.remove(index + 1);
             ops.remove(index);
