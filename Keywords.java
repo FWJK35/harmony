@@ -1,3 +1,5 @@
+import java.util.Map;
+
 public class Keywords {
     public static final String FOR_KEYWORD = "lmfao";
     public static final String IF_KEYWORD = "lmao";
@@ -22,19 +24,20 @@ public class Keywords {
     public static final String OPERATOR_CHARACTERS = "+-*/%^";
 
     //TYPES
-    public static final String NULL_TYPE = "non";
-    public static final String INTEGER_TYPE = "int";
-    public static final String DOUBLE_TYPE = "dbl";
-    public static final String STRING_TYPE = "str";
-    public static final String ARRAY_TYPE = "arr";
+    public static Map<String, String> typeMap = Map.of(
+        "null", "non",
+        "int", "int",
+        "double", "dbl",
+        "String", "str",
+        "ArrayList", "arr"
+        );
 
     //ILLEGAL IDENTIFIERS
     public static final String[] ILLEGAL_IDENTIFIERS = {
         FOR_KEYWORD, IF_KEYWORD, ELSE_KEYWORD, WHILE_KEYWORD, DEFINE_VARIABLE_KEYWORD, DEFINE_FUNCTION_KEYWORD, 
         DECREMENT_KEYWORD, INCREMENT_KEYWORD, PRINT_KEYWORD, INPUT_KEYWORD, RETURN_KEYWORD, EQUALS_KEYWORD, 
-        STRING_LITERAL_KEYWORD, ESCAPE_CHARACTER_KEYWORD, OPEN_PAREN_KEYWORD, CLOSE_PAREN_KEYWORD, OPEN_ARRAY_KEYWORD,
-        CLOSE_ARRAY_KEYWORD, COLON_KEYWORD, SEPARATOR_KEYWORD, OPERATOR_CHARACTERS, NULL_TYPE, INTEGER_TYPE,
-        DOUBLE_TYPE, STRING_TYPE, ARRAY_TYPE
+        COLON_KEYWORD, OPERATOR_CHARACTERS, /*typeMap.get("null"), typeMap.get("int"), typeMap.get("double")
+        , typeMap.get("String"), typeMap.get("ArrayList")*/
     };
     public static boolean isIllegalIdentifier(String s) {
         for (String id : ILLEGAL_IDENTIFIERS) {

@@ -6,6 +6,7 @@ public class Function {
     List<String> paramTypes;
     String returnType;
     String name;
+    Object returnMain;
     
     public Function(String code, List<String> paramNames, List<String> paramTypes, String returnType, String name) {
         this.name = name;
@@ -13,6 +14,7 @@ public class Function {
         this.paramNames = paramNames;
         this.paramTypes = paramTypes;
         this.returnType = returnType;
+        returnMain = false;
     }
 
     public Function() {
@@ -39,17 +41,22 @@ public class Function {
         this.code = newCode;
     }
 
-    //TODO IMPORT COMPILER CODE HERE
-    public Variable runFunction(String[] localParam) {
+    public Variable run(List<Variable> args) {
         Scanner codeScanner = new Scanner(code);
         while (codeScanner.hasNext()) {
             String line = codeScanner.nextLine();
+            //check for...
+            //return
+            //variable declaration
+            //variable modification
+            //print line
+            //if
+            //else
+            //for
+            //while
+            
         }
         codeScanner.close();
-        return new Variable();
-    }
-
-    public Variable run(List<Variable> args) {
         return new Variable();
     }
 

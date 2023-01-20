@@ -187,9 +187,12 @@ public class StaticMethods {
                     else if (isAlpha(c)) {
                         //will need to be evaluated
                         if (tokenStack.isEmpty()) {
-                            while (isIdentifierChar(c) && i + 1 < line.length()) {
+                            while (isIdentifierChar(c)) {
                                 currentToken += c;
                                 i++;
+                                if (i == line.length()) {
+                                    break;
+                                }
                                 c = line.charAt(i);
                             }
                             //end by setting current character to last one of identifier
@@ -469,6 +472,7 @@ public class StaticMethods {
         if (finalVariables.size() == 1) {
             return finalVariables.get(0);
         }
+        System.out.println(finalVariables);
         for (Variable fv : finalVariables) {
             result = Variable.combine(result, new Variable(fv.toString()));
         }
