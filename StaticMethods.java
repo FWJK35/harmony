@@ -193,7 +193,8 @@ public class StaticMethods {
                                 c = line.charAt(i);
                             }
                             //end by setting current character to last one of identifier
-                            i--;
+                            if (i == line.length())
+                                i--;
                             skip = true;
                             //currentToken is now the name of the identifier
                             tokenTypes.add(TokenType.Identifier);
@@ -280,7 +281,7 @@ public class StaticMethods {
         for (int t = 0; t < tokenTypes.size(); t++) {
             TokenType currentType = tokenTypes.get(t);
             Variable currentVariable = tokenVariables.get(t);
-            System.out.println(tokenTypes.get(t) + ": " + tokenVariables.get(t));
+            //System.out.println(tokenTypes.get(t) + ": " + tokenVariables.get(t));
             if (currentType == TokenType.Expression) {
                 finalVariables.add(eval(currentVariable.toString(), env));
                 finalTypes.add(FinalType.Evaluated);
@@ -381,7 +382,7 @@ public class StaticMethods {
             throw new Error("Must have expression after operator");
         }
 
-        System.out.println("Final vars: " + finalVariables);
+        //System.out.println("Final vars: " + finalVariables);
 
         //parse for number expressions
         List<Variable> vars = new ArrayList<Variable>();
@@ -399,7 +400,7 @@ public class StaticMethods {
                 vars.add(finalVariables.get(f));
             }
             //different parity as beginning index and operator
-            else if (isNumberExpression && f % 2 == expStart % 2 && finalTypes.get(f) == FinalType.Operator) {
+            else if (isNumberExpression && (f + 1) % 2 == expStart % 2 && finalTypes.get(f) == FinalType.Operator) {
                 ops.add((char) finalVariables.get(f).getData());
             }
             //end number expression 
@@ -408,12 +409,16 @@ public class StaticMethods {
                 if (finalTypes.get(f) == FinalType.Evaluated) {
                     //single variable, leave as is
                     if (vars.size() == 1) {
-                        
+                        //System.out.println("single: " + vars.get(0));
+                        isNumberExpression = false;
+                        vars.clear();
+                        ops.clear();
+                        f--;
                     }
                     //longer, number expression
                     else {
-                        System.out.println("calc vars: " + vars);
-                        System.out.println("calc ops: " + ops);
+                        //System.out.println("calc vars: " + vars);
+                        //System.out.println("calc ops: " + ops);
                         Variable evaluatedNumber = interpretNumberExpression(vars, ops);
                         while (f != expStart) {
                             finalTypes.remove(f);
@@ -424,6 +429,7 @@ public class StaticMethods {
                         vars.clear();
                         ops.clear();
                         isNumberExpression = false;
+                        f--;
                     }
                 }
                 //TODO throw error
@@ -431,19 +437,26 @@ public class StaticMethods {
         }
         if (isNumberExpression) {
             if (vars.size() > ops.size()) {
-                System.out.println("calc vars: " + vars);
-                System.out.println("calc ops: " + ops);
-                Variable evaluatedNumber = interpretNumberExpression(vars, ops);
-                int f = finalTypes.size() - 1;
-                while (f != expStart) {
-                    finalTypes.remove(f);
-                    finalVariables.remove(f);
-                    f--;
+                //single variable, leave as is
+                if (vars.size() == 1) {
+                    //System.out.println("single: " + vars.get(0));
+                    isNumberExpression = false;
+                    vars.clear();
+                    ops.clear();
                 }
-                finalVariables.set(f, evaluatedNumber);
-                vars.clear();
-                ops.clear();
-                isNumberExpression = false;
+                //longer, number expression
+                else {
+                    //System.out.println("last calc vars: " + vars);
+                    //System.out.println("last calc ops: " + ops);
+                    Variable evaluatedNumber = interpretNumberExpression(vars, ops);
+                    int f = finalTypes.size() - 1;
+                    while (f != expStart) {
+                        finalTypes.remove(f);
+                        finalVariables.remove(f);
+                        f--;
+                    }
+                    finalVariables.set(f, evaluatedNumber);
+                }
             }
             else {
                 throw new Error("Must have expression after operator");
