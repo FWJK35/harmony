@@ -368,7 +368,7 @@ public class StaticMethods {
 
             //possibly new array
             else if (currentType == TokenType.Array) {
-
+                //TODO idk something
             }
 
             //operator
@@ -380,6 +380,9 @@ public class StaticMethods {
         if (finalTypes.get(finalTypes.size() - 1) == FinalType.Operator) {
             throw new Error("Must have expression after operator");
         }
+
+        System.out.println("Final vars: " + finalVariables);
+
         //parse for number expressions
         List<Variable> vars = new ArrayList<Variable>();
         List<Character> ops = new ArrayList<Character>();
@@ -409,8 +412,8 @@ public class StaticMethods {
                     }
                     //longer, number expression
                     else {
-                        System.out.println(vars);
-                        System.out.println(ops);
+                        System.out.println("calc vars: " + vars);
+                        System.out.println("calc ops: " + ops);
                         Variable evaluatedNumber = interpretNumberExpression(vars, ops);
                         while (f != expStart) {
                             finalTypes.remove(f);
@@ -428,8 +431,8 @@ public class StaticMethods {
         }
         if (isNumberExpression) {
             if (vars.size() > ops.size()) {
-                System.out.println(vars);
-                System.out.println(ops);
+                System.out.println("calc vars: " + vars);
+                System.out.println("calc ops: " + ops);
                 Variable evaluatedNumber = interpretNumberExpression(vars, ops);
                 int f = finalTypes.size() - 1;
                 while (f != expStart) {
@@ -453,7 +456,7 @@ public class StaticMethods {
             return finalVariables.get(0);
         }
         for (Variable fv : finalVariables) {
-            result = result.addTo(new Variable(fv.toString()));
+            result = Variable.combine(result, new Variable(fv.toString()));
         }
         return result;
     }
@@ -604,7 +607,7 @@ public class StaticMethods {
         String variableName = line.split(" ")[1];
         String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 
         Variable incrementBy = interpretExpression(afterVariable, env);
-        env.getVariable(variableName).setData(env.getVariable(variableName).addTo(incrementBy));
+        env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), incrementBy).getData());
     } 
 
     public static void decrement(Environment env, String line) {
@@ -613,16 +616,16 @@ public class StaticMethods {
         Variable incrementBy = interpretExpression(afterVariable, env);
         //get data of variable from interpret expression chec kif integer cast to integer and make the integer negative then add to and then
         if (incrementBy.getData() instanceof Integer) {
-            int decrementValue = (int) incrementBy.getData();
-            env.getVariable(variableName).setData(env.getVariable(variableName).addTo(new Variable(-decrementValue)));
+            int decrementValue = -(int) incrementBy.getData();
+            env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), new Variable(decrementValue)).getData());
         } else {
-            throw new Error("type has to be double or integer");
+            throw new Error("Type has to be double or integer");
         }
         if (incrementBy.getData() instanceof Double) {
-            double decrementValue = (double) incrementBy.getData();
-            env.getVariable(variableName).setData(env.getVariable(variableName).addTo(new Variable(-decrementValue)));
+            double decrementValue = -(double) incrementBy.getData();
+            env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), new Variable(decrementValue)).getData());
         } else {
-            throw new Error("type has to be double or integer");
+            throw new Error("Type has to be double or integer");
         }
     }
 
@@ -660,7 +663,7 @@ public class StaticMethods {
         }
         while (ops.contains(add)) {
             int index = ops.indexOf(pow);
-            vars.set(index, new Variable(vars.get(index).addTo(vars.get(index + 1))));
+            vars.set(index, Variable.combine(vars.get(index), vars.get(index + 1)));
             vars.remove(index + 1);
             ops.remove(index);
         }

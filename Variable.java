@@ -62,107 +62,86 @@ public class Variable {
      * 
      */
      //b + a
-    public Variable addTo(Variable a) {
-        Variable out = new Variable();
-        if (data == null) {
-            out = a;
-            return out;
-        }
+    public static Variable combine(Variable a, Variable b) {
         if (a.getData() == null) {
-            out = this;
-            return out;
+            return b;
         }
-        if (data instanceof Integer) {
-            if (a.getData() instanceof Integer) {
-                return new Variable((int) data + (int) a.getData());
-            }
-            else if (a.getData() instanceof Double) {
-                return new Variable((int) data + (double) a.getData());
-            }
-            else if (a.getData() instanceof Character) {
-                return new Variable((int) data + (char) a.getData());
-            }
-            else if (a.getData() instanceof String) {
-                return new Variable((int) data + (String) a.getData());
-            }
-            else if (a.getData() instanceof ArrayList){
-                Variable output = this.copy();
-                output.add(0, a);
-                return output;
-            } 
+        if (b.getData() == null) {
+            return a;
         }
-        else if (data instanceof Double) {
-            if (a.getData() instanceof Integer) {
-                return new Variable((double) data + (int) a.getData());
-            }
-            else if (a.getData() instanceof Double) {
-                return new Variable((double) data + (double) a.getData());
-            }
-            else if (a.getData() instanceof Character) {
-                return new Variable((double) data + (char) a.getData());
-            }
-            else if (a.getData() instanceof String) {
-                return new Variable((double) data + (String) a.getData());
-            }
-            else if (a.getData() instanceof ArrayList){
-                Variable output = this.copy();
-                output.add(0, a);
-                return output;
-            } 
-        }
-        else if (data instanceof Character) {
-            if (a.getData() instanceof Integer) {
-                return new Variable((char) data + (int) a.getData());
-            }
-            else if (a.getData() instanceof Double) {
-                return new Variable((char) data + (double) a.getData());
-            }
-            else if (a.getData() instanceof Character) {
-                return new Variable((char) data + (char) a.getData());
-            }
-            else if (a.getData() instanceof String) {
-                return new Variable((char) data + (String) a.getData());
-            }
-            else if (a.getData() instanceof ArrayList){
-                Variable output = this.copy();
-                output.add(0, a);
-                return output;
-            } 
-        }
-        else if (data instanceof String) {
-            if (a.getData() instanceof Integer) {
-                return new Variable((String) data + (int) a.getData());
-            }
-            else if (a.getData() instanceof Double) {
-                return new Variable((String) data + (double) a.getData());
-            }
-            else if (a.getData() instanceof Character) {
-                return new Variable((String) data + (char) a.getData());
-            }
-            else if (a.getData() instanceof String) {
-                return new Variable((String) data + (String) a.getData());
-            }
-            else if (a.getData() instanceof ArrayList){
-                Variable output = this.copy();
-                output.add(0, a);
-                return output;
-            } 
-        }
-        else if (data instanceof ArrayList) {
-            if (a.getData() instanceof ArrayList) {
-                ArrayList<Variable> output = new ArrayList<Variable>();
-                output.addAll((ArrayList<Variable>) data);
-                output.addAll((ArrayList<Variable>) a.getData());
-                return new Variable(output);
+        if (a.getData() instanceof ArrayList) {
+            if (b.getData() instanceof ArrayList) {
+                Variable out = a.copy();
+                ((ArrayList<Variable>) out.getData()).addAll((ArrayList<Variable>) b.getData());
             }
             else {
-                Variable output = this.copy();
-                output.add(a);
-                return output;
+                Variable out = a.copy();
+                out.add(b);
+                return out;
             }
-            
         }
-        return out;
+        if (b.getData() instanceof ArrayList) {
+            Variable out = b.copy();
+            out.add(0, a);
+            return out;
+        }
+        if (a.getData() instanceof Integer) {
+            if (b.getData() instanceof Integer) {
+                return new Variable((int) a.getData() + (int) b.getData());
+            }
+            if (b.getData() instanceof Double) {
+                return new Variable((int) a.getData() + (double) b.getData());
+            }
+            if (b.getData() instanceof Character) {
+                return new Variable((int) a.getData() + (char) b.getData());
+            }
+            if (b.getData() instanceof String) {
+                return new Variable((int) a.getData() + (String) b.getData());
+            }
+        }
+        if (a.getData() instanceof Double) {
+            if (b.getData() instanceof Integer) {
+                return new Variable((double) a.getData() + (int) b.getData());
+            }
+            if (b.getData() instanceof Double) {
+                return new Variable((double) a.getData() + (double) b.getData());
+            }
+            if (b.getData() instanceof Character) {
+                return new Variable((double) a.getData() + (char) b.getData());
+            }
+            if (b.getData() instanceof String) {
+                return new Variable((double) a.getData() + (String) b.getData());
+            }
+        }
+        if (a.getData() instanceof Character) {
+            if (b.getData() instanceof Integer) {
+                return new Variable((char) a.getData() + (int) b.getData());
+            }
+            if (b.getData() instanceof Double) {
+                return new Variable((char) a.getData() + (double) b.getData());
+            }
+            if (b.getData() instanceof Character) {
+                return new Variable((char) a.getData() + (char) b.getData());
+            }
+            if (b.getData() instanceof String) {
+                return new Variable((char) a.getData() + (String) b.getData());
+            }
+        }
+        if (a.getData() instanceof String) {
+            if (b.getData() instanceof Integer) {
+                return new Variable((String) a.getData() + (int) b.getData());
+            }
+            if (b.getData() instanceof Double) {
+                return new Variable((String) a.getData() + (double) b.getData());
+            }
+            if (b.getData() instanceof Character) {
+                return new Variable((String) a.getData() + (char) b.getData());
+            }
+            if (b.getData() instanceof String) {
+                return new Variable((String) a.getData() + (String) b.getData());
+            }
+        }
+        throw new Error("Failed to combine variables: " + a.toString() + " and " + b.toString());
     }
 
     public Variable slice(int start, int end, int step) {
