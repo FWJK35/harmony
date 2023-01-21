@@ -1,6 +1,6 @@
 name aka    #calvin#   # # 35
 age aka 16 name
-number aka 15 + 2*3
+number aka (6* 7 / 3 %10) ^ 0.5
 
 wdym non main :)
     xd #Hello, world!#

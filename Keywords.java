@@ -21,6 +21,7 @@ public class Keywords {
     public static final char CLOSE_ARRAY_KEYWORD = ']';
     public static final String COLON_KEYWORD = ":)";
     public static final char SEPARATOR_KEYWORD = '?';
+    public static final char LINE_JOINER_KEYWORD = '|';
     public static final String OPERATOR_CHARACTERS = "+-*/%^";
 
     //TYPES

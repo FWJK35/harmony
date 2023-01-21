@@ -2,19 +2,23 @@ import java.util.*;
 
 public class Function {
     String code;
+    Environment env;
     List<String> paramNames;
     List<String> paramTypes;
     String returnType;
     String name;
-    Variable returnMain;
+    Variable hasReturned;
+    Variable returnValue;
     
-    public Function(String code, List<String> paramNames, List<String> paramTypes, String returnType, String name) {
+    public Function(String code, Environment env, List<String> paramNames, List<String> paramTypes, String returnType, String name) {
         this.name = name;
         this.code = code;
+        this.env = env;
         this.paramNames = paramNames;
         this.paramTypes = paramTypes;
         this.returnType = returnType;
-        returnMain = new Variable(false);
+        this.hasReturned = new Variable(false);
+        this.returnValue = new Variable();
     }
 
     public Function() {
@@ -42,44 +46,62 @@ public class Function {
     }
 
     public Variable run(List<Variable> args){//, Object returnMain) {
-        return run(args, new Variable(false));
-        Scanner codeScanner = new Scanner(code);
-        boolean multiLine = false;
-        while (codeScanner.hasNext()) {
-            String line = codeScanner.nextLine();
-
-            //check for...
-            //return
-            //variable declaration
-            //variable modification
-            //print line
-            //if
-            //else
-            //for
-            //while
-            
-        }
-        codeScanner.close();
-        return new Variable();
+        return run(args, new Variable(false), new Variable());
     }
-    public Variable run(List<Variable> args, Variable returnMain){//, Object returnMain) {
-        Scanner codeScanner = new Scanner(code);
-        boolean multiLine = false;
-        while (codeScanner.hasNext()) {
-            String line = codeScanner.nextLine();
+
+    public Variable run(List<Variable> args, Variable hasReturned, Variable returnValue) {
+        String[] lines = code.split("\n");
+        for (int l = 0; l < lines.length; l++) {
+            String line = lines[l];
+            String[] tokens = line.split(" ");
+            //fisrtly, check if should be multi line statement
+            if (line.charAt(line.length()) == Keywords.LINE_JOINER_KEYWORD) {
+                while (line.charAt(line.length()) == Keywords.LINE_JOINER_KEYWORD) {
+                    if (l + 1 >= lines.length) {
+                        throw new Error("Must have line after line joiner");
+                    }
+                    line += " " + StaticMethods.stripSpaces(codeScanner.nextLine());
+                }
+            }
 
             //check for...
+
             //return
+            if (tokens[TokenIndex.RETURN_TOKEN].equals(Keywords.RETURN_KEYWORD)) {
+                String toReturn = line.substring(Keywords.RETURN_KEYWORD.length() + 1);
+                hasReturned.setData(true);
+                returnValue.setData(StaticMethods.eval(toReturn, env).getData());
+                return returnValue;
+            }
+            
             //variable declaration
+            if (tokens[TokenIndex.DEFINE_VARIABLE_TOKEN].equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
+                StaticMethods.defineVariable(env, line);
+            }
+
             //variable modification
+            if (tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.INCREMENT_KEYWORD)) {
+                StaticMethods.increment(env, line);
+            } 
+            if (tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.DECREMENT_KEYWORD)) {
+                StaticMethods.decrement(env, line);
+            }
+
             //print line
-            //if
-            //else
-            //for
-            //while
+            if (tokens[TokenIndex.PRINT_TOKEN].equals(Keywords.PRINT_KEYWORD)) {
+                //TODO print to notepad, placeholder for now
+                System.out.println(StaticMethods.eval(line.substring(Keywords.PRINT_KEYWORD.length() + 1), env));
+            }
+
+            //TODO if
+            if (tokens[TokenIndex.IF_STATEMENT_TOKEN].equals(Keywords.PRINT_KEYWORD)) {
+                
+            }
+            //TODO else
+            //TODO for
+            //TODO while
             
         }
-        codeScanner.close();
         return new Variable();
     }
 

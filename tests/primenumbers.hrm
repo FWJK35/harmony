@@ -1,7 +1,7 @@
 //main method
 wdym non main str[] args :)
     //user inputs a number 
-    xd "type a number to see if it is prime!"
+    xd #type a number to see if it is prime!#
     //variables
     num aka hmu
     flag aka false
@@ -12,7 +12,7 @@ wdym non main str[] args :)
             break
 
     lmao !flag :)
-        xd num " is a prime number"
+        xd num # is a prime number#
     afk :)
-        xd num " is not a prime number"
+        xd num # is not a prime number#
 

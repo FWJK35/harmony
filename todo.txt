@@ -3,14 +3,11 @@ Function:
     get return statements working
     write test functions
     finish class
-StaticMethods:
-    interpretExpression
-    interpretNumberExpression
-Compiler:
-    
-ForLoop:
-    finish class
-    figure out what is wanted
-        how to initialize temporary variable and increment through iterations
-        structure of the statement: ie. typically for(initialization; conditional; iteration) 
-    finish runCode
+Calvin:
+    Function run
+    remove function return types
+Esther:
+    eval comparisons
+    user input
+    eval arrays
+    notepad indentation

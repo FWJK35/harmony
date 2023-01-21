@@ -8,25 +8,11 @@ public class StaticMethods {
     }
     //types of expressions used in final list
     private enum FinalType {
-        Evaluated, Number, Array, Operator, Negative
+        Evaluated, Number, Array, Operator
     }
     //types of expressions used in expression stack
     private enum ExpressionType {
         None, Expression, Array, String, Identifier
-    }
-
-    public static void print(String line, Environment env) {
-        // get beginning of string literal and trim line
-        int beginIndex = line.indexOf(Keywords.STRING_LITERAL_KEYWORD);
-        int endIndex = line.indexOf(Keywords.STRING_LITERAL_KEYWORD, beginIndex + 1);
-        String remaining = line.substring(endIndex + 1);
-        //System.out.println(beginIndex + " " + endIndex + remaining);
-        if (remaining.length() > 0) {
-            throw new Error("Invalid Arguments to command: " + Keywords.PRINT_KEYWORD);
-        }
-        else {
-            System.out.println(interpretExpression(line, env));
-        }
     }
     
     public static int countIndent(String line) {
@@ -223,8 +209,10 @@ public class StaticMethods {
                                 do {
                                     currentToken += c;
                                     i++;
-                                    c = line.charAt(i);
-                                } while (isIdentifierChar(c));
+                                    if (i < line.length()) {
+                                        c = line.charAt(i);
+                                    }
+                                } while (isIdentifierChar(c) && i < line.length());
                                 numVar = new Variable(Double.parseDouble(currentToken));
                             }
                             else {
@@ -472,7 +460,7 @@ public class StaticMethods {
         if (finalVariables.size() == 1) {
             return finalVariables.get(0);
         }
-        System.out.println(finalVariables);
+        //System.out.println(finalVariables);
         for (Variable fv : finalVariables) {
             result = Variable.combine(result, new Variable(fv.toString()));
         }
@@ -616,7 +604,7 @@ public class StaticMethods {
             paramTypes.add(tokens[t + 1]);
         }
 
-        Function func = new Function("", paramNames, paramTypes, returnType, funcName);
+        Function func = new Function("", env, paramNames, paramTypes, returnType, funcName);
         env.putFunction(func);
         return func;
     }
@@ -662,32 +650,30 @@ public class StaticMethods {
 
         while (ops.contains(pow)) {
             int index = ops.indexOf(pow);
-            vars.set(index, new Variable(Math.pow((double) vars.get(index).getData(), (double) vars.get(index + 1).getData())));
+            vars.set(index, new Variable(Math.pow(vars.get(index).toDouble(), vars.get(index + 1).toDouble())));
             vars.remove(index + 1);
             ops.remove(index);
         }
-        //TODO ESTHERRRRRRRRR
-        // while (ops.contains(divide)) {
-        //     int index = 0;
-        //     vars.set(index, new Variable((double) vars.get(index).getData() % (double) vars.get(index + 1).getData()));
-        //     vars.remove(index + 1);
-        //     ops.remove(index);
-        // }
-        while (ops.contains(mod)) {
-            int index = ops.indexOf(mod);
-            vars.set(index, new Variable(vars.get(index).toDouble() % vars.get(index + 1).toDouble()));
-            vars.remove(index + 1);
-            ops.remove(index);
-        }
-        while (ops.contains(divide)) {
-            int index = ops.indexOf(divide);
-            vars.set(index, new Variable(vars.get(index).toDouble() / vars.get(index + 1).toDouble()));
-            vars.remove(index + 1);
-            ops.remove(index);
-        }
-        while (ops.contains(times)) {
-            int index = ops.indexOf(times);
-            vars.set(index, new Variable(vars.get(index).toDouble() * vars.get(index + 1).toDouble()));
+        while (ops.contains(times) || ops.contains(divide) || ops.contains(mod)) {
+            int index = posMin(ops.indexOf(times), ops.indexOf(divide), ops.indexOf(mod));
+            char op = ops.get(index);
+            double num;
+            if (op == times) {
+                num = vars.get(index).toDouble() * vars.get(index + 1).toDouble();
+            }
+            else if (op == divide) {
+                num = vars.get(index).toDouble() / vars.get(index + 1).toDouble();
+            }
+            else {
+                num = vars.get(index).toDouble() % vars.get(index + 1).toDouble();
+            }
+
+            if ((int) num == num) {
+                vars.set(index, new Variable((int) num));
+            }
+            else {
+                vars.set(index, new Variable(num));
+            }
             vars.remove(index + 1);
             ops.remove(index);
         }
@@ -705,10 +691,23 @@ public class StaticMethods {
         }
         
         if (vars.size() != 1 || ops.size() != 0) {
-            System.out.println("this is bad");
+            throw new Error("idk esther knows why this is bad");
         }
         return vars.get(0);
     }
+
+    private static int posMin(int a, int b, int c) {
+        if (a < b && -1 < a) {
+            if (c < a && -1 < c) {
+                return c;
+            }
+            return a;
+        }
+        else if (b < c && -1 < b) {
+            return b;
+        }
+        return c;
+    } 
 
     public static boolean isAlpha(char c) {
         String alpha = "abcdefghijklmnopqrstuvwxyz";
