@@ -8,7 +8,7 @@ public class StaticMethods {
     }
     //types of expressions used in final list
     private enum FinalType {
-        Evaluated, Array, Operator
+        Evaluated, Number, Array, Operator, Negative
     }
     //types of expressions used in expression stack
     private enum ExpressionType {
@@ -54,7 +54,7 @@ public class StaticMethods {
     }
 
     public static Variable eval(String line, Environment env) {
-        line = line.strip();
+        line = stripSpaces(line);
         Variable result = new Variable();
         List<TokenType> tokenTypes = new ArrayList<TokenType>();
         List<Variable> tokenVariables = new ArrayList<Variable>();
@@ -187,13 +187,18 @@ public class StaticMethods {
                     else if (isAlpha(c)) {
                         //will need to be evaluated
                         if (tokenStack.isEmpty()) {
-                            while (isIdentifierChar(c) && i + 1 < line.length()) {
+                            while (isIdentifierChar(c)) {
                                 currentToken += c;
                                 i++;
+                                if (i == line.length()) {
+                                    break;
+                                }
                                 c = line.charAt(i);
                             }
                             //end by setting current character to last one of identifier
-                            i--;
+                            //TODO HANDLE END OF LINE
+                            if (i == line.length())
+                                i--;
                             skip = true;
                             //currentToken is now the name of the identifier
                             tokenTypes.add(TokenType.Identifier);
@@ -203,7 +208,7 @@ public class StaticMethods {
                     }
                 
                     //check for explicitly defined number
-                    else if (isDigit(c)) {
+                    else if (isDigit(c) || c == '.') {
                         //will need to be evaluated
                         if (tokenStack.isEmpty()) {
                             while (isDigit(c) && i < line.length()) {
@@ -280,11 +285,13 @@ public class StaticMethods {
         for (int t = 0; t < tokenTypes.size(); t++) {
             TokenType currentType = tokenTypes.get(t);
             Variable currentVariable = tokenVariables.get(t);
-            System.out.println(tokenTypes.get(t) + ": " + tokenVariables.get(t));
+            //System.out.println(tokenTypes.get(t) + ": " + tokenVariables.get(t));
             if (currentType == TokenType.Expression) {
                 finalVariables.add(eval(currentVariable.toString(), env));
                 finalTypes.add(FinalType.Evaluated);
             }
+
+            //identifier (function, variable, etc)
             else if (currentType == TokenType.Identifier) {
                 //there is another token after it
                 if (t + 1 < tokenTypes.size()) {
@@ -366,7 +373,7 @@ public class StaticMethods {
 
             //possibly new array
             else if (currentType == TokenType.Array) {
-
+                //TODO idk something
             }
 
             //operator
@@ -375,7 +382,100 @@ public class StaticMethods {
                 finalTypes.add(FinalType.Operator);
             }
         }
+        if (finalTypes.get(finalTypes.size() - 1) == FinalType.Operator) {
+            throw new Error("Must have expression after operator");
+        }
 
+        //System.out.println("Final vars: " + finalVariables);
+
+        //parse for number expressions
+        List<Variable> vars = new ArrayList<Variable>();
+        List<Character> ops = new ArrayList<Character>();
+        boolean isNumberExpression = false;
+        int expStart = 0;
+        for (int f = 0; f < finalTypes.size(); f++) {
+            //beginning of number expression or just regular expression
+            if (!isNumberExpression && finalTypes.get(f) == FinalType.Evaluated) {
+                isNumberExpression = true;
+                expStart = f;
+            }
+            //same parity as beginning index and variable
+            if (isNumberExpression && f % 2 == expStart % 2 && finalTypes.get(f) == FinalType.Evaluated) {
+                vars.add(finalVariables.get(f));
+            }
+            //different parity as beginning index and operator
+            else if (isNumberExpression && (f + 1) % 2 == expStart % 2 && finalTypes.get(f) == FinalType.Operator) {
+                ops.add((char) finalVariables.get(f).getData());
+            }
+            //end number expression 
+            else {
+                //just join them
+                if (finalTypes.get(f) == FinalType.Evaluated) {
+                    //single variable, leave as is
+                    if (vars.size() == 1) {
+                        //System.out.println("single: " + vars.get(0));
+                        isNumberExpression = false;
+                        vars.clear();
+                        ops.clear();
+                        f--;
+                    }
+                    //longer, number expression
+                    else {
+                        //System.out.println("calc vars: " + vars);
+                        //System.out.println("calc ops: " + ops);
+                        Variable evaluatedNumber = interpretNumberExpression(vars, ops);
+                        while (f != expStart) {
+                            finalTypes.remove(f);
+                            finalVariables.remove(f);
+                            f--;
+                        }
+                        finalVariables.set(f, evaluatedNumber);
+                        vars.clear();
+                        ops.clear();
+                        isNumberExpression = false;
+                        f--;
+                    }
+                }
+                //TODO throw error
+            }
+        }
+        if (isNumberExpression) {
+            if (vars.size() > ops.size()) {
+                //single variable, leave as is
+                if (vars.size() == 1) {
+                    //System.out.println("single: " + vars.get(0));
+                    isNumberExpression = false;
+                    vars.clear();
+                    ops.clear();
+                }
+                //longer, number expression
+                else {
+                    //System.out.println("last calc vars: " + vars);
+                    //System.out.println("last calc ops: " + ops);
+                    Variable evaluatedNumber = interpretNumberExpression(vars, ops);
+                    int f = finalTypes.size() - 1;
+                    while (f != expStart) {
+                        finalTypes.remove(f);
+                        finalVariables.remove(f);
+                        f--;
+                    }
+                    finalVariables.set(f, evaluatedNumber);
+                }
+            }
+            else {
+                throw new Error("Must have expression after operator");
+            }
+        }
+        if (finalVariables.size() == 0) {
+            return new Variable();
+        }
+        if (finalVariables.size() == 1) {
+            return finalVariables.get(0);
+        }
+        System.out.println(finalVariables);
+        for (Variable fv : finalVariables) {
+            result = Variable.combine(result, new Variable(fv.toString()));
+        }
         return result;
     }
 
@@ -477,14 +577,7 @@ public class StaticMethods {
     public static Variable interpretExpression(String line, Environment env) {
         return eval(line, env);
     }
-    //ily calvin
-    //calvin++
-
-    //ily calvin 3000
-    //           ||||                                                        number
-    //env.getVariable("i").setData(env.getVariable("i").addTo(new Variable(          )).getData());
-    //calvin += 3000
-
+    
     public static Variable defineVariable(Environment env, String line) {
         String[] tokens = line.split(" ");
         if (line.length() >= 3) {
@@ -532,7 +625,7 @@ public class StaticMethods {
         String variableName = line.split(" ")[1];
         String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 
         Variable incrementBy = interpretExpression(afterVariable, env);
-        env.getVariable(variableName).setData(env.getVariable(variableName).addTo(incrementBy));
+        env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), incrementBy).getData());
     } 
 
     public static void decrement(Environment env, String line) {
@@ -541,86 +634,80 @@ public class StaticMethods {
         Variable incrementBy = interpretExpression(afterVariable, env);
         //get data of variable from interpret expression chec kif integer cast to integer and make the integer negative then add to and then
         if (incrementBy.getData() instanceof Integer) {
-            int decrementValue = (int) incrementBy.getData();
-            env.getVariable(variableName).setData(env.getVariable(variableName).addTo(new Variable(-decrementValue)));
+            int decrementValue = -(int) incrementBy.getData();
+            env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), new Variable(decrementValue)).getData());
         } else {
-            throw new Error("type has to be double or integer");
+            throw new Error("Type has to be double or integer");
         }
         if (incrementBy.getData() instanceof Double) {
-            double decrementValue = (double) incrementBy.getData();
-            env.getVariable(variableName).setData(env.getVariable(variableName).addTo(new Variable(-decrementValue)));
+            double decrementValue = -(double) incrementBy.getData();
+            env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), new Variable(decrementValue)).getData());
         } else {
-            throw new Error("type has to be double or integer");
+            throw new Error("Type has to be double or integer");
         }
     }
 
-    /* TODO read this
-     * interpretNumberExpression
-     * should take a string containing numbers, variables, and functions
-     * containing NO SPACES and use order of operations
-     * you can put any expression within parenthesis back into interpretExpression
-     * same with really anything between operators
-     * for example:
-     * 3.5*sqrt(9)+6/(3/2)
-     *     |||||||   |||||
-     * you can put these sections into interpretExpression
-     * have fun :)
-     * 
-     */
-
-    //you can use interpretExpression on each segment of the expression
-    //for example
-    //1+2*3-(sqrt(9)/2)
-    //| | | ||||||||||| <- this 
     
+    //TODO Esther do this method
+    public static Variable interpretNumberExpression(List<Variable> variables, List<Character> operators) {
+        List<Variable> vars = new ArrayList<Variable>(variables);
+        List<Character> ops = new ArrayList<Character>(operators);
 
-    public double interpretNumberExpression(String line, Environment env) {
-        if (line.contains(" ")) {
-            // TODO: throw some error here
-        }
-        
-        String expression = line;
-        
-        while (expression.contains("(") || expression.contains("")) {
-            int open = expression.indexOf("(");
-            int close = expression.indexOf(")");
-            if (open < close && open != -1) {
-                expression = expression.substring(0, open) + interpretNumberExpression(expression.substring(open + 1, close), env) + expression.substring(close);
-            }
-            else {
-                // TODO: throw some error here
-            }
-        }
-        
+        char pow = Keywords.OPERATOR_CHARACTERS.charAt(5),
+            mod = Keywords.OPERATOR_CHARACTERS.charAt(4),
+            divide = Keywords.OPERATOR_CHARACTERS.charAt(3),
+            times = Keywords.OPERATOR_CHARACTERS.charAt(2),
+            subtract = Keywords.OPERATOR_CHARACTERS.charAt(1),
+            add = Keywords.OPERATOR_CHARACTERS.charAt(0);
 
-        // int left = 0;
-        // int right = 0;
-        // for (char i : line.toCharArray()) {
-        //     right++;
-        //     if(special.contains(i + "")) {
-        //         if (i=='+') {
-        //             return Integer.parseInt(line.substring(left,right)) + interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='-') {
-        //             return Integer.parseInt(line.substring(left,right)) - interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='*') {
-        //             return Integer.parseInt(line.substring(left,right)) * interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='/') {
-        //             return Integer.parseInt(line.substring(left,right)) / interpretNumberExpression(line.substring(right), variables, functions);
-        //         }
-        //         else if (i=='-') {
-        //             return Math.pow(Integer.parseInt(line.substring(left,right)), interpretNumberExpression(line.substring(right), variables, functions));
-        //         }
-        //         else if (i=='(') {
-        //             left = right;
-        //             right = line.indexOf(")");
-                    
-        //         }
-        //     }
+        while (ops.contains(pow)) {
+            int index = ops.indexOf(pow);
+            vars.set(index, new Variable(Math.pow((double) vars.get(index).getData(), (double) vars.get(index + 1).getData())));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        //TODO ESTHERRRRRRRRR
+        // while (ops.contains(divide)) {
+        //     int index = 0;
+        //     vars.set(index, new Variable((double) vars.get(index).getData() % (double) vars.get(index + 1).getData()));
+        //     vars.remove(index + 1);
+        //     ops.remove(index);
         // }
-        return 0.0;
+        while (ops.contains(mod)) {
+            int index = ops.indexOf(mod);
+            vars.set(index, new Variable(vars.get(index).toDouble() % vars.get(index + 1).toDouble()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(divide)) {
+            int index = ops.indexOf(divide);
+            vars.set(index, new Variable(vars.get(index).toDouble() / vars.get(index + 1).toDouble()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(times)) {
+            int index = ops.indexOf(times);
+            vars.set(index, new Variable(vars.get(index).toDouble() * vars.get(index + 1).toDouble()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(subtract)) {
+            int index = ops.indexOf(subtract);
+            vars.set(index, new Variable(vars.get(index).toDouble() - vars.get(index + 1).toDouble()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(add)) {
+            int index = ops.indexOf(add);
+            vars.set(index, Variable.combine(vars.get(index), vars.get(index + 1)));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        
+        if (vars.size() != 1 || ops.size() != 0) {
+            System.out.println("this is bad");
+        }
+        return vars.get(0);
     }
 
     public static boolean isAlpha(char c) {
@@ -635,5 +722,17 @@ public class StaticMethods {
     }
     public static boolean isIdentifierChar(char c) {
         return (isAlpha(c) || isDigit(c) || c == '_');
+    }
+    
+    //method that removes all spaces from the start and end of the string
+    public static String stripSpaces(String input) {
+        String output = input;
+        while (output.charAt(0) == ' ') {
+            output = output.substring(1);
+        }
+        while (output.charAt(output.length() - 1) == ' ') {
+            output = output.substring(0, output.length() - 1);
+        }
+        return output;
     }
 }

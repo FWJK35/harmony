@@ -1,7 +1,5 @@
-Variable:
-    boolean addition (True + True = 2)
 Function:
-    IMPORTANT GET 
+    SystemFunctions class
     get return statements working
     write test functions
     finish class
@@ -9,7 +7,7 @@ StaticMethods:
     interpretExpression
     interpretNumberExpression
 Compiler:
-    identify variables vs functions
+    
 ForLoop:
     finish class
     figure out what is wanted

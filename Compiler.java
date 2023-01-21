@@ -20,8 +20,7 @@ public class Compiler {
     public Environment getEnvironment() {
         return env;
     }
-    
-    //TODO write compile method
+
     //adds global variables and all functions
     public void compile() {
         env = new Environment();
@@ -188,19 +187,5 @@ public class Compiler {
         }
         
         // runCode(input);
-    }
-    
-    
-    // testing things here so it doesn't clog up the main class
-    public static void test() {
-        Variable intTest = new Variable(4);
-        Variable doubleTest = new Variable(6.9);
-        Variable boolTest = new Variable(true);
-        Variable stringTest = new Variable("0123456789abcdefg");
-        
-        int a = 3;
-        int b = 4;
-        System.out.println(a + b);
-        
     }
 }

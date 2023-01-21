@@ -1,3 +1,5 @@
+import java.util.Map;
+
 public class Keywords {
     public static final String FOR_KEYWORD = "lmfao";
     public static final String IF_KEYWORD = "lmao";
@@ -10,6 +12,7 @@ public class Keywords {
     public static final String PRINT_KEYWORD = "xd";
     public static final String INPUT_KEYWORD = "hmu";
     public static final String RETURN_KEYWORD = "ttyl";
+    public static final String EQUALS_KEYWORD = "is";
     public static final char STRING_LITERAL_KEYWORD = '#';
     public static final char ESCAPE_CHARACTER_KEYWORD = '\\';
     public static final char OPEN_PAREN_KEYWORD = '(';
@@ -18,18 +21,23 @@ public class Keywords {
     public static final char CLOSE_ARRAY_KEYWORD = ']';
     public static final String COLON_KEYWORD = ":)";
     public static final char SEPARATOR_KEYWORD = '?';
-    public static final String OPERATOR_CHARACTERS = "+-/*%^";
+    public static final String OPERATOR_CHARACTERS = "+-*/%^";
 
     //TYPES
-    public static final String NULL_TYPE = "non";
-    public static final String INTEGER_TYPE = "int";
-    public static final String DOUBLE_TYPE = "dbl";
-    public static final String STRING_TYPE = "str";
-    public static final String ARRAY_TYPE = "arr";
+    public static Map<String, String> typeMap = Map.of(
+        "null", "non",
+        "int", "int",
+        "double", "dbl",
+        "String", "str",
+        "ArrayList", "arr"
+        );
 
     //ILLEGAL IDENTIFIERS
     public static final String[] ILLEGAL_IDENTIFIERS = {
-        "lmfao", "lmao"
+        FOR_KEYWORD, IF_KEYWORD, ELSE_KEYWORD, WHILE_KEYWORD, DEFINE_VARIABLE_KEYWORD, DEFINE_FUNCTION_KEYWORD, 
+        DECREMENT_KEYWORD, INCREMENT_KEYWORD, PRINT_KEYWORD, INPUT_KEYWORD, RETURN_KEYWORD, EQUALS_KEYWORD, 
+        COLON_KEYWORD, OPERATOR_CHARACTERS, /*typeMap.get("null"), typeMap.get("int"), typeMap.get("double")
+        , typeMap.get("String"), typeMap.get("ArrayList")*/
     };
     public static boolean isIllegalIdentifier(String s) {
         for (String id : ILLEGAL_IDENTIFIERS) {
