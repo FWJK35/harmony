@@ -7,8 +7,8 @@ import javax.swing.*;
 public class Notepad implements ActionListener  
 {  
     public static int windows = 0;
-    private File file;
     private Compiler compiler;
+    private File file;
     private JFrame frm;
     private JMenuBar mnubr;  
     private JMenu fileMenu, editMenu;  
@@ -21,42 +21,13 @@ public class Notepad implements ActionListener
     }
 
     public Notepad() {
-        try {
-                String fileName = JOptionPane.showInputDialog("Input File Name: ");
-                fileName = fileName.trim();
-                if (fileName.isEmpty()) {
-                    int i = 1;
-                    while(new File(fileName).exists()) {
-                        fileName = "Untitled " + i; 
-                        i++;
-                    }
-                }
-                File file = new File(fileName);
-                if (file.createNewFile()) {
-                    if (JOptionPane.showConfirmDialog(null, "Create new file named \"" + fileName + "\"?", "Error: File not found", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        new Notepad(fileName);
-                    }
-                    else {
-                        file.delete();
-                    }
-                }
-                else {
-                    try {
-                        new Notepad(fileName);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.out.println("Bad file name");
-                    }
-                }
-        } catch (IOException e) {
-            e.getStackTrace();
-            System.out.println("Error: Invalid File");
-        }
+        this(promptFile());
     }
 
     public Notepad(String fileName) {
         windows++;
 
+        file = new File(fileName);
         compiler = new Compiler(file);
         frm = new JFrame(fileName);
         mnubr = new JMenuBar();
@@ -92,10 +63,10 @@ public class Notepad implements ActionListener
         txtarea = new JTextArea(400, 400);  
         txtarea.setBounds(5,30,460,460);
 
-        JScrollPane scroll = new JScrollPane(txtarea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane scroll = new JScrollPane(txtarea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setBounds(0, 20, 500, 500);
-        scroll.getVerticalScrollBar().setPreferredSize(new Dimension(10, 0));
-        scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 10));
+        scroll.getVerticalScrollBar().setPreferredSize(new Dimension(15, 0));
+        scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 15));
 
         frm.add(mnubr);
         frm.add(scroll);
@@ -107,7 +78,7 @@ public class Notepad implements ActionListener
 
         frm.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent componentEvent) {
-                scroll.setBounds(0, 20, frm.getWidth()-20, frm.getHeight()-40);
+                scroll.setBounds(0, mnubr.getHeight(), frm.getWidth()-scroll.getVerticalScrollBar().getWidth(), frm.getHeight()-mnubr.getHeight()-38);
                 mnubr.setBounds(0, 0, frm.getWidth(), 20);
             }
         }); 
@@ -140,38 +111,10 @@ public class Notepad implements ActionListener
             txtarea.selectAll();  
         }
 
-
         else if (ae.getSource() == openItem) {
-            try {
-                String fileName = JOptionPane.showInputDialog("Input File Name: ");
-                fileName = fileName.trim();
-                if (fileName.isEmpty()) {
-                    int i = 1;
-                    while(new File(fileName).exists()) {
-                        fileName = "Untitled " + i; 
-                        i++;
-                    }
-                }
-                File file = new File(fileName);
-                if (file.createNewFile()) {
-                    if (JOptionPane.showConfirmDialog(null, "Create new file named \"" + fileName + "\"?", "Error: File not found", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        new Notepad(fileName);
-                    }
-                    else {
-                        file.delete();
-                    }
-                }
-                else {
-                    try {
-                        new Notepad(fileName);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.out.println("Bad file name");
-                    }
-                }
-            } catch (IOException e) {
-                e.getStackTrace();
-                System.out.println("Error: Invalid File");
+            String fileName = promptFile();
+            if (!fileName.isBlank()) { 
+                new Notepad(promptFile());
             }
         }
 
@@ -199,5 +142,37 @@ public class Notepad implements ActionListener
                 System.out.println("lol code bad");
             }
         }
+    }
+
+    public static String promptFile() {
+        String fileName = JOptionPane.showInputDialog("Input File Name: ");
+        fileName = fileName.trim();
+        if (fileName.isBlank()) {
+            int i = 2;
+            fileName = "Untitled 1.hrm";
+            while(new File(fileName).exists()) {
+                fileName = "Untitled" + i + ".hrm"; 
+                i++;
+            }
+        }
+
+        try {
+            File file = new File(fileName);
+            if (file.createNewFile()) {
+                if (JOptionPane.showConfirmDialog(null, "Create new file named \"" + fileName + "\"?", "Error: File not found", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+                    file.delete();
+                    return null;
+                }
+            }
+            
+            if (!file.exists()) {
+                System.out.println("Error: Bad file name");
+                return null;
+            }
+        } catch (IOException e) {
+            e.getStackTrace();
+            System.out.println("Error: Invalid File");
+        }
+        return fileName;
     }
 }  

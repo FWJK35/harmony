@@ -9,6 +9,20 @@
             "name": "Launch Main",
             "request": "launch",
             "mainClass": "Main",
+            "projectName": "harmony_af7bd8d6"
+        },
+        {
+            "type": "java",
+            "name": "Launch Notepad",
+            "request": "launch",
+            "mainClass": "Notepad",
+            "projectName": "harmony_af7bd8d6"
+        },
+        {
+            "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "Main",
             "projectName": "harmony_d33e92aa"
         },
         {
