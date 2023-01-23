@@ -4,9 +4,8 @@ import java.awt.*;
 import java.awt.event.*;  
 import javax.swing.*;  
 
-public class Notepad implements ActionListener  
+public class Notepad implements ActionListener
 {  
-    public static int windows = 0;
     private Compiler compiler;
     private File file;
     private JFrame frm;
@@ -20,13 +19,11 @@ public class Notepad implements ActionListener
         Main.main(null);
     }
 
+    // constructors
     public Notepad() {
         this(promptFile());
     }
-
     public Notepad(String fileName) {
-        windows++;
-
         file = new File(fileName);
         compiler = new Compiler(file);
         frm = new JFrame(fileName);
@@ -96,6 +93,7 @@ public class Notepad implements ActionListener
         }
     }  
     
+    // menubar actions implementation
     public void actionPerformed(ActionEvent ae) {   
         if (ae.getSource() == cutItem) {
             txtarea.cut();  
@@ -111,12 +109,10 @@ public class Notepad implements ActionListener
         }
 
         else if (ae.getSource() == openItem) {
-            String fileName = promptFile();
-            if (!fileName.isBlank()) { 
-                new Notepad(promptFile());
-            }
+            new Notepad();
         }
 
+        // saves text area to file for actions saveItem and runItem
         else if (ae.getSource() == saveItem || ae.getSource() == runItem) {
             try {
                 Scanner in = new Scanner(txtarea.getText());
@@ -132,13 +128,16 @@ public class Notepad implements ActionListener
                 e.printStackTrace();
                 System.out.println("idk what happened this should've been fine");
             }
-        }
-        if (ae.getSource() == runItem) {
-            try {
-                compiler.runCode(new Scanner(file));
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("lol code bad");
+
+            // compiles and runs saved file for action runItem
+            if (ae.getSource() == runItem) {
+                try {
+                    compiler.compile();
+                    compiler.runCode();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("lol code bad");
+                }
             }
         }
     }

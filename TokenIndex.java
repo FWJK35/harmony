@@ -11,6 +11,8 @@ public class TokenIndex {
     public static final int PRINT_TOKEN = 0;
 
     public static final int IF_STATEMENT_TOKEN = 0;
+    public static final int ELSE_STATEMENT_TOKEN = 0;
+    public static final int ELIF_STATEMENT_TOKEN = 1;
     public static final int WHILE_STATEMENT_TOKEN = 0;
     public static final int FOR_STATEMENT_TOKEN = 0;
     public static final int RETURN_TOKEN = 0;
@@ -20,7 +22,6 @@ public class TokenIndex {
     public static final int MODIFY_VARIABLE_TOKEN = 0;
     
     public static final int DEFINE_FUNCTION_TOKEN = 0;
-    public static final int DEFINE_FUNCTION_TYPE_TOKEN = 1;
-    public static final int DEFINE_FUNCTION_NAME_TOKEN = 2;
-    public static final int MIN_DEFINE_LEN = 4;
+    public static final int DEFINE_FUNCTION_NAME_TOKEN = 1;
+    public static final int MIN_DEFINE_LEN = 3;
 }

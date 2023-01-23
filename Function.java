@@ -10,13 +10,12 @@ public class Function {
     Variable hasReturned;
     Variable returnValue;
     
-    public Function(String code, Environment env, List<String> paramNames, List<String> paramTypes, String returnType, String name) {
+    public Function(String code, Environment env, List<String> paramNames, List<String> paramTypes, String name) {
         this.name = name;
         this.code = code;
         this.env = env;
         this.paramNames = paramNames;
         this.paramTypes = paramTypes;
-        this.returnType = returnType;
         this.hasReturned = new Variable(false);
         this.returnValue = new Variable();
     }
@@ -50,24 +49,50 @@ public class Function {
     }
 
     public Variable run(List<Variable> args, Variable hasReturned, Variable returnValue) {
+        //add arguments to enviroment
+        Environment env = this.env.copyEnvironment();
+        for (int v = 0; v < paramNames.size(); v++) {
+            env.putVariable(paramNames.get(v), args.get(v));
+        }
+
         String[] lines = code.split("\n");
+        int baseIndent = 0;
+        boolean endOfFile = false;
         for (int l = 0; l < lines.length; l++) {
             String line = lines[l];
-            String[] tokens = line.split(" ");
+            //System.out.println("line " + l + ": " + line);
+            String doubleSpacesRemoved = StaticMethods.stripSpaces(line);
+            while (doubleSpacesRemoved.contains("  ")) {
+                doubleSpacesRemoved = doubleSpacesRemoved.replaceFirst("  ", " ");
+            }
+            String[] tokens = doubleSpacesRemoved.split(" ");
             //fisrtly, check if should be multi line statement
-            if (line.charAt(line.length()) == Keywords.LINE_JOINER_KEYWORD) {
+            if (line.charAt(line.length() - 1) == Keywords.LINE_JOINER_KEYWORD) {
                 while (line.charAt(line.length()) == Keywords.LINE_JOINER_KEYWORD) {
                     if (l + 1 >= lines.length) {
                         throw new Error("Must have line after line joiner");
                     }
-                    line += " " + StaticMethods.stripSpaces(codeScanner.nextLine());
+                    l++;
+                    //remove joiner character
+                    line = line.substring(0, line.length() - 1);
+                    line += " " + StaticMethods.stripSpaces(lines[l]);
                 }
             }
 
             //check for...
+            
+            //base indentation and indentation errors
+            if (baseIndent == 0 && !line.isBlank()) {
+                baseIndent = StaticMethods.countIndent(line);
+            }
+            if (baseIndent > 0 && !line.isBlank()) {
+                if (StaticMethods.countIndent(line) != baseIndent) {
+                    throw new Error("Incorrect indentation on line " + l);
+                }
+            }
 
             //return
-            if (tokens[TokenIndex.RETURN_TOKEN].equals(Keywords.RETURN_KEYWORD)) {
+            if (tokens.length > TokenIndex.RETURN_TOKEN && tokens[TokenIndex.RETURN_TOKEN].equals(Keywords.RETURN_KEYWORD)) {
                 String toReturn = line.substring(Keywords.RETURN_KEYWORD.length() + 1);
                 hasReturned.setData(true);
                 returnValue.setData(StaticMethods.eval(toReturn, env).getData());
@@ -75,29 +100,139 @@ public class Function {
             }
             
             //variable declaration
-            if (tokens[TokenIndex.DEFINE_VARIABLE_TOKEN].equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
+            if (tokens.length > TokenIndex.DEFINE_VARIABLE_TOKEN && tokens[TokenIndex.DEFINE_VARIABLE_TOKEN].equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
                 StaticMethods.defineVariable(env, line);
             }
 
             //variable modification
-            if (tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.INCREMENT_KEYWORD)) {
+            if (tokens.length > TokenIndex.MODIFY_VARIABLE_TOKEN && tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.INCREMENT_KEYWORD)) {
                 StaticMethods.increment(env, line);
             } 
-            if (tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.DECREMENT_KEYWORD)) {
+            if (tokens.length > TokenIndex.MODIFY_VARIABLE_TOKEN && tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.DECREMENT_KEYWORD)) {
                 StaticMethods.decrement(env, line);
             }
 
             //print line
-            if (tokens[TokenIndex.PRINT_TOKEN].equals(Keywords.PRINT_KEYWORD)) {
+            if (tokens.length > TokenIndex.PRINT_TOKEN && tokens[TokenIndex.PRINT_TOKEN].equals(Keywords.PRINT_KEYWORD)) {
                 //TODO print to notepad, placeholder for now
-                System.out.println(StaticMethods.eval(line.substring(Keywords.PRINT_KEYWORD.length() + 1), env));
+                System.out.println(StaticMethods.eval(line.substring(line.indexOf(Keywords.PRINT_KEYWORD) + Keywords.PRINT_KEYWORD.length() + 1), env));
             }
 
             //TODO if
-            if (tokens[TokenIndex.IF_STATEMENT_TOKEN].equals(Keywords.PRINT_KEYWORD)) {
+            if (tokens.length > TokenIndex.IF_STATEMENT_TOKEN && tokens[TokenIndex.IF_STATEMENT_TOKEN].equals(Keywords.IF_KEYWORD)) {
+                //get all code inside the if statement
+                //get condition statement
+                String ifCondition = line.substring(line.indexOf(Keywords.IF_KEYWORD) + Keywords.IF_KEYWORD.length(), 
+                    line.length() - Keywords.COLON_KEYWORD.length());
+                l++;
+                //check line after
+                if (l >= lines.length) {
+                    endOfFile = true;
+                    throw new Error("No next line found");
+                }
+                String nextLine = lines[l];
+                int blockIndent = StaticMethods.countIndent(nextLine);
+                //check next indentation fine
+                if (blockIndent <= baseIndent) {
+                    throw new Error("Incorrect indentation on line " + l);
+                }
+                //get code inside if statement
+                String nestedIfCode = "";
+                while (StaticMethods.countIndent(nextLine) >= blockIndent || StaticMethods.countIndent(nextLine) == -1) {
+                    nestedIfCode += nextLine + "\n";
+                    l++;
+                    if (l >= lines.length) {
+                        endOfFile = true;
+                        break;
+                    }
+                    nextLine = lines[l];
+                }
+                //go back to last line of the if block
+                l--;
+
+                //else statement exists
+                int startElse = l + 1;
+                String nestedElseCode = "";
+                String lineAfter = StaticMethods.stripSpaces(nextLine);
+                String wholeLineAfter = nextLine;
+                //System.out.println("line after if block: " + wholeLineAfter);
+                while (lineAfter.contains("  ")) {
+                    lineAfter = lineAfter.replaceFirst("  ", " ");
+                }
+                //next line is else or elif
+                if (!endOfFile && lineAfter.split(" ")[TokenIndex.ELSE_STATEMENT_TOKEN].equals(Keywords.ELSE_KEYWORD)) {
+                    l += 2;
+                    //check line after
+                    if (l >= lines.length) {
+                        endOfFile = true;
+                        throw new Error("No next line found");
+                    }
+                    nextLine = lines[l];
+                    blockIndent = StaticMethods.countIndent(nextLine);
+                    //check indentation fine
+                    if (blockIndent <= baseIndent) {
+                        throw new Error("Incorrect indentation on line " + l);
+                    }
+                    while (StaticMethods.countIndent(nextLine) >= blockIndent || StaticMethods.countIndent(nextLine) == -1) {
+                        nestedElseCode += nextLine + "\n";
+                        l++;
+                        if (l >= lines.length) {
+                            endOfFile = true;
+                            break;
+                        }
+                        nextLine = lines[l];
+                    }
+                    l--;
+                }
                 
+                
+                Function ifStatement = new Function(nestedIfCode, env.copyEnvironment(), new ArrayList<String>(), 
+                        new ArrayList<String>(), Keywords.IF_KEYWORD);
+                
+                //should run if statement
+                if (StaticMethods.eval(ifCondition, env).toBoolean()) {
+                    ifStatement.run(new ArrayList<Variable>());
+                    if (hasReturned.toBoolean()) {
+                        return returnValue;
+                    }
+                }
+                else {
+                    //check for elif
+                    if (lineAfter.split(" ").length > TokenIndex.ELIF_STATEMENT_TOKEN && 
+                            lineAfter.split(" ")[TokenIndex.ELIF_STATEMENT_TOKEN].equals(Keywords.IF_KEYWORD)) {
+                        //just set next line to an if statement and go back to it
+                        //System.out.println("found elif");
+                        l = startElse;
+                        lines[l] = wholeLineAfter.substring(0, wholeLineAfter.indexOf(Keywords.ELSE_KEYWORD)) + 
+                                wholeLineAfter.substring(wholeLineAfter.indexOf(Keywords.IF_KEYWORD));
+                        l--;
+                    }
+                    else if (!nestedElseCode.isBlank()) {
+                        //System.out.println("found else");
+                        Function elseStatement = new Function(nestedElseCode, env.copyEnvironment(), new ArrayList<String>(), 
+                            new ArrayList<String>(), Keywords.ELSE_KEYWORD);
+                        elseStatement.run(new ArrayList<Variable>(), hasReturned, returnValue);
+                        if (hasReturned.toBoolean()) {
+                            return returnValue;
+                        }
+                    }
+                }
             }
-            //TODO else
+            //finds else statement
+            if (tokens.length > TokenIndex.ELSE_STATEMENT_TOKEN && tokens[TokenIndex.ELSE_STATEMENT_TOKEN].equals(Keywords.ELSE_KEYWORD)) {
+                //should have already run or is elif, skip over it
+                String nextLine = lines[l + 1];
+                int blockIndent = StaticMethods.countIndent(line);
+                while (StaticMethods.countIndent(nextLine) >= blockIndent || StaticMethods.countIndent(nextLine) == -1) {
+                    l++;
+                    if (l >= lines.length) {
+                        endOfFile = true;
+                        break;
+                    }
+                    nextLine = lines[l];
+                }
+                l--;
+            }
             //TODO for
             //TODO while
             

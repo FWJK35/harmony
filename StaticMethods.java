@@ -1,14 +1,16 @@
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 public class StaticMethods {
     
     //types of expressions used in token types
     private enum TokenType {
-        None, Number, String, Expression, Array, Identifier, Operator, Joiner
+        None, Number, String, Expression, Array, Identifier, Operator, BoolOperator, Joiner
     }
     //types of expressions used in final list
     private enum FinalType {
-        Evaluated, Number, Array, Operator
+        Evaluated, Operator, BoolOperator
     }
     //types of expressions used in expression stack
     private enum ExpressionType {
@@ -41,6 +43,7 @@ public class StaticMethods {
 
     public static Variable eval(String line, Environment env) {
         line = stripSpaces(line);
+        //System.out.println(line);
         Variable result = new Variable();
         List<TokenType> tokenTypes = new ArrayList<TokenType>();
         List<Variable> tokenVariables = new ArrayList<Variable>();
@@ -170,6 +173,7 @@ public class StaticMethods {
                     }
                     
                     //check for beginning of identifier
+                    //TODO CORRECTLY IDENTIFY IDENTIFIERS
                     else if (isAlpha(c)) {
                         //will need to be evaluated
                         if (tokenStack.isEmpty()) {
@@ -258,7 +262,6 @@ public class StaticMethods {
                 }
             }
         }
-
         //remove double joiners
         for (int t = tokenTypes.size() - 2; t > 0; t--) {
             if (tokenTypes.get(t) == tokenTypes.get(t + 1) && tokenTypes.get(t) == TokenType.Joiner) {
@@ -281,8 +284,24 @@ public class StaticMethods {
 
             //identifier (function, variable, etc)
             else if (currentType == TokenType.Identifier) {
-                //there is another token after it
-                if (t + 1 < tokenTypes.size()) {
+                String idName = currentVariable.toString();
+                //boolean keyword
+                boolean boolKeyword = false;
+                for (String word : Keywords.BOOLEAN_KEYWORDS) {
+                    if (idName.equals(word)) {
+                        boolKeyword = true;
+                    }
+                }
+                if (boolKeyword) {
+                    finalVariables.add(currentVariable);
+                    finalTypes.add(FinalType.BoolOperator);
+                }
+                else if (Keywords.isIllegalEvalIdentifier(idName)) {
+                    throw new Error("Invalid identifier");
+                }
+                //there is another token after it and it isnt an eval keyword
+                else if (t + 1 < tokenTypes.size() && 
+                        !(Keywords.isIllegalIdentifier(idName) && !Keywords.isIllegalEvalIdentifier(idName))) {
                     TokenType nextType = tokenTypes.get(t + 1);
 
                     //identifies function
@@ -294,7 +313,7 @@ public class StaticMethods {
                         for (String arg : separate(nextVariable.toString())) {
                             arguments.add(eval(arg, env));
                         }
-                        Function func = env.getFunction(currentVariable.toString(), arguments);
+                        Function func = env.getFunction(idName, arguments);
                         if (func != null) {
                             finalVariables.add(func.run(arguments));
                             finalTypes.add(FinalType.Evaluated);
@@ -303,29 +322,35 @@ public class StaticMethods {
                             throw new Error("Function not found");
                         }
                     }
-                    
-                    //identifies array index or slice
-                    else if (nextType == TokenType.Array) {
-                        //TODO do something
-                    }
 
                     //just a variable
-                    else if (nextType == TokenType.Joiner || nextType == TokenType.Operator) {
+                    else if (nextType == TokenType.Joiner || nextType == TokenType.Operator || 
+                            nextType == TokenType.BoolOperator || nextType == TokenType.Array) {
                         //add the value of that variable
-                        finalVariables.add(env.getVariable(currentVariable.toString()));
+                        finalVariables.add(env.getVariable(idName));
                         finalTypes.add(FinalType.Evaluated);
                         //do nothing, just figure out at next step
                     }
 
                     else {
-                        throw new Error("Incorrect token found!");
+                        System.out.println(tokenTypes);
+                        throw new Error("Incorrect token found for expression: " + line);
                     }
                 }
 
-                //just a variable
+                //just a variable or eval keyword
                 else {
-                    finalVariables.add(env.getVariable(currentVariable.toString()));
-                    finalTypes.add(FinalType.Evaluated);
+                    //eval keyword
+                    if (Keywords.isIllegalIdentifier(idName) && !Keywords.isIllegalEvalIdentifier(idName)) {
+                        //TODO manually find them
+                    }
+                    else {
+                        if (!env.containsVariable(idName)) {
+                            throw new Error("Variable name not found");
+                        }
+                        finalVariables.add(env.getVariable(idName));
+                        finalTypes.add(FinalType.Evaluated);
+                    }
                 }
             }
 
@@ -359,9 +384,12 @@ public class StaticMethods {
                 finalTypes.add(FinalType.Evaluated);
             }
 
-            //possibly new array
+            //possibly new array or slice
+            //arrtest aka [1, 2, 3]
+            //xd arrtest[0]
+            //
             else if (currentType == TokenType.Array) {
-                //TODO idk something
+                
             }
 
             //operator
@@ -381,6 +409,7 @@ public class StaticMethods {
         List<Character> ops = new ArrayList<Character>();
         boolean isNumberExpression = false;
         int expStart = 0;
+        //collapse number expressions
         for (int f = 0; f < finalTypes.size(); f++) {
             //beginning of number expression or just regular expression
             if (!isNumberExpression && finalTypes.get(f) == FinalType.Evaluated) {
@@ -398,7 +427,7 @@ public class StaticMethods {
             //end number expression 
             else {
                 //just join them
-                if (finalTypes.get(f) == FinalType.Evaluated) {
+                if (finalTypes.get(f) == FinalType.Evaluated || finalTypes.get(f) == FinalType.BoolOperator) {
                     //single variable, leave as is
                     if (vars.size() == 1) {
                         //System.out.println("single: " + vars.get(0));
@@ -423,8 +452,13 @@ public class StaticMethods {
                         isNumberExpression = false;
                         f--;
                     }
+                    if (finalTypes.get(f) == FinalType.BoolOperator) {
+                        f++;
+                    }
                 }
-                //TODO throw error
+                else if (finalTypes.get(f) == FinalType.Operator) {
+                    throw new Error("Cannot have double operator");
+                }
             }
         }
         if (isNumberExpression) {
@@ -454,16 +488,28 @@ public class StaticMethods {
                 throw new Error("Must have expression after operator");
             }
         }
+        //boolean combiation
+        vars.clear();
+        List<String> boolOps = new ArrayList<String>();
+
         if (finalVariables.size() == 0) {
             return new Variable();
         }
         if (finalVariables.size() == 1) {
             return finalVariables.get(0);
         }
-        //System.out.println(finalVariables);
-        for (Variable fv : finalVariables) {
-            result = Variable.combine(result, new Variable(fv.toString()));
+        //combine things before boolean evaluation
+        boolean combiningEvaluated = false;
+        for (int f = 0; f < finalTypes.size(); f++) {
+            //current and next one are both evaluated
+            if (finalTypes.get(f) == FinalType.Evaluated && finalTypes.get(f + 1) == FinalType.Evaluated) {
+                finalVariables.set(f, Variable.combine(finalVariables.get(f), finalVariables.get(f = 1)));
+                finalTypes.remove(f + 1);
+                finalVariables.remove(f + 1);
+                f--;
+            }
         }
+        System.out.println(finalVariables);
         return result;
     }
 
@@ -561,12 +607,12 @@ public class StaticMethods {
         return args;
     }
 
-
     public static Variable interpretExpression(String line, Environment env) {
         return eval(line, env);
     }
     
     public static Variable defineVariable(Environment env, String line) {
+        line = StaticMethods.stripSpaces(line);
         String[] tokens = line.split(" ");
         if (line.length() >= 3) {
             boolean validName = true;
@@ -581,7 +627,7 @@ public class StaticMethods {
             if (!validName) {
                 throw new Error("Invalid identifier name");
             }
-            String expression = line.substring(line.indexOf(Keywords.DEFINE_VARIABLE_KEYWORD) + Keywords.DEFINE_VARIABLE_KEYWORD.length());
+            String expression = line.substring(line.indexOf(" " + Keywords.DEFINE_VARIABLE_KEYWORD + " ") + Keywords.DEFINE_VARIABLE_KEYWORD.length() + 2);
             Variable evaluated = eval(expression, env);
             env.putVariable(tokens[0], evaluated);
             return evaluated;
@@ -594,7 +640,6 @@ public class StaticMethods {
     // wdym TYPE NAME type1 name1 type2 name2 :)
     public static Function defineFunction(Environment env, String defLine) {
         String[] tokens = defLine.split(" ");
-        String returnType = tokens[TokenIndex.DEFINE_FUNCTION_TYPE_TOKEN];
         String funcName = tokens[TokenIndex.DEFINE_FUNCTION_NAME_TOKEN];
         List<String> paramTypes = new ArrayList<String>();
         List<String> paramNames = new ArrayList<String>();
@@ -604,7 +649,7 @@ public class StaticMethods {
             paramTypes.add(tokens[t + 1]);
         }
 
-        Function func = new Function("", env, paramNames, paramTypes, returnType, funcName);
+        Function func = new Function("", env, paramNames, paramTypes, funcName);
         env.putFunction(func);
         return func;
     }
@@ -635,8 +680,66 @@ public class StaticMethods {
         }
     }
 
-    
-    //TODO Esther do this method
+    public static String input() {
+        return JOptionPane.showInputDialog("");
+    }
+
+    public static boolean interpretBooleanExpression(List<Variable> variables, List<String> operators) {
+        List<Variable> vars = new ArrayList<Variable>(variables);
+        List<String> ops = new ArrayList<String>(operators);
+        
+        for (Variable var : vars) {
+            if (var.getData().equals(Keywords.TRUE_KEYWORD)) {
+                var.setData(true);
+            }
+            else if (var.getData().equals(Keywords.FALSE_KEYWORD)) {
+                var.setData(false);
+            }
+        }
+
+        while (ops.contains(Keywords.EQUALS_KEYWORD)) {
+            int index = ops.indexOf(Keywords.EQUALS_KEYWORD);
+            vars.set(index, new Variable(vars.get(index).equals(vars.get(index + 1))));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(Keywords.GREATER_KEYWORD)) {
+            int index = ops.indexOf(Keywords.GREATER_KEYWORD);
+            vars.set(index, new Variable(vars.get(index).toDouble() > vars.get(index + 1).toDouble()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(Keywords.LESSER_KEYWORD)) {
+            int index = ops.indexOf(Keywords.LESSER_KEYWORD);
+            vars.set(index, new Variable(vars.get(index).toDouble() < vars.get(index + 1).toDouble()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(Keywords.OR_KEYWORD)) {
+            int index = ops.indexOf(Keywords.OR_KEYWORD);
+            vars.set(index, new Variable((boolean) vars.get(index).getData() || (boolean) vars.get(index + 1).getData()));
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+        while (ops.contains(Keywords.AND_KEYWORD)) {
+            int index = ops.indexOf(Keywords.AND_KEYWORD);
+            vars.set(index, new Variable((boolean) vars.get(index).getData() && (boolean) vars.get(index + 1).getData()));;
+            vars.remove(index + 1);
+            ops.remove(index);
+        }
+
+        if (vars.size() == 1 && ops.size() == 0) {
+            if (vars.get(0).getData() instanceof Integer) {
+                return (int) vars.get(0).getData() >= 1;
+            }       
+            return (boolean) vars.get(0).getData();
+        }
+
+        else {
+            throw new Error("bad bad bad bad bad bad bad bad");
+        }
+    }
+
     public static Variable interpretNumberExpression(List<Variable> variables, List<Character> operators) {
         List<Variable> vars = new ArrayList<Variable>(variables);
         List<Character> ops = new ArrayList<Character>(operators);
@@ -726,6 +829,9 @@ public class StaticMethods {
     //method that removes all spaces from the start and end of the string
     public static String stripSpaces(String input) {
         String output = input;
+        if (input.isBlank()) {
+            return "";
+        }
         while (output.charAt(0) == ' ') {
             output = output.substring(1);
         }

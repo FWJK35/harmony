@@ -15,7 +15,6 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class Variable {
-
     private Object data;
     
     // constructors
@@ -262,7 +261,8 @@ public class Variable {
             throw new IllegalStateException("Type must be Array");
         }
     }
-   
+    
+    // gets length of data 
     public int len() {
         if (data instanceof String) {
             return ((String) data).length();
@@ -318,19 +318,15 @@ public class Variable {
                 return true;
             }
         }
-        else if (data instanceof Integer) {
+        else if (data instanceof Double) {
             if (((int) data) == 0) {
                 return false;
             } else {
                 return true;
             }
         }
-        else { // (data instanceof Double) {
-            if(((double) data) == 0) {
-                return false;
-            } else {
-                return true;
-            } 
+        else {
+            return (boolean) data;
         }
     }
 
@@ -390,6 +386,10 @@ public class Variable {
     }
 
     public double toDouble() {
+        Object data = this.data;
+        if (data instanceof String) {
+            return Double.parseDouble((String) data);
+        }
         if (data instanceof Integer) {
             return (double) (int) data;
         }

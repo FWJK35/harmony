@@ -1,13 +1,14 @@
-Function:
-    SystemFunctions class
-    get return statements working
-    write test functions
-    finish class
+Johnny:
+    unit converter
+
 Calvin:
     Function run
-    remove function return types
+    System functions
+        -lengths (str and arr and list)
+        -casting
+    Implement slicing
 Esther:
-    eval comparisons
-    user input
-    eval arrays
+    eval:
+        eval arrays
+        eval slicing
     notepad indentation

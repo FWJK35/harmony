@@ -12,7 +12,23 @@ public class Keywords {
     public static final String PRINT_KEYWORD = "xd";
     public static final String INPUT_KEYWORD = "hmu";
     public static final String RETURN_KEYWORD = "ttyl";
+    //boolean keywords
     public static final String EQUALS_KEYWORD = "is";
+    public static final String GREATER_KEYWORD = "more";
+    public static final String LESSER_KEYWORD = "less";
+    public static final String OR_KEYWORD = "or";
+    public static final String AND_KEYWORD = "and";
+    public static final String TRUE_KEYWORD = "good";
+    public static final String FALSE_KEYWORD = "bad";
+    public static final String[] BOOLEAN_KEYWORDS = {
+        EQUALS_KEYWORD, GREATER_KEYWORD, LESSER_KEYWORD,
+        OR_KEYWORD, AND_KEYWORD
+    };
+
+    public static final String[] EVAL_KEYWORDS = {
+        TRUE_KEYWORD, FALSE_KEYWORD, INPUT_KEYWORD,
+    };
+
     public static final char STRING_LITERAL_KEYWORD = '#';
     public static final char ESCAPE_CHARACTER_KEYWORD = '\\';
     public static final char OPEN_PAREN_KEYWORD = '(';
@@ -45,6 +61,17 @@ public class Keywords {
             if (s.equals(id)) {
                 return true;
             }
+        }
+        return false;
+    }
+    public static boolean isIllegalEvalIdentifier(String s) {
+        if (isIllegalIdentifier(s)) {
+            for (String id : EVAL_KEYWORDS) {
+                if (s.equals(id)) {
+                    return false;
+                }
+            }
+            return true;
         }
         return false;
     }
