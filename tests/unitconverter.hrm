@@ -6,6 +6,7 @@ wdym main :)
     xd #input unit#
     unit1 aka hmu
     xd #input amount#
+    
     amount aka hmu
     xd #input what you want to convert to#
     unit2 aka hmu
@@ -15,9 +16,9 @@ wdym main :)
     lmao item is #Temperature# :)
         lmao unit1 is #Fahrenheit# :) 
             lmao unit2 is #Celsius# :)
-                amount aka amount - 32 * 5/9.0
+                amount aka (amount - 32) * 5/9.0
             afk lmao amount is #Kelvin# :)
-                amount aka amount + 459.67 * 5/9.0
+                amount aka (amount + 459.67) * 5/9.0
         afk lmao is #Celsius# :)
             lmao is #Fahrenheit# :)
                 amount aka amount * 9/5.0 + 32
@@ -38,20 +39,20 @@ wdym main :)
             afk lmao is #Grams# :)
                 amount aka amount * 907185
             
-        afk lmao is #Stones# :) 
+        afk lmao unit1 is #Stones# :) 
             lmao amount is #Imperial Tons# :)
                 amount aka amount / 160 
-            afk lmao is #Pounds# :)
+            afk lmao unit2 is #Pounds# :)
                 amount aka amount * 14
-            afk lmao is #Grams# :)
+            afk lmao unit2 is #Grams# :)
                 amount aka amount * 6350.3
 
-        afk lmao is #Pounds# :)
-            lmao #Imperial Tons# :)
+        afk lmao unit1 is #Pounds# :)
+            lmao unit 2 #Imperial Tons# :)
                 amount aka amount / 2000
-        afk lmao is #Stones#
+        afk lmao unit2 is #Stones# :)
             amount aka amount / 14
-        afk lmao is #Grams#
+        afk lmao unit2 is #Grams# :)
             amount aka * 453.592 
         
 
@@ -74,7 +75,7 @@ wdym main :)
                 amount aka amount / 1852 / 1000000000 
             afk lmao unit2 is #Feet# :)
                 amount aka amount * 3280389895000000000
-            afk lmao unit 2 is #Inches# :)
+            afk lmao unit2 is #Inches# :)
                 amount aka amount * 6350.3
             afk lmao unit2 is #Meters# :)
                 amount aka * 1000000000

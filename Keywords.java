@@ -43,13 +43,13 @@ public class Keywords {
     public static final String OPERATOR_CHARACTERS = "+-*/%^";
 
     //TYPES
-    public static Map<String, String> typeMap = Map.of(
-        "null", "non",
-        "int", "int",
-        "double", "dbl",
-        "String", "str",
-        "ArrayList", "arr"
-        );
+    // public static Map<String, String> typeMap = Map.of(
+    //     "null", "non",
+    //     "int", "int",
+    //     "double", "dbl",
+    //     "String", "str",
+    //     "ArrayList", "arr"
+    //     );
 
     //ILLEGAL IDENTIFIERS
     public static final String[] ILLEGAL_IDENTIFIERS = {

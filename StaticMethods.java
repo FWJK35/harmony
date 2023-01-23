@@ -323,6 +323,9 @@ public class StaticMethods {
                     else if (nextType == TokenType.Joiner || nextType == TokenType.Operator || 
                             nextType == TokenType.BoolOperator || nextType == TokenType.Array) {
                         //add the value of that variable
+                        if (!env.containsVariable(idName)) {
+                            throw new Error("Variable name not found: " + idName);
+                        }
                         finalVariables.add(env.getVariable(idName));
                         finalTypes.add(FinalType.Evaluated);
                         //do nothing, just figure out at next step
@@ -505,18 +508,25 @@ public class StaticMethods {
         
         //combine things before boolean evaluation
         List<String> boolOps = new ArrayList<String>();
+        // System.out.println(finalTypes);
+        // System.out.println(finalVariables);
+        // System.out.println(tokenTypes);
         for (int f = 0; f < finalTypes.size(); f++) {
             //current and next one are both evaluated
             if (finalTypes.get(f) == FinalType.Evaluated) {
                 if (f + 1 < finalTypes.size() && finalTypes.get(f + 1) == FinalType.Evaluated) {
-                    finalVariables.set(f, Variable.combine(new Variable(finalVariables.get(f).toString()), new Variable(finalVariables.get(f + 1).toString())));
+                    finalVariables.set(f, Variable.combine(
+                        new Variable(
+                            finalVariables.get(f)
+                        .toString()),
+                        new Variable(finalVariables.get(f + 1).toString())));
                     finalTypes.remove(f + 1);
                     finalVariables.remove(f + 1);
                     f--;
                 }
             }
             else if (finalTypes.get(f) == FinalType.BoolOperator) {
-                if (f + 1 < finalTypes.size() && finalTypes.get(f + 1) == FinalType.BoolOperator) {
+                if (f + 1 >= finalTypes.size() || finalTypes.get(f + 1) == FinalType.BoolOperator || f == 0) {
                     throw new Error("Error with boolean operators");
                 }
                 boolOps.add(finalVariables.get(f).toString());
@@ -863,7 +873,7 @@ public class StaticMethods {
     //method that removes all spaces from the start and end of the string
     public static String stripSpaces(String input) {
         String output = new String(input);
-        if (input.isBlank()) {
+        if (isBlank(input)) {
             return "";
         }
         while (output.charAt(0) == ' ') {
@@ -877,12 +887,21 @@ public class StaticMethods {
 
     public static String stripTrailingSpaces(String input) {
         String output = new String(input);
-        if (input.isBlank()) {
+        if (isBlank(input)) {
             return "";
         }
         while (output.charAt(output.length() - 1) == ' ') {
             output = output.substring(0, output.length() - 1);
         }
         return output;
+    }
+
+    public static boolean isBlank(String s) {
+        for (char c : s.toCharArray()) {
+            if (c != ' ') {
+                return false;
+            }
+        }
+        return true;
     }
 }

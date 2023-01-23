@@ -66,9 +66,9 @@ public class Function {
         int baseIndent = 0;
         boolean endOfFile = false;
         String line = "";
-        try {
+        
         for (int l = 0; l < lines.length; l++) {
-            
+            try {
             line = StaticMethods.stripTrailingSpaces(lines[l]);
             //System.out.println("line " + l + ": " + line);
             String doubleSpacesRemoved = StaticMethods.stripSpaces(line);
@@ -77,7 +77,7 @@ public class Function {
             }
             String[] tokens = doubleSpacesRemoved.split(" ");
             //VERY first, check comment or blank line
-            if (line.isBlank() || doubleSpacesRemoved.substring(0, 
+            if (StaticMethods.isBlank(line) || doubleSpacesRemoved.substring(0, 
                     Keywords.COMMENT_KEYWORD.length()).equals(Keywords.COMMENT_KEYWORD)) {
                 //ignore line
             }
@@ -97,10 +97,10 @@ public class Function {
             //check for...
             
             //base indentation and indentation errors
-            if (baseIndent == 0 && !line.isBlank()) {
+            if (baseIndent == 0 && !StaticMethods.isBlank(line)) {
                 baseIndent = StaticMethods.countIndent(line);
             }
-            if (baseIndent > 0 && !line.isBlank()) {
+            if (baseIndent > 0 && !StaticMethods.isBlank(line)) {
                 if (StaticMethods.countIndent(line) != baseIndent) {
                     throw new Error("Incorrect indentation on line " + l);
                 }
@@ -140,6 +140,7 @@ public class Function {
                 String ifCondition = line.substring(line.indexOf(Keywords.IF_KEYWORD) + Keywords.IF_KEYWORD.length(), 
                     line.length() - Keywords.COLON_KEYWORD.length());
                 l++;
+                int startIf = l;
                 //check line after
                 if (l >= lines.length) {
                     endOfFile = true;
@@ -203,9 +204,9 @@ public class Function {
                 
                 Function ifStatement = new Function(nestedIfCode, env.copyEnvironment(), new ArrayList<String>(), 
                         new ArrayList<String>(), Keywords.IF_KEYWORD);
-                
+                ifStatement.setStartLine(startLine + startIf);
                 //should run if statement
-                System.out.println(ifCondition);
+                //System.out.println(ifCondition);
                 if (StaticMethods.eval(ifCondition, env).toBoolean()) {
                     ifStatement.run(new ArrayList<Variable>(), hasReturned, returnValue);
                     if (hasReturned.toBoolean()) {
@@ -223,11 +224,11 @@ public class Function {
                                 wholeLineAfter.substring(wholeLineAfter.indexOf(Keywords.IF_KEYWORD));
                         l--;
                     }
-                    else if (!nestedElseCode.isBlank()) {
+                    else if (!StaticMethods.isBlank(nestedElseCode)) {
                         //System.out.println("found else");
                         Function elseStatement = new Function(nestedElseCode, env.copyEnvironment(), new ArrayList<String>(), 
                             new ArrayList<String>(), Keywords.ELSE_KEYWORD);
-                        elseStatement.setStartLine(startLine + l);
+                        elseStatement.setStartLine(startLine + startElse);
                         elseStatement.run(new ArrayList<Variable>(), hasReturned, returnValue);
                         if (hasReturned.toBoolean()) {
                             return returnValue;
@@ -252,14 +253,17 @@ public class Function {
             }
             //TODO for
             //TODO while
-            } 
-        } catch (Exception e) {
-            e.printStackTrace();
-            for (int c = 0; c < lines.length; c++) {
-                if (lines[c].equals(line)) {
-                    System.out.println("Possible error on line " + (c + 2 + startLine) + " :" + e.getMessage());
+
+
+            } catch (Error e) {
+                //e.printStackTrace();
+                for (int c = 0; c < lines.length; c++) {
+                    if (lines[c].contains(line)) {
+                        System.out.println("Possible error on line " + (c + 1 + startLine) + ": " + e.getMessage());
+                    }
                 }
-            }
+                break;
+            } 
         }
         return new Variable();
     }

@@ -50,7 +50,7 @@ public class Compiler {
                         //at least has min number of tokens in definition
                         if (tokens.length - TokenIndex.MIN_DEFINE_LEN >= 0 && (tokens.length - TokenIndex.MIN_DEFINE_LEN) % 2 == 0) {
                             currentFunc = StaticMethods.defineFunction(env, line);
-                            currentFunc.setStartLine(lineNum);
+                            currentFunc.setStartLine(lineNum + 1);
                             defining = true;
                         }
                     }
