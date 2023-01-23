@@ -8,12 +8,12 @@ public class Notepad implements ActionListener
 {  
     private Compiler compiler;
     private File file;
-    private JFrame frm;
-    private JMenuBar mnubr;  
+    private JFrame frame;
+    private JMenuBar menuBar;  
     private JMenu fileMenu, editMenu;  
     private JMenuItem openItem, saveItem, runItem;
     private JMenuItem cutItem, copyItem, pasteItem, selectAll;
-    private JTextArea txtarea;  
+    private JTextArea textArea;  
 
     public static void main(String[] args) {
         Main.main(null);
@@ -26,9 +26,9 @@ public class Notepad implements ActionListener
     public Notepad(String fileName) {
         file = new File(fileName);
         compiler = new Compiler(file);
-        frm = new JFrame(fileName);
-        mnubr = new JMenuBar();
-        mnubr.setBounds(0, 0, 500, 20);
+        frame = new JFrame(fileName);
+        menuBar = new JMenuBar();
+        menuBar.setBounds(0, 0, 500, 20);
         
         fileMenu = new JMenu("File");
         openItem = new JMenuItem("openItem");
@@ -55,28 +55,28 @@ public class Notepad implements ActionListener
         selectAll.addActionListener(this);  
         editMenu.add(selectAll);  
         
-        mnubr.add(fileMenu);  
-        mnubr.add(editMenu);
-        txtarea = new JTextArea(400, 400);  
-        txtarea.setBounds(5,30,460,460);
+        menuBar.add(fileMenu);  
+        menuBar.add(editMenu);
+        textArea = new JTextArea(400, 400);  
+        textArea.setBounds(5,30,460,460);
 
-        JScrollPane scroll = new JScrollPane(txtarea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setBounds(0, 20, 500, 500);
         scroll.getVerticalScrollBar().setPreferredSize(new Dimension(15, 0));
         scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 15));
 
-        frm.add(mnubr);
-        frm.add(scroll);
-        frm.setLayout(null);  
-        frm.setSize(500, 500);
-        frm.setResizable(true);
-        frm.setVisible(true);
-        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(menuBar);
+        frame.add(scroll);
+        frame.setLayout(null);  
+        frame.setSize(500, 500);
+        frame.setResizable(true);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frm.addComponentListener(new ComponentAdapter() {
+        frame.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent componentEvent) {
-                scroll.setBounds(0, mnubr.getHeight(), frm.getWidth()-scroll.getVerticalScrollBar().getWidth(), frm.getHeight()-mnubr.getHeight()-38);
-                mnubr.setBounds(0, 0, frm.getWidth(), 20);
+                scroll.setBounds(0, menuBar.getHeight(), frame.getWidth()-scroll.getVerticalScrollBar().getWidth(), frame.getHeight()-menuBar.getHeight()-38);
+                menuBar.setBounds(0, 0, frame.getWidth(), 20);
             }
         }); 
 
@@ -84,7 +84,7 @@ public class Notepad implements ActionListener
             file = new File(fileName);
             Scanner scan = new Scanner(file);
             while(scan.hasNextLine()) {
-                txtarea.append(scan.nextLine() + "\n");
+                textArea.append(scan.nextLine() + "\n");
             }
             scan.close();
         } catch (Exception e) {
@@ -93,29 +93,28 @@ public class Notepad implements ActionListener
         }
     }  
     
-    // menubar actions implementation
+    // menuBar actions implementation
     public void actionPerformed(ActionEvent ae) {   
         if (ae.getSource() == cutItem) {
-            txtarea.cut();  
+            textArea.cut();  
         }
         else if (ae.getSource() == pasteItem) {    
-            txtarea.paste();
+            textArea.paste();
         }
         else if (ae.getSource() == copyItem) {
-            txtarea.copy();
+            textArea.copy();
         }
         else if (ae.getSource() == selectAll) {
-            txtarea.selectAll();  
+            textArea.selectAll();  
         }
-
         else if (ae.getSource() == openItem) {
             new Notepad();
         }
 
-        // saves text area to file for actions saveItem and runItem
+        // saves text to file
         else if (ae.getSource() == saveItem || ae.getSource() == runItem) {
             try {
-                Scanner in = new Scanner(txtarea.getText());
+                Scanner in = new Scanner(textArea.getText());
                 PrintStream out = new PrintStream(file);
                 
                 while (in.hasNextLine()) {
@@ -173,4 +172,4 @@ public class Notepad implements ActionListener
         }
         return fileName;
     }
-}  
+}

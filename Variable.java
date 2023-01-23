@@ -9,7 +9,6 @@
  * Arr - Array
  */
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +32,14 @@ public class Variable {
         this.data = data;
     }
 
+    // accessor methods
     public Object getData() {
         return data;
     }
 
+    public String getType() {
+        return data.getClass().getSimpleName();
+    }
 
     //TODO add the following functionality
     /*
@@ -290,50 +293,61 @@ public class Variable {
         return data.toString();
     }
 
-    // accessor methods
-    public String getType() {
-        return data.getClass().getSimpleName();
-    }
-
     public boolean toBoolean() {
+        if (data == null) {
+            return false;
+        }
         if (data instanceof Integer) {
             if ((int) data == 0) {
                 return false;
             }
-            else {
-                return true;
-            }
+            return true;
         }
-        else if (data instanceof String) {
-            if (((String) data).equals("")) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        else if (data instanceof Character) {
-            if (((char) data) == ' ') {
-                return false;
-            } else {
-                return true;
-            }
-        }
-        else if (data instanceof Double) {
+        if (data instanceof Double) {
             if (((int) data) == 0) {
                 return false;
-            } else {
-                return true;
             }
+            return true;
         }
-        else {
-            return (boolean) data;
+        if (data instanceof String) {
+            if (((String) data).equals("")) {
+                return false;
+            } 
+            return true;
         }
+        if (data instanceof Character) {
+            if (((char) data) == ' ') {
+                return false;
+            }
+            return true;
+        }
+        return (boolean) data;
     }
 
     public int toInteger() {
-        return 0;
+        Object data = this.data;
+        if (data instanceof String) {
+            return (int) Double.parseDouble((String) data);
+        }
+        if (data instanceof Character) {
+            return (int) (char) data;
+        }
+        if (data instanceof Double) {
+            return (int) (double) data;
+        }
+        return (int) data;
     }
 
+    public double toDouble() {
+        Object data = this.data;
+        if (data instanceof String) {
+            return Double.parseDouble((String) data);
+        }
+        if (data instanceof Integer) {
+            return (double) (int) data;
+        }
+        return (double) data;
+    }
 
     //method that sees if stuff equal
     public boolean equals(Variable v) {
@@ -383,16 +397,5 @@ public class Variable {
             return false;
         }
         return false;
-    }
-
-    public double toDouble() {
-        Object data = this.data;
-        if (data instanceof String) {
-            return Double.parseDouble((String) data);
-        }
-        if (data instanceof Integer) {
-            return (double) (int) data;
-        }
-        return (double) data;
     }
 }

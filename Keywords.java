@@ -12,14 +12,16 @@ public class Keywords {
     public static final String PRINT_KEYWORD = "xd";
     public static final String INPUT_KEYWORD = "hmu";
     public static final String RETURN_KEYWORD = "ttyl";
-    //boolean keywords
-    public static final String EQUALS_KEYWORD = "is";
-    public static final String GREATER_KEYWORD = "more";
-    public static final String LESSER_KEYWORD = "less";
-    public static final String OR_KEYWORD = "or";
-    public static final String AND_KEYWORD = "and";
-    public static final String TRUE_KEYWORD = "good";
-    public static final String FALSE_KEYWORD = "bad";
+    public static final String COMMENT_KEYWORD = "//";
+    // boolean keywords
+    public static final String 
+        EQUALS_KEYWORD = "is",
+        GREATER_KEYWORD = "more",
+        LESSER_KEYWORD = "less",
+        OR_KEYWORD = "or",
+        AND_KEYWORD = "and",
+        TRUE_KEYWORD = "good",
+        FALSE_KEYWORD = "bad";
     public static final String[] BOOLEAN_KEYWORDS = {
         EQUALS_KEYWORD, GREATER_KEYWORD, LESSER_KEYWORD,
         OR_KEYWORD, AND_KEYWORD
@@ -53,8 +55,7 @@ public class Keywords {
     public static final String[] ILLEGAL_IDENTIFIERS = {
         FOR_KEYWORD, IF_KEYWORD, ELSE_KEYWORD, WHILE_KEYWORD, DEFINE_VARIABLE_KEYWORD, DEFINE_FUNCTION_KEYWORD, 
         DECREMENT_KEYWORD, INCREMENT_KEYWORD, PRINT_KEYWORD, INPUT_KEYWORD, RETURN_KEYWORD, EQUALS_KEYWORD, 
-        COLON_KEYWORD, OPERATOR_CHARACTERS, /*typeMap.get("null"), typeMap.get("int"), typeMap.get("double")
-        , typeMap.get("String"), typeMap.get("ArrayList")*/
+        COLON_KEYWORD, OPERATOR_CHARACTERS, TRUE_KEYWORD, FALSE_KEYWORD
     };
     public static boolean isIllegalIdentifier(String s) {
         for (String id : ILLEGAL_IDENTIFIERS) {

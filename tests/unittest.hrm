@@ -1,0 +1,19 @@
+wdym main :)
+    unit1 aka 0
+    amount aka 0
+    unit2 aka 0
+    xd #input unit#
+    unit1 aka #centimeters#
+    xd #input amount#
+    amount aka 5
+    xd #input what you want to convert to#
+    unit2 aka #inches#
+    
+    lmao unit1 is #inches# and unit2 is #centimeters# :)
+        xd amount * 2.54
+    afk lmao unit1 is #centimeters# and unit2 is #inches# :)
+        xd amount / 2.54
+    afk lmao unit1 is #Nautical Miles# and unit2 is #Nanometers# :)
+        xd amount / 2.54
+    afk :)
+        xd #invalid types!#

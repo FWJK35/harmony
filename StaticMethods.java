@@ -1,9 +1,7 @@
 import java.util.*;
-
 import javax.swing.JOptionPane;
 
 public class StaticMethods {
-    
     //types of expressions used in token types
     private enum TokenType {
         None, Number, String, Expression, Array, Identifier, Operator, BoolOperator, Joiner
@@ -173,7 +171,6 @@ public class StaticMethods {
                     }
                     
                     //check for beginning of identifier
-                    //TODO CORRECTLY IDENTIFY IDENTIFIERS
                     else if (isAlpha(c)) {
                         //will need to be evaluated
                         if (tokenStack.isEmpty()) {
@@ -186,9 +183,8 @@ public class StaticMethods {
                                 c = line.charAt(i);
                             }
                             //end by setting current character to last one of identifier
-                            //TODO HANDLE END OF LINE
-                            if (i == line.length())
-                                i--;
+                            i--;
+                                
                             skip = true;
                             //currentToken is now the name of the identifier
                             tokenTypes.add(TokenType.Identifier);
@@ -297,7 +293,7 @@ public class StaticMethods {
                     finalTypes.add(FinalType.BoolOperator);
                 }
                 else if (Keywords.isIllegalEvalIdentifier(idName)) {
-                    throw new Error("Invalid identifier");
+                    throw new Error("Illegal identifier name: " + idName);
                 }
                 //there is another token after it and it isnt an eval keyword
                 else if (t + 1 < tokenTypes.size() && 
@@ -333,7 +329,6 @@ public class StaticMethods {
                     }
 
                     else {
-                        System.out.println(tokenTypes);
                         throw new Error("Incorrect token found for expression: " + line);
                     }
                 }
@@ -342,7 +337,19 @@ public class StaticMethods {
                 else {
                     //eval keyword
                     if (Keywords.isIllegalIdentifier(idName) && !Keywords.isIllegalEvalIdentifier(idName)) {
-                        //TODO manually find them
+                        if (idName.equals(Keywords.INPUT_KEYWORD)) {
+                            finalVariables.add(new Variable(input()));
+                            finalTypes.add(FinalType.Evaluated);
+                        }
+                        else if (idName.equals(Keywords.TRUE_KEYWORD)) {
+                            finalVariables.add(new Variable(true));
+                            finalTypes.add(FinalType.Evaluated);
+                        }
+                        else if (idName.equals(Keywords.FALSE_KEYWORD)) {
+                            finalVariables.add(new Variable(false));
+                            finalTypes.add(FinalType.Evaluated);
+                        }
+
                     }
                     else {
                         if (!env.containsVariable(idName)) {
@@ -429,17 +436,15 @@ public class StaticMethods {
                 //just join them
                 if (finalTypes.get(f) == FinalType.Evaluated || finalTypes.get(f) == FinalType.BoolOperator) {
                     //single variable, leave as is
-                    if (vars.size() == 1) {
-                        //System.out.println("single: " + vars.get(0));
+                    if (vars.size() <= 1) {
                         isNumberExpression = false;
                         vars.clear();
                         ops.clear();
-                        f--;
+                        f -= vars.size();
                     }
                     //longer, number expression
                     else {
-                        //System.out.println("calc vars: " + vars);
-                        //System.out.println("calc ops: " + ops);
+                        //System.out.println(vars + " " + ops);
                         Variable evaluatedNumber = interpretNumberExpression(vars, ops);
                         while (f != expStart) {
                             finalTypes.remove(f);
@@ -488,29 +493,46 @@ public class StaticMethods {
                 throw new Error("Must have expression after operator");
             }
         }
-        //boolean combiation
         vars.clear();
-        List<String> boolOps = new ArrayList<String>();
-
+        
+        //System.out.println(finalVariables);
         if (finalVariables.size() == 0) {
             return new Variable();
         }
         if (finalVariables.size() == 1) {
             return finalVariables.get(0);
         }
+        
         //combine things before boolean evaluation
-        boolean combiningEvaluated = false;
+        List<String> boolOps = new ArrayList<String>();
         for (int f = 0; f < finalTypes.size(); f++) {
             //current and next one are both evaluated
-            if (finalTypes.get(f) == FinalType.Evaluated && finalTypes.get(f + 1) == FinalType.Evaluated) {
-                finalVariables.set(f, Variable.combine(finalVariables.get(f), finalVariables.get(f = 1)));
-                finalTypes.remove(f + 1);
-                finalVariables.remove(f + 1);
-                f--;
+            if (finalTypes.get(f) == FinalType.Evaluated) {
+                if (f + 1 < finalTypes.size() && finalTypes.get(f + 1) == FinalType.Evaluated) {
+                    finalVariables.set(f, Variable.combine(new Variable(finalVariables.get(f).toString()), new Variable(finalVariables.get(f + 1).toString())));
+                    finalTypes.remove(f + 1);
+                    finalVariables.remove(f + 1);
+                    f--;
+                }
+            }
+            else if (finalTypes.get(f) == FinalType.BoolOperator) {
+                if (f + 1 < finalTypes.size() && finalTypes.get(f + 1) == FinalType.BoolOperator) {
+                    throw new Error("Error with boolean operators");
+                }
+                boolOps.add(finalVariables.get(f).toString());
+                finalTypes.remove(f);
+                finalVariables.remove(f);
+            }
+            else {
+                throw new Error("something is stupid and I dont know what");
             }
         }
-        System.out.println(finalVariables);
-        return result;
+        if (finalVariables.size() == 1) {
+            return finalVariables.get(0);
+        }
+        //System.out.println(finalVariables);
+
+        return new Variable(interpretBooleanExpression(finalVariables, boolOps));
     }
 
     public static List<String> separate(String line) {
@@ -684,10 +706,14 @@ public class StaticMethods {
         return JOptionPane.showInputDialog("");
     }
 
+    // evaluates a boolean expression, returns a boolean
+    // takes an expression separated into a Variable list and String list of boolean operators and (in)equalities (<, >, ==)
+    //TODO is doesnt work properly
     public static boolean interpretBooleanExpression(List<Variable> variables, List<String> operators) {
         List<Variable> vars = new ArrayList<Variable>(variables);
         List<String> ops = new ArrayList<String>(operators);
         
+        // processes references to boolean values (true/false)
         for (Variable var : vars) {
             if (var.getData().equals(Keywords.TRUE_KEYWORD)) {
                 var.setData(true);
@@ -697,12 +723,15 @@ public class StaticMethods {
             }
         }
 
+        // checks for equality comparisons (==)
         while (ops.contains(Keywords.EQUALS_KEYWORD)) {
             int index = ops.indexOf(Keywords.EQUALS_KEYWORD);
             vars.set(index, new Variable(vars.get(index).equals(vars.get(index + 1))));
             vars.remove(index + 1);
             ops.remove(index);
         }
+
+        // inequality comparisons (<, >)
         while (ops.contains(Keywords.GREATER_KEYWORD)) {
             int index = ops.indexOf(Keywords.GREATER_KEYWORD);
             vars.set(index, new Variable(vars.get(index).toDouble() > vars.get(index + 1).toDouble()));
@@ -715,6 +744,8 @@ public class StaticMethods {
             vars.remove(index + 1);
             ops.remove(index);
         }
+
+        // checks for boolean operators (or, and)
         while (ops.contains(Keywords.OR_KEYWORD)) {
             int index = ops.indexOf(Keywords.OR_KEYWORD);
             vars.set(index, new Variable((boolean) vars.get(index).getData() || (boolean) vars.get(index + 1).getData()));
@@ -728,18 +759,16 @@ public class StaticMethods {
             ops.remove(index);
         }
 
-        if (vars.size() == 1 && ops.size() == 0) {
-            if (vars.get(0).getData() instanceof Integer) {
-                return (int) vars.get(0).getData() >= 1;
-            }       
-            return (boolean) vars.get(0).getData();
+        // checks that all variables and operators have been processed
+        if (vars.size() != 1 || ops.size() != 0) {
+            throw new Error("Remaining Variables in List: " + vars.size() + ", Remaining Operators in List: " + ops.size());
         }
 
-        else {
-            throw new Error("bad bad bad bad bad bad bad bad");
-        }
+        return vars.get(0).toBoolean();
     }
 
+    // evaluates a numerical expression using PEMDAS (no parenthesis, modulus included) and returns a Variable
+    // takes an expression separated into a Variables list of length n and String list of mathematical operators of length n-1
     public static Variable interpretNumberExpression(List<Variable> variables, List<Character> operators) {
         List<Variable> vars = new ArrayList<Variable>(variables);
         List<Character> ops = new ArrayList<Character>(operators);
@@ -751,12 +780,14 @@ public class StaticMethods {
             subtract = Keywords.OPERATOR_CHARACTERS.charAt(1),
             add = Keywords.OPERATOR_CHARACTERS.charAt(0);
 
+        // exponential operator processing
         while (ops.contains(pow)) {
             int index = ops.indexOf(pow);
             vars.set(index, new Variable(Math.pow(vars.get(index).toDouble(), vars.get(index + 1).toDouble())));
             vars.remove(index + 1);
             ops.remove(index);
         }
+        // multiplication, division, modulus operator processing (left to right)
         while (ops.contains(times) || ops.contains(divide) || ops.contains(mod)) {
             int index = posMin(ops.indexOf(times), ops.indexOf(divide), ops.indexOf(mod));
             char op = ops.get(index);
@@ -780,33 +811,36 @@ public class StaticMethods {
             vars.remove(index + 1);
             ops.remove(index);
         }
+        // subtraction processing
         while (ops.contains(subtract)) {
             int index = ops.indexOf(subtract);
             vars.set(index, new Variable(vars.get(index).toDouble() - vars.get(index + 1).toDouble()));
             vars.remove(index + 1);
             ops.remove(index);
         }
+        // addition processing
         while (ops.contains(add)) {
             int index = ops.indexOf(add);
             vars.set(index, Variable.combine(vars.get(index), vars.get(index + 1)));
             vars.remove(index + 1);
             ops.remove(index);
         }
-        
+        // checks that all variables and operators have been processed
         if (vars.size() != 1 || ops.size() != 0) {
-            throw new Error("idk esther knows why this is bad");
+            throw new Error("Remaining Variables in List: " + vars.size() + ", Remaining Operators in List: " + ops.size());
         }
         return vars.get(0);
     }
 
+    // finds the positive minimum value among three integers
     private static int posMin(int a, int b, int c) {
-        if (a < b && -1 < a) {
-            if (c < a && -1 < c) {
+        if ((b < 0 || a < b) && a >= 0) {
+            if (c < a && c >= 0) {
                 return c;
             }
             return a;
         }
-        else if (b < c && -1 < b) {
+        if ((c < 0 || b < c) && 0 <= b) {
             return b;
         }
         return c;
@@ -828,12 +862,23 @@ public class StaticMethods {
     
     //method that removes all spaces from the start and end of the string
     public static String stripSpaces(String input) {
-        String output = input;
+        String output = new String(input);
         if (input.isBlank()) {
             return "";
         }
         while (output.charAt(0) == ' ') {
             output = output.substring(1);
+        }
+        while (output.charAt(output.length() - 1) == ' ') {
+            output = output.substring(0, output.length() - 1);
+        }
+        return output;
+    }
+
+    public static String stripTrailingSpaces(String input) {
+        String output = new String(input);
+        if (input.isBlank()) {
+            return "";
         }
         while (output.charAt(output.length() - 1) == ' ') {
             output = output.substring(0, output.length() - 1);

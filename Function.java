@@ -9,6 +9,8 @@ public class Function {
     String name;
     Variable hasReturned;
     Variable returnValue;
+    boolean isMainCall;
+    int startLine;
     
     public Function(String code, Environment env, List<String> paramNames, List<String> paramTypes, String name) {
         this.name = name;
@@ -18,6 +20,7 @@ public class Function {
         this.paramTypes = paramTypes;
         this.hasReturned = new Variable(false);
         this.returnValue = new Variable();
+        this.isMainCall = true;
     }
 
     public Function() {
@@ -44,6 +47,10 @@ public class Function {
         this.code = newCode;
     }
 
+    public void setStartLine(int startLine) {
+        this.startLine = startLine;
+    }
+
     public Variable run(List<Variable> args){//, Object returnMain) {
         return run(args, new Variable(false), new Variable());
     }
@@ -58,16 +65,24 @@ public class Function {
         String[] lines = code.split("\n");
         int baseIndent = 0;
         boolean endOfFile = false;
+        String line = "";
+        try {
         for (int l = 0; l < lines.length; l++) {
-            String line = lines[l];
+            
+            line = StaticMethods.stripTrailingSpaces(lines[l]);
             //System.out.println("line " + l + ": " + line);
             String doubleSpacesRemoved = StaticMethods.stripSpaces(line);
             while (doubleSpacesRemoved.contains("  ")) {
                 doubleSpacesRemoved = doubleSpacesRemoved.replaceFirst("  ", " ");
             }
             String[] tokens = doubleSpacesRemoved.split(" ");
+            //VERY first, check comment or blank line
+            if (line.isBlank() || doubleSpacesRemoved.substring(0, 
+                    Keywords.COMMENT_KEYWORD.length()).equals(Keywords.COMMENT_KEYWORD)) {
+                //ignore line
+            }
             //fisrtly, check if should be multi line statement
-            if (line.charAt(line.length() - 1) == Keywords.LINE_JOINER_KEYWORD) {
+            else if (line.charAt(line.length() - 1) == Keywords.LINE_JOINER_KEYWORD) {
                 while (line.charAt(line.length()) == Keywords.LINE_JOINER_KEYWORD) {
                     if (l + 1 >= lines.length) {
                         throw new Error("Must have line after line joiner");
@@ -130,7 +145,7 @@ public class Function {
                     endOfFile = true;
                     throw new Error("No next line found");
                 }
-                String nextLine = lines[l];
+                String nextLine = StaticMethods.stripTrailingSpaces(lines[l]);
                 int blockIndent = StaticMethods.countIndent(nextLine);
                 //check next indentation fine
                 if (blockIndent <= baseIndent) {
@@ -190,8 +205,9 @@ public class Function {
                         new ArrayList<String>(), Keywords.IF_KEYWORD);
                 
                 //should run if statement
+                System.out.println(ifCondition);
                 if (StaticMethods.eval(ifCondition, env).toBoolean()) {
-                    ifStatement.run(new ArrayList<Variable>());
+                    ifStatement.run(new ArrayList<Variable>(), hasReturned, returnValue);
                     if (hasReturned.toBoolean()) {
                         return returnValue;
                     }
@@ -211,6 +227,7 @@ public class Function {
                         //System.out.println("found else");
                         Function elseStatement = new Function(nestedElseCode, env.copyEnvironment(), new ArrayList<String>(), 
                             new ArrayList<String>(), Keywords.ELSE_KEYWORD);
+                        elseStatement.setStartLine(startLine + l);
                         elseStatement.run(new ArrayList<Variable>(), hasReturned, returnValue);
                         if (hasReturned.toBoolean()) {
                             return returnValue;
@@ -235,7 +252,14 @@ public class Function {
             }
             //TODO for
             //TODO while
-            
+            } 
+        } catch (Exception e) {
+            e.printStackTrace();
+            for (int c = 0; c < lines.length; c++) {
+                if (lines[c].equals(line)) {
+                    System.out.println("Possible error on line " + (c + 2 + startLine) + " :" + e.getMessage());
+                }
+            }
         }
         return new Variable();
     }

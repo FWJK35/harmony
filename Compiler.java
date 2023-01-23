@@ -12,11 +12,13 @@ public class Compiler {
     private File file;
     // public static List<Function> functions = env.getFunctions();
     
+    // constructor
     public Compiler(File file) {
         this.file = file;
         this.env = new Environment();
     }
 
+    // accessors
     public Environment getEnvironment() {
         return env;
     }
@@ -29,7 +31,7 @@ public class Compiler {
             boolean defining = false;
             String code = "";
             Function currentFunc = new Function();
-
+            int lineNum = 0;
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] tokens = line.split(" ");
@@ -48,6 +50,7 @@ public class Compiler {
                         //at least has min number of tokens in definition
                         if (tokens.length - TokenIndex.MIN_DEFINE_LEN >= 0 && (tokens.length - TokenIndex.MIN_DEFINE_LEN) % 2 == 0) {
                             currentFunc = StaticMethods.defineFunction(env, line);
+                            currentFunc.setStartLine(lineNum);
                             defining = true;
                         }
                     }
@@ -62,10 +65,11 @@ public class Compiler {
                     if (defining) {
                         code += line + "\n";
                     }
-                    else {
+                    else if (StaticMethods.countIndent(line) > 0) {
                         throw new Error("Incorrect indentation for line: " + line);
                     }
                 }
+                lineNum++;
             }
             //get to end, finish defining
             if (defining) {
@@ -88,21 +92,5 @@ public class Compiler {
             throw new Error("Main function not found");
         }
         return mainFunction.run(new ArrayList<Variable>());
-    }
-
-    public static void getFile() {
-        // prompt file name using JOptionPane 
-        Scanner input = new Scanner(System.in);
-        try {
-            String file = JOptionPane.showInputDialog("Input File Name: ");
-            input = new Scanner(new File(file));
-        } catch (FileNotFoundException e) {
-            e.getStackTrace();
-            System.out.println("Error: Invalid File Type");
-        } catch (Exception e) {
-            e.getStackTrace();
-        }
-        
-        // runCode(input);
     }
 }

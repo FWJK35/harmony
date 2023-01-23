@@ -2,16 +2,109 @@ wdym main :)
     unit1 aka 0
     amount aka 0
     unit2 aka 0
+
     xd #input unit#
-    unit1 aka #centimeters#
+    unit1 aka hmu
     xd #input amount#
-    amount aka 5
+    amount aka hmu
     xd #input what you want to convert to#
-    unit2 aka #inches#
-    
-    lmao unit1 is #inches# and unit2 is #centimeters# :)
-        xd amount * 2.54
-    afk lmao unit1 is #centimeters# and unit2 is #inches# :)
-        xd amount / 2.54
-    afk :)
-        xd #invalid types!#
+    unit2 aka hmu
+    xd #input what item you would like (Temperature, Mass, Length)#
+    item aka hmu
+      
+    lmao item is #Temperature# :)
+        lmao unit1 is #Fahrenheit# :) 
+            lmao unit2 is #Celsius# :)
+                amount aka amount - 32 * 5/9.0
+            afk lmao amount is #Kelvin# :)
+                amount aka amount + 459.67 * 5/9.0
+        afk lmao is #Celsius# :)
+            lmao is #Fahrenheit# :)
+                amount aka amount * 9/5.0 + 32
+            afk lmao is #Kelvin# :)
+                amount aka amount + 273.15
+        afk lmao is #Kelvin# :)
+            lmao #Fahrenheit# :)
+                amount aka amount * 9/5.0 - 459.67
+            afk lmao is #Celsius#
+                amount aka amount - 273.15
+
+    afk lmao item is #Mass# :)
+        lmao unit1 is #Imperial Tons# :) 
+            lmao unit2 is #Stones# :)
+                amount aka amount * 160
+            afk lmao amount is #Pounds# :)
+                amount aka amount * 2000
+            afk lmao is #Grams# :)
+                amount aka amount * 907185
+            
+        afk lmao is #Stones# :) 
+            lmao amount is #Imperial Tons# :)
+                amount aka amount / 160 
+            afk lmao is #Pounds# :)
+                amount aka amount * 14
+            afk lmao is #Grams# :)
+                amount aka amount * 6350.3
+
+        afk lmao is #Pounds# :)
+            lmao #Imperial Tons# :)
+                amount aka amount / 2000
+        afk lmao is #Stones#
+            amount aka amount / 14
+        afk lmao is #Grams#
+            amount aka * 453.592 
+        
+
+    afk lmao item is #Length# :)
+        lmao unit1 is #Nautical Miles# :)
+            lmao unit2 is Nanometers :)
+                amount aka amount * 1852 * 1000000000
+            afk lmao unit2 is #Feet# :)
+                amount aka amount * 6076.11549
+            afk lmao unit2 is #Inches# :)
+                amount aka amount * 72913.3858
+            afk lmao unit2 is #Meters# :)
+                amount aka amount * 1852
+            afk lmao unit2 is #Kilometers# :)
+                amount aka amount * 1.852 
+            afk lmao unit2 is #Miles# :)
+                amount aka amount * 1.150779
+        afk lmao is #Nanometers# :) 
+            lmao unit1 is #Nautical Miles# :)
+                amount aka amount / 1852 / 1000000000 
+            afk lmao unit2 is #Feet# :)
+                amount aka amount * 3280389895000000000
+            afk lmao unit 2 is #Inches# :)
+                amount aka amount * 6350.3
+            afk lmao unit2 is #Meters# :)
+                amount aka * 1000000000
+            afk lmao unit2 is #Kilometers# :)
+                amount aka amount * 1000000000000
+            afk lmao unit2 is #Miles# :)
+                amount aka amount * 62137119220000000000000
+        afk lmao unit1 is #Feet# :)
+            lmao unit2 is #Nautical Miles# :)
+                amount aka amount / 6076.11549
+            afk lmao unit2 is #Nanometers# :)
+                amount aka amount * 3280839895000000000
+            afk lmao unit2 is #Inches# :)
+                amount aka * 12
+            afk lmao unit2 is #Meters# :)
+                amount aka amount * 0.3048
+            afk lmao unit2 is #Kilometers# :)
+                amount aka amount * 0.0003048
+            afk lmao unit2 is #Miles# :)
+                amount aka amount * 0.000189393939
+        afk lmao unit1 is #Inches# :)
+            lmao unit2 is #Nautical Miles# :)
+                amount aka amount / 72913.3858
+            afk lmao unit2 is #Nanometers# :)
+                amount aka amount * 25400000000
+            afk lmao unit2 is #Inches# :)
+                amount aka / 12
+            afk lmao unit2 is #Meters# :)
+                amount aka amount * 0.0254
+            afk lmao unit2 is #Kilometers# :)
+                amount aka amount * 0.0000254
+            afk lmao unit2 is #Miles# :)
+                amount aka amount * 0.00001578282828

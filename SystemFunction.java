@@ -10,6 +10,7 @@ public class SystemFunction extends Function {
         "wdym toInt str data :)",
         "wdym toDouble str data :)",
         "wdym toString str data :)",
+        "wdym random :)"
     };
     //xd len(#calvin#)
     //xd split(#03:05:06:11# ? #:#)
@@ -40,6 +41,9 @@ public class SystemFunction extends Function {
         }
         else if (this.getName().equals("toString")) {
             return new Variable(args.get(0).toString());
+        }
+        else if (this.getName().equals("random")) {
+            return new Variable(Math.random());
         }
         return new Variable();
     }
