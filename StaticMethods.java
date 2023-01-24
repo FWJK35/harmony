@@ -1,3 +1,12 @@
+/*
+ * StaticMethods contains methods that are used across many
+ * other classes, such as code to evaluate arguments in functions
+ * EVAL TOOK SO LONG
+ * Also contains helper methods that modify/check arguments,
+ * such as isBlank and isAlpha. Also contains helper methods for 
+ * other functions in this class
+ */
+
 import java.util.*;
 import javax.swing.JOptionPane;
 

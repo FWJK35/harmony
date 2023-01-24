@@ -1,6 +1,7 @@
 /**
  * Environment holds a map of String names to Variable variables
- * and a list of Function objects. 
+ * and a list of Function objects. Basically contains all data
+ * of the current runtime
  */
 
 import java.util.*;

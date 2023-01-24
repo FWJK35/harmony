@@ -1,3 +1,9 @@
+/*
+ * Function class is the class that contains user-defined
+ * functions as well as nested code (e.g. If, For etc)
+ * can run these functions with arguments, and has inheritance
+ */
+
 import java.util.*;
 
 public class Function {
