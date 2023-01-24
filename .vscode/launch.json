@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "harmony_d214cc26"
+        },
+        {
+            "type": "java",
             "name": "Launch Notepad",
             "request": "launch",
             "mainClass": "Notepad",

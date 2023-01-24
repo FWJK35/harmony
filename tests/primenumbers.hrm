@@ -1,18 +1,16 @@
-//main method
-wdym non main str[] args :)
-    //user inputs a number 
+// main method
+wdym main :)
+    // user inputs a number 
     xd #type a number to see if it is prime!#
-    //variables
-    num aka hmu
-    flag aka false
-    //the shit
-    lmfao i aka 2 ? i < Math.Sqrt(num) ? ily i :)
+    // variables
+    num aka 13
+    flag aka bad
+    // the code to test
+    lmfao i aka 2 ? i less num ^ 0.5 ? ily i :)
         lmao num % i is 0 :)
-            flag aka true
-            break
+            flag aka good
 
-    lmao !flag :)
+    lmao flag is bad :)
         xd num # is a prime number#
     afk :)
         xd num # is not a prime number#
-

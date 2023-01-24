@@ -1,7 +1,18 @@
-wdym non main str[] args :)
-answer aka 
-cope choice is true :) 
-    xd #choose heads or tails#
-    choice aka hrm 
-    answer is random(0,1)
-    lmao answer is 0 && choice == 
+wdym main :)
+    choice aka 0
+    answer aka 1
+    cope choice is answer is bad :) 
+        xd #choose heads or tails#
+        choice aka hmu
+        lmao choice is #heads# :)
+            xd #heads#
+            choice aka 0
+        lmao choice is #tails# :)
+            choice aka 1
+        answer aka toInt(random() * 2)
+        xd answer choice
+        lmao choice is answer :)
+            xd #you got it right#
+        afk :)
+            xd #you got it wrong#
+        

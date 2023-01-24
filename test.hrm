@@ -1,22 +1,5 @@
-name aka    #calvin#   # # 35
-age aka 16 name
-number aka (6* 7 / 3 %10) ^ 0.5
-
 wdym main :)
-    lmao good :)
-        xd #Hello, world!#
-    afk lmao testfalse :)
-        xd #Elif 1 worked#
-    afk lmao testfalse :)
-        xd #Elif 2 worked#
-    afk lmao testtrue :)
-        xd #Elif 3 worked#
-        
-    afk lmao testfalse :)
-        xd #Elif 4 worked#
+    xd test(3)
 
-
-    afk lmao testfalse :)
-        xd #Elif 5 worked#
-    afk :)
-        xd #idk edited code!#
+wdym test int a :)
+    ttyl a + 3

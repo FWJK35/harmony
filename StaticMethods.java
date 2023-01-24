@@ -270,7 +270,6 @@ public class StaticMethods {
         for (int t = 0; t < tokenTypes.size(); t++) {
             TokenType currentType = tokenTypes.get(t);
             Variable currentVariable = tokenVariables.get(t);
-            //System.out.println(tokenTypes.get(t) + ": " + tokenVariables.get(t));
             if (currentType == TokenType.Expression) {
                 finalVariables.add(eval(currentVariable.toString(), env));
                 finalTypes.add(FinalType.Evaluated);
@@ -304,7 +303,7 @@ public class StaticMethods {
                         List<Variable> arguments = new ArrayList<Variable>();
                         Variable nextVariable = tokenVariables.get(t);
                         //adds arguments to function parameters
-                        for (String arg : separate(nextVariable.toString())) {
+                        for (String arg : separate(nextVariable.toString(), Keywords.SEPARATOR_KEYWORD)) {
                             arguments.add(eval(arg, env));
                         }
                         Function func = env.getFunction(idName, arguments);
@@ -313,7 +312,7 @@ public class StaticMethods {
                             finalTypes.add(FinalType.Evaluated);
                         }
                         else {
-                            throw new Error("Function not found");
+                            throw new Error("Function " + idName + " not found");
                         }
                     }
 
@@ -354,7 +353,7 @@ public class StaticMethods {
                     }
                     else {
                         if (!env.containsVariable(idName)) {
-                            throw new Error("Variable name not found");
+                            throw new Error("Variable name not found: " + idName);
                         }
                         finalVariables.add(env.getVariable(idName));
                         finalTypes.add(FinalType.Evaluated);
@@ -406,11 +405,9 @@ public class StaticMethods {
                 finalTypes.add(FinalType.Operator);
             }
         }
-        if (finalTypes.get(finalTypes.size() - 1) == FinalType.Operator) {
+        if (finalTypes.size() > 0 && finalTypes.get(finalTypes.size() - 1) == FinalType.Operator) {
             throw new Error("Must have expression after operator");
         }
-
-        //System.out.println("Final vars: " + finalVariables);
 
         //parse for number expressions
         List<Variable> vars = new ArrayList<Variable>();
@@ -441,11 +438,10 @@ public class StaticMethods {
                         isNumberExpression = false;
                         vars.clear();
                         ops.clear();
-                        f -= vars.size();
+                        //f -= vars.size();
                     }
                     //longer, number expression
                     else {
-                        //System.out.println(vars + " " + ops);
                         Variable evaluatedNumber = interpretNumberExpression(vars, ops);
                         while (f != expStart) {
                             finalTypes.remove(f);
@@ -458,9 +454,6 @@ public class StaticMethods {
                         isNumberExpression = false;
                         f--;
                     }
-                    if (finalTypes.get(f) == FinalType.BoolOperator) {
-                        f++;
-                    }
                 }
                 else if (finalTypes.get(f) == FinalType.Operator) {
                     throw new Error("Cannot have double operator");
@@ -471,15 +464,12 @@ public class StaticMethods {
             if (vars.size() > ops.size()) {
                 //single variable, leave as is
                 if (vars.size() == 1) {
-                    //System.out.println("single: " + vars.get(0));
                     isNumberExpression = false;
                     vars.clear();
                     ops.clear();
                 }
                 //longer, number expression
                 else {
-                    //System.out.println("last calc vars: " + vars);
-                    //System.out.println("last calc ops: " + ops);
                     Variable evaluatedNumber = interpretNumberExpression(vars, ops);
                     int f = finalTypes.size() - 1;
                     while (f != expStart) {
@@ -496,7 +486,6 @@ public class StaticMethods {
         }
         vars.clear();
         
-        //System.out.println(finalVariables);
         if (finalVariables.size() == 0) {
             return new Variable();
         }
@@ -506,9 +495,6 @@ public class StaticMethods {
         
         //combine things before boolean evaluation
         List<String> boolOps = new ArrayList<String>();
-        // System.out.println(finalTypes);
-        // System.out.println(finalVariables);
-        // System.out.println(tokenTypes);
         for (int f = 0; f < finalTypes.size(); f++) {
             //current and next one are both evaluated
             if (finalTypes.get(f) == FinalType.Evaluated) {
@@ -538,12 +524,11 @@ public class StaticMethods {
         if (finalVariables.size() == 1) {
             return finalVariables.get(0);
         }
-        //System.out.println(finalVariables);
 
         return new Variable(interpretBooleanExpression(finalVariables, boolOps));
     }
 
-    public static List<String> separate(String line) {
+    public static List<String> separate(String line, char sep) {
         List<String> args = new ArrayList<String>();
         Stack<ExpressionType> tokenStack = new Stack<ExpressionType>();
         String currentArg = "";
@@ -624,7 +609,7 @@ public class StaticMethods {
                 }
             }
 
-            if (c == Keywords.SEPARATOR_KEYWORD && tokenStack.isEmpty()) {
+            if (c == sep && tokenStack.isEmpty()) {
                 args.add(currentArg);
                 currentArg = "";
             }
@@ -632,8 +617,13 @@ public class StaticMethods {
                 currentArg += c;
             }
         }
-        args.add(currentArg);
-
+        if (!isBlank(currentArg)) {
+            args.add(currentArg);
+        }
+        
+        for (int arg = 0; arg < args.size(); arg++) {
+            args.set(arg, stripSpaces(args.get(arg)));
+        }
         return args;
     }
 
@@ -675,43 +665,115 @@ public class StaticMethods {
         List<String> paramNames = new ArrayList<String>();
 
         for (int t = TokenIndex.MIN_DEFINE_LEN - 1; t < tokens.length - 1; t += 2) {
-            paramTypes.add(tokens[t]);
-            paramTypes.add(tokens[t + 1]);
+            int typeIndex = -1;
+            for (int type = 0; type < Keywords.HARMONY_TYPES.length; type++) {
+                if (tokens[t].equals(Keywords.HARMONY_TYPES[type])) {
+                    typeIndex = type;
+                }
+            }
+            if (typeIndex < 0) {
+                throw new Error("Invalid type name " + tokens[t]);
+            }
+            paramTypes.add(Keywords.JAVA_TYPES[typeIndex]);
+            paramNames.add(tokens[t + 1]);
         }
 
         Function func = new Function("", env, paramNames, paramTypes, funcName);
         env.putFunction(func);
         return func;
     }
+    public static SystemFunction defineSystemFunction(Environment env, String defLine) {
+        String[] tokens = defLine.split(" ");
+        String funcName = tokens[TokenIndex.DEFINE_FUNCTION_NAME_TOKEN];
+        List<String> paramTypes = new ArrayList<String>();
+        List<String> paramNames = new ArrayList<String>();
+
+        for (int t = TokenIndex.MIN_DEFINE_LEN - 1; t < tokens.length - 1; t += 2) {
+            int typeIndex = -1;
+            for (int type = 0; type < Keywords.HARMONY_TYPES.length; type++) {
+                if (tokens[t].equals(Keywords.HARMONY_TYPES[type])) {
+                    typeIndex = type;
+                }
+            }
+            if (typeIndex < 0) {
+                throw new Error("Invalid type name " + tokens[t]);
+            }
+            paramTypes.add(Keywords.JAVA_TYPES[typeIndex]);
+            paramNames.add(tokens[t + 1]);
+        }
+
+        SystemFunction func = new SystemFunction(env, paramNames, paramTypes, funcName);
+        env.putFunction(func);
+        return func;
+    }
 
     public static void increment(Environment env, String line) {
         String variableName = line.split(" ")[1];
-        String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 
+        String afterKeyword = line.substring(Keywords.INCREMENT_KEYWORD.length());
+        String afterVariable = afterKeyword.substring(afterKeyword.indexOf(variableName) + variableName.length()); 
         Variable incrementBy = interpretExpression(afterVariable, env);
-        env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), incrementBy).getData());
+        if (!env.containsVariable(variableName)) {
+            throw new Error("Variable name not found: " + variableName);
+        }
+        if (incrementBy.getData() == null) {
+            if (env.getVariable(variableName).getData() instanceof Integer || env.getVariable(variableName).getData() instanceof Double) {
+                env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), new Variable(1)).getData());
+            }
+        }
+        else {
+            env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), incrementBy).getData());
+        }
     } 
 
     public static void decrement(Environment env, String line) {
         String variableName = line.split(" ")[1];
-        String afterVariable = line.substring(line.indexOf(variableName) + variableName.length()); 
+        String afterKeyword = line.substring(Keywords.INCREMENT_KEYWORD.length());
+        String afterVariable = afterKeyword.substring(afterKeyword.indexOf(variableName) + variableName.length()); 
         Variable incrementBy = interpretExpression(afterVariable, env);
         //get data of variable from interpret expression chec kif integer cast to integer and make the integer negative then add to and then
+        if (incrementBy.getData() == null) {
+            if (env.getVariable(variableName).getData() instanceof Integer || env.getVariable(variableName).getData() instanceof Double) {
+                env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), new Variable(1)).getData());
+                return;
+            }
+        }
         if (incrementBy.getData() instanceof Integer) {
             int decrementValue = -(int) incrementBy.getData();
             env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), new Variable(decrementValue)).getData());
-        } else {
-            throw new Error("Type has to be double or integer");
         }
-        if (incrementBy.getData() instanceof Double) {
+        else if (incrementBy.getData() instanceof Double) {
             double decrementValue = -(double) incrementBy.getData();
+            if (!env.containsVariable(variableName)) {
+                throw new Error("Variable name not found: " + variableName);
+            }
             env.getVariable(variableName).setData(Variable.combine(env.getVariable(variableName), new Variable(decrementValue)).getData());
-        } else {
+        } 
+        else {
             throw new Error("Type has to be double or integer");
         }
     }
 
     public static String input() {
         return JOptionPane.showInputDialog("");
+    }
+
+    public static List<Variable> arrayInitialize(String input, Environment env) {
+        List<Variable> output = new ArrayList<Variable>();
+        for (String term : separate(input, Keywords.ARRAY_SEPARATOR_KEYWORD)) {
+            output.add(eval(term, env));
+        }
+        return output;
+    }
+
+    public static List<Variable> arraySplit(List<Variable> array, int start, int end, int increment) {
+        List<Variable> output = new ArrayList<Variable>();
+        if (start < 0 || end > array.size()) {
+            throw new Error("Index out of bounds, start: " + start + ", end: " + end + ", size: " + array.size());
+        }
+        for (int i = start; i < end; i += increment) {
+            output.add(array.get(i));
+        }
+        return output;
     }
 
     // evaluates a boolean expression, returns a boolean
@@ -721,6 +783,10 @@ public class StaticMethods {
         List<Variable> vars = new ArrayList<Variable>(variables);
         List<String> ops = new ArrayList<String>(operators);
         
+        if (variables.size() != operators.size() + 1) {
+            throw new Error("Mismatched variables and operators: " + variables.size() + " Variables, " + operators.size() + " Operators");
+        }
+
         // processes references to boolean values (true/false)
         for (Variable var : vars) {
             if (var.getData().equals(Keywords.TRUE_KEYWORD)) {
@@ -780,6 +846,10 @@ public class StaticMethods {
     public static Variable interpretNumberExpression(List<Variable> variables, List<Character> operators) {
         List<Variable> vars = new ArrayList<Variable>(variables);
         List<Character> ops = new ArrayList<Character>(operators);
+
+        if (variables.size() != operators.size() + 1) {
+            throw new Error("Mismatched variables and operators: " + variables.size() + " Variables, " + operators.size() + " Operators");
+        }
 
         char pow = Keywords.OPERATOR_CHARACTERS.charAt(5),
             mod = Keywords.OPERATOR_CHARACTERS.charAt(4),
@@ -854,6 +924,14 @@ public class StaticMethods {
         return c;
     } 
 
+    public static void print(Variable var) {
+        print(var.toString());
+    }
+    public static void print(String line) {
+        // temporary print replacement
+        System.out.println(line);
+    }
+
     public static boolean isAlpha(char c) {
         String alpha = "abcdefghijklmnopqrstuvwxyz";
         return (alpha.contains(c + "") || alpha.toUpperCase().contains(c + ""));
@@ -894,6 +972,7 @@ public class StaticMethods {
         return output;
     }
 
+    // similar to Java 11's 
     public static boolean isBlank(String s) {
         for (char c : s.toCharArray()) {
             if (c != ' ') {

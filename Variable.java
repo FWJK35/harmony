@@ -332,6 +332,12 @@ public class Variable {
         if (data instanceof Character) {
             return (int) (char) data;
         }
+        if (data instanceof Boolean) {
+            if ((boolean) data) {
+                return 1;
+            }
+            return 0;
+        }
         if (data instanceof Double) {
             return (int) (double) data;
         }

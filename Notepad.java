@@ -1,3 +1,13 @@
+/**
+* Notepad class creates the frontend user interface
+* It serves as a simple text editor for Harmony code
+* With open/create, save, and run file functionalities
+* Using a private compiler  
+*
+* Basic framework for implementation of editable notepad from :
+* Sandeep Sharma @ c-sharpcorner.com/UploadFile/fd0172/how-to-create-editable-notepad-in-java/
+*/ 
+
 import java.io.*;
 import java.util.*;
 import java.awt.*;
@@ -59,6 +69,7 @@ public class Notepad implements ActionListener
         menuBar.add(editMenu);
         textArea = new JTextArea(400, 400);  
         textArea.setBounds(5,30,460,460);
+        textArea.setFont(new Font("Courier", Font.PLAIN, 12));
 
         JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setBounds(0, 20, 500, 500);
@@ -141,6 +152,8 @@ public class Notepad implements ActionListener
         }
     }
 
+    // uses a JOptionPane to prompt user for a file name
+    // if file not found, creates a new file upon confirmation
     public static String promptFile() {
         String fileName = JOptionPane.showInputDialog("Input File Name: ");
         fileName = fileName.trim();

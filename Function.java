@@ -5,7 +5,6 @@ public class Function {
     Environment env;
     List<String> paramNames;
     List<String> paramTypes;
-    String returnType;
     String name;
     Variable hasReturned;
     Variable returnValue;
@@ -22,21 +21,26 @@ public class Function {
         this.returnValue = new Variable();
         this.isMainCall = true;
     }
+    public Function(String code, Environment env, String name) {
+        this.name = name;
+        this.code = code;
+        this.env = env;
+        this.paramNames = new ArrayList<String>();
+        this.paramTypes = new ArrayList<String>();
+        this.hasReturned = new Variable(false);
+        this.returnValue = new Variable();
+        this.isMainCall = true;
+    }
 
     public Function() {
         this.name = "";
         this.code = "";
         this.paramNames = new ArrayList<String>();
         this.paramTypes = new ArrayList<String>();
-        this.returnType = "";
     }
 
     public List<String> getParamTypes() {
         return paramTypes;
-    }
-
-    public String getReturnType() {
-        return returnType;
     }
 
     public String getName() {
@@ -51,13 +55,18 @@ public class Function {
         this.startLine = startLine;
     }
 
+    public Environment getEnvironment() {
+        return this.env;
+    }
+
+
     public Variable run(List<Variable> args){//, Object returnMain) {
         return run(args, new Variable(false), new Variable());
     }
 
     public Variable run(List<Variable> args, Variable hasReturned, Variable returnValue) {
         //add arguments to enviroment
-        Environment env = this.env.copyEnvironment();
+        //Environment env = this.env.copyEnvironment();
         for (int v = 0; v < paramNames.size(); v++) {
             env.putVariable(paramNames.get(v), args.get(v));
         }
@@ -70,7 +79,6 @@ public class Function {
         for (int l = 0; l < lines.length; l++) {
             try {
             line = StaticMethods.stripTrailingSpaces(lines[l]);
-            //System.out.println("line " + l + ": " + line);
             String doubleSpacesRemoved = StaticMethods.stripSpaces(line);
             while (doubleSpacesRemoved.contains("  ")) {
                 doubleSpacesRemoved = doubleSpacesRemoved.replaceFirst("  ", " ");
@@ -102,7 +110,7 @@ public class Function {
             }
             if (baseIndent > 0 && !StaticMethods.isBlank(line)) {
                 if (StaticMethods.countIndent(line) != baseIndent) {
-                    throw new Error("Incorrect indentation on line " + l);
+                    throw new Error("Incorrect indentation found");
                 }
             }
 
@@ -115,26 +123,24 @@ public class Function {
             }
             
             //variable declaration
-            if (tokens.length > TokenIndex.DEFINE_VARIABLE_TOKEN && tokens[TokenIndex.DEFINE_VARIABLE_TOKEN].equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
+            else if (tokens.length > TokenIndex.DEFINE_VARIABLE_TOKEN && tokens[TokenIndex.DEFINE_VARIABLE_TOKEN].equals(Keywords.DEFINE_VARIABLE_KEYWORD)) {
                 StaticMethods.defineVariable(env, line);
             }
 
             //variable modification
-            if (tokens.length > TokenIndex.MODIFY_VARIABLE_TOKEN && tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.INCREMENT_KEYWORD)) {
+            else if (tokens.length > TokenIndex.MODIFY_VARIABLE_TOKEN && tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.INCREMENT_KEYWORD)) {
                 StaticMethods.increment(env, line);
             } 
-            if (tokens.length > TokenIndex.MODIFY_VARIABLE_TOKEN && tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.DECREMENT_KEYWORD)) {
+            else if (tokens.length > TokenIndex.MODIFY_VARIABLE_TOKEN && tokens[TokenIndex.MODIFY_VARIABLE_TOKEN].equals(Keywords.DECREMENT_KEYWORD)) {
                 StaticMethods.decrement(env, line);
             }
 
             //print line
-            if (tokens.length > TokenIndex.PRINT_TOKEN && tokens[TokenIndex.PRINT_TOKEN].equals(Keywords.PRINT_KEYWORD)) {
-                //TODO print to notepad, placeholder for now
-                System.out.println(StaticMethods.eval(line.substring(line.indexOf(Keywords.PRINT_KEYWORD) + Keywords.PRINT_KEYWORD.length() + 1), env));
+            else if (tokens.length > TokenIndex.PRINT_TOKEN && tokens[TokenIndex.PRINT_TOKEN].equals(Keywords.PRINT_KEYWORD)) {
+                StaticMethods.print(StaticMethods.eval(line.substring(line.indexOf(Keywords.PRINT_KEYWORD) + Keywords.PRINT_KEYWORD.length() + 1), env).toString());
             }
 
-            //TODO if
-            if (tokens.length > TokenIndex.IF_STATEMENT_TOKEN && tokens[TokenIndex.IF_STATEMENT_TOKEN].equals(Keywords.IF_KEYWORD)) {
+            else if (tokens.length > TokenIndex.IF_STATEMENT_TOKEN && tokens[TokenIndex.IF_STATEMENT_TOKEN].equals(Keywords.IF_KEYWORD)) {
                 if (!line.endsWith(Keywords.COLON_KEYWORD)) {
                     throw new Error("Code is not happy enough!");
                 }
@@ -153,7 +159,7 @@ public class Function {
                 int blockIndent = StaticMethods.countIndent(nextLine);
                 //check next indentation fine
                 if (blockIndent <= baseIndent) {
-                    throw new Error("Incorrect indentation on line " + l);
+                    throw new Error("Incorrect indentation found");
                 }
                 //get code inside if statement
                 String nestedIfCode = "";
@@ -174,7 +180,6 @@ public class Function {
                 String nestedElseCode = "";
                 String lineAfter = StaticMethods.stripSpaces(nextLine);
                 String wholeLineAfter = nextLine;
-                //System.out.println("line after if block: " + wholeLineAfter);
                 while (lineAfter.contains("  ")) {
                     lineAfter = lineAfter.replaceFirst("  ", " ");
                 }
@@ -193,7 +198,7 @@ public class Function {
                     blockIndent = StaticMethods.countIndent(nextLine);
                     //check indentation fine
                     if (blockIndent <= baseIndent) {
-                        throw new Error("Incorrect indentation on line " + l);
+                        throw new Error("Incorrect indentation found");
                     }
                     while (StaticMethods.countIndent(nextLine) >= blockIndent || StaticMethods.countIndent(nextLine) == -1) {
                         nestedElseCode += nextLine + "\n";
@@ -208,11 +213,9 @@ public class Function {
                 }
                 
                 
-                Function ifStatement = new Function(nestedIfCode, env.copyEnvironment(), new ArrayList<String>(), 
-                        new ArrayList<String>(), Keywords.IF_KEYWORD);
+                Function ifStatement = new Function(nestedIfCode, env.copyEnvironment(), Keywords.IF_KEYWORD);
                 ifStatement.setStartLine(startLine + startIf);
                 //should run if statement
-                //System.out.println(ifCondition);
                 if (StaticMethods.eval(ifCondition, env).toBoolean()) {
                     ifStatement.run(new ArrayList<Variable>(), hasReturned, returnValue);
                     if (hasReturned.toBoolean()) {
@@ -224,16 +227,13 @@ public class Function {
                     if (lineAfter.split(" ").length > TokenIndex.ELIF_STATEMENT_TOKEN && 
                             lineAfter.split(" ")[TokenIndex.ELIF_STATEMENT_TOKEN].equals(Keywords.IF_KEYWORD)) {
                         //just set next line to an if statement and go back to it
-                        //System.out.println("found elif");
                         l = startElse;
                         lines[l] = wholeLineAfter.substring(0, wholeLineAfter.indexOf(Keywords.ELSE_KEYWORD)) + 
                                 wholeLineAfter.substring(wholeLineAfter.indexOf(Keywords.IF_KEYWORD));
                         l--;
                     }
                     else if (!StaticMethods.isBlank(nestedElseCode)) {
-                        //System.out.println("found else");
-                        Function elseStatement = new Function(nestedElseCode, env.copyEnvironment(), new ArrayList<String>(), 
-                            new ArrayList<String>(), Keywords.ELSE_KEYWORD);
+                        Function elseStatement = new Function(nestedElseCode, env.copyEnvironment(), Keywords.ELSE_KEYWORD);
                         elseStatement.setStartLine(startLine + startElse);
                         elseStatement.run(new ArrayList<Variable>(), hasReturned, returnValue);
                         if (hasReturned.toBoolean()) {
@@ -243,7 +243,7 @@ public class Function {
                 }
             }
             //finds else statement
-            if (tokens.length > TokenIndex.ELSE_STATEMENT_TOKEN && tokens[TokenIndex.ELSE_STATEMENT_TOKEN].equals(Keywords.ELSE_KEYWORD)) {
+            else if (tokens.length > TokenIndex.ELSE_STATEMENT_TOKEN && tokens[TokenIndex.ELSE_STATEMENT_TOKEN].equals(Keywords.ELSE_KEYWORD)) {
                 if (!line.endsWith(Keywords.COLON_KEYWORD)) {
                     throw new Error("Code is not happy enough!");
                 }
@@ -260,19 +260,119 @@ public class Function {
                 }
                 l--;
             }
-            //TODO for
-            if (tokens.length > TokenIndex.FOR_STATEMENT_TOKEN && tokens[TokenIndex.FOR_STATEMENT_TOKEN].equals(Keywords.FOR_KEYWORD)) {
+
+            else if (tokens.length > TokenIndex.FOR_STATEMENT_TOKEN && tokens[TokenIndex.FOR_STATEMENT_TOKEN].equals(Keywords.FOR_KEYWORD)) {
+                if (!line.endsWith(Keywords.COLON_KEYWORD)) {
+                    throw new Error("Code is not happy enough!");
+                }
+                //get all code inside the for loop
+                //get header statement
+                String forHeader = line.substring(line.indexOf(Keywords.FOR_KEYWORD) + Keywords.FOR_KEYWORD.length(), 
+                    line.length() - Keywords.COLON_KEYWORD.length());
+                List<String> forArgs = StaticMethods.separate(forHeader, Keywords.SEPARATOR_KEYWORD);
+                if (forArgs.size() != 3) {
+                    throw new Error("Invalid for loop header");
+                }
+                Function initFunc = new Function(forArgs.get(0), env.copyEnvironment(), "forInit");
+                initFunc.setStartLine(l);
+                String condition = forArgs.get(1);
+                Function afterFunc = new Function(forArgs.get(2), initFunc.getEnvironment(), "forAfter"); 
+                afterFunc.setStartLine(l);
+                
+                //get nested for code
+                l++;
+                //check line after
+                if (l >= lines.length) {
+                    endOfFile = true;
+                    throw new Error("No next line found");
+                }
+                String nextLine = StaticMethods.stripTrailingSpaces(lines[l]);
+                int blockIndent = StaticMethods.countIndent(nextLine);
+                //check next indentation fine
+                if (blockIndent <= baseIndent) {
+                    throw new Error("Incorrect indentation found");
+                }
+                //get code inside for statement
+                String nestedForCode = "";
+                while (StaticMethods.countIndent(nextLine) >= blockIndent || StaticMethods.countIndent(nextLine) == -1) {
+                    nestedForCode += nextLine + "\n";
+                    l++;
+                    if (l >= lines.length) {
+                        endOfFile = true;
+                        break;
+                    }
+                    nextLine = lines[l];
+                }
+                //go back to last line of the for block
+                l--;
+
+                Function forCode = new Function(nestedForCode, initFunc.getEnvironment(), Keywords.FOR_KEYWORD);
+                forCode.setStartLine(l + startLine);
+
+                //initialize for loop
+                initFunc.run(new ArrayList<Variable>());
+                while (StaticMethods.eval(condition, initFunc.getEnvironment()).toBoolean()) {
+                    forCode.run(new ArrayList<Variable>());
+                    afterFunc.run(new ArrayList<Variable>());
+                }
 
             }
 
-            //TODO while
+            else if (tokens.length > TokenIndex.WHILE_STATEMENT_TOKEN && tokens[TokenIndex.WHILE_STATEMENT_TOKEN].equals(Keywords.WHILE_KEYWORD)) {
+                if (!line.endsWith(Keywords.COLON_KEYWORD)) {
+                    throw new Error("Code is not happy enough!");
+                }
+                //get all code inside the for loop
+                //get header statement
+                String whileCondition = line.substring(line.indexOf(Keywords.WHILE_KEYWORD) + Keywords.WHILE_KEYWORD.length(), 
+                    line.length() - Keywords.COLON_KEYWORD.length());
+                
+                //get nested while code
+                l++;
+                //check line after
+                if (l >= lines.length) {
+                    endOfFile = true;
+                    throw new Error("No next line found");
+                }
+                String nextLine = StaticMethods.stripTrailingSpaces(lines[l]);
+                int blockIndent = StaticMethods.countIndent(nextLine);
+                //check next indentation fine
+                if (blockIndent <= baseIndent) {
+                    throw new Error("Incorrect indentation found");
+                }
+                //get code inside while loop
+                String nestedWhileCode = "";
+                while (StaticMethods.countIndent(nextLine) >= blockIndent || StaticMethods.countIndent(nextLine) == -1) {
+                    nestedWhileCode += nextLine + "\n";
+                    l++;
+                    if (l >= lines.length) {
+                        endOfFile = true;
+                        break;
+                    }
+                    nextLine = lines[l];
+                }
+                //go back to last line of the while block
+                l--;
+
+                Function whileCode = new Function(nestedWhileCode, env.copyEnvironment(), Keywords.FOR_KEYWORD);
+                whileCode.setStartLine(l + startLine);
+
+                //initialize while loop
+                while (StaticMethods.eval(whileCondition, whileCode.getEnvironment()).toBoolean()) {
+                    whileCode.run(new ArrayList<Variable>());
+                }
+
+            }
+            else {
+                StaticMethods.interpretExpression(line, env);
+            }
 
 
             } catch (Error e) {
-                //e.printStackTrace();
+                e.printStackTrace();
                 for (int c = 0; c < lines.length; c++) {
                     if (lines[c].contains(line)) {
-                        System.out.println("Possible error on line " + (c + 1 + startLine) + ": " + e.getMessage());
+                        StaticMethods.print("Possible error on line " + (c + 1 + startLine) + ": " + e.getMessage());
                     }
                 }
                 break;
@@ -281,14 +381,16 @@ public class Function {
         return new Variable();
     }
 
-
     public Variable runHelper(List<Variable> args) {
         return new Variable();
     }
 
     public static Function getFunction(List<Function> functions, String name, List<Variable> inputs) {
         for (Function possible : functions) {
-            if (name.equals(possible.getName()) && inputs.size() == possible.getParamTypes().size()) {
+            if (name.equals(
+                possible.getName()) && 
+            inputs.size() == 
+            possible.getParamTypes().size()) {
                 boolean match = true;
                 for (int i = 0; i < inputs.size(); i++) {
                     if (!(inputs.get(i).getType().equals(possible.getParamTypes().get(i)))) {
@@ -315,7 +417,7 @@ public class Function {
     }
     public String toString() {
         String out = "";
-        out += "wdym " + returnType + " " + name + " ";
+        out += "wdym " + name + " ";
         for (int p = 0; p < paramTypes.size(); p++) {
             out += paramTypes.get(p) + " " + paramNames + " ";
         }

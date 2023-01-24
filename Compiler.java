@@ -1,9 +1,11 @@
-import java.io.*;
-import java.util.*;
-
 /**
  * Compiler
  */
+
+import java.io.*;
+import java.util.*;
+
+
 
 public class Compiler {
     private Environment env;
@@ -24,6 +26,9 @@ public class Compiler {
     //adds global variables and all functions
     public void compile() {
         env = new Environment();
+        for (String sysfunc : SystemFunction.systemFunctionHeaders) {
+            StaticMethods.defineSystemFunction(env, sysfunc);
+        }
         try (Scanner fileScanner = new Scanner(file);) {
 
             boolean defining = false;

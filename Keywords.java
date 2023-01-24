@@ -1,5 +1,3 @@
-//import java.util.Map;
-
 public class Keywords {
     public static final String FOR_KEYWORD = "lmfao";
     public static final String IF_KEYWORD = "lmao";
@@ -31,6 +29,7 @@ public class Keywords {
         TRUE_KEYWORD, FALSE_KEYWORD, INPUT_KEYWORD,
     };
 
+    public static final char ARRAY_SEPARATOR_KEYWORD = ',';
     public static final char STRING_LITERAL_KEYWORD = '#';
     public static final char ESCAPE_CHARACTER_KEYWORD = '\\';
     public static final char OPEN_PAREN_KEYWORD = '(';
@@ -43,13 +42,8 @@ public class Keywords {
     public static final String OPERATOR_CHARACTERS = "+-*/%^";
 
     //TYPES
-    // public static Map<String, String> typeMap = Map.of(
-    //     "null", "non",
-    //     "int", "int",
-    //     "double", "dbl",
-    //     "String", "str",
-    //     "ArrayList", "arr"
-    //     );
+    public static String[] JAVA_TYPES = {"Integer", "Double", "String", "Boolean", "ArrayList"};
+    public static String[] HARMONY_TYPES = {"int", "dbl", "str", "boo", "arr"};
 
     //ILLEGAL IDENTIFIERS
     public static final String[] ILLEGAL_IDENTIFIERS = {

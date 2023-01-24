@@ -1,3 +1,10 @@
+/**
+ *
+ *
+ *
+ *
+ */
+
 import java.util.List;
 
 public class SystemFunction extends Function {
@@ -8,13 +15,22 @@ public class SystemFunction extends Function {
         "wdym len arr toFind :)",
         "wdym split str original str splitChar :)",
         "wdym toInt str data :)",
+        "wdym toInt dbl data :)",
+        "wdym toInt boo data :)",
         "wdym toDouble str data :)",
-        "wdym toString str data :)",
+        "wdym toDouble int data :)",
+        "wdym toString int data :)",
+        "wdym toString dbl data :)",
+        "wdym toString boo data :)",
         "wdym random :)"
     };
-    //xd len(#calvin#)
+    public SystemFunction(Environment env, List<String> paramNames, List<String> paramTypes, String funcName) {
+        super("", env, paramNames, paramTypes, funcName);
+	}
+
+	//xd len(#calvin#)
     //xd split(#03:05:06:11# ? #:#)
-    public static Variable getSystemFunction() {
+    public static Variable getSystemFuction() {
         return new Variable();
     }
 
@@ -27,14 +43,7 @@ public class SystemFunction extends Function {
             return new Variable(((String) args.get(0).getData()).split((String) args.get(1).getData()));
         }
         else if (this.getName().equals("toInt")) {
-            Object data = args.get(0).getData();
-            if (data instanceof String) {
-                data = Double.parseDouble((String) data);
-            }
-            if (data instanceof Double) {
-                return new Variable((int) (double) data);
-            }
-            return new Variable((int) data);
+            return new Variable(args.get(0).toInteger());
         }
         else if (this.getName().equals("toDouble")) {
             return new Variable(args.get(0).toDouble());
