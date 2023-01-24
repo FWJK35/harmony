@@ -46,6 +46,7 @@ public class Compiler {
                     if (defining) {
                         defining = false;
                         currentFunc.setCode(code);
+                        code = "";
                     }
                     //define function token
                     if (tokens.length >= TokenIndex.DEFINE_FUNCTION_TOKEN && 

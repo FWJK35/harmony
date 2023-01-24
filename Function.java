@@ -85,9 +85,11 @@ public class Function {
             }
             String[] tokens = doubleSpacesRemoved.split(" ");
             //VERY first, check comment or blank line
+            boolean ignore = false;
             if (StaticMethods.isBlank(line) || doubleSpacesRemoved.substring(0, 
                     Keywords.COMMENT_KEYWORD.length()).equals(Keywords.COMMENT_KEYWORD)) {
                 //ignore line
+                ignore = true;
             }
             //firstly, check if should be multi line statement
             else if (line.charAt(line.length() - 1) == Keywords.LINE_JOINER_KEYWORD) {
@@ -113,10 +115,10 @@ public class Function {
                     throw new Error("Incorrect indentation found");
                 }
             }
-
+            if (!ignore) {
             //return
             if (tokens.length > TokenIndex.RETURN_TOKEN && tokens[TokenIndex.RETURN_TOKEN].equals(Keywords.RETURN_KEYWORD)) {
-                String toReturn = line.substring(Keywords.RETURN_KEYWORD.length() + 1);
+                String toReturn = line.substring(line.indexOf(Keywords.RETURN_KEYWORD) + Keywords.RETURN_KEYWORD.length() + 1);
                 hasReturned.setData(true);
                 returnValue.setData(StaticMethods.eval(toReturn, env).getData());
                 return returnValue;
@@ -314,7 +316,10 @@ public class Function {
                 //initialize for loop
                 initFunc.run(new ArrayList<Variable>());
                 while (StaticMethods.eval(condition, initFunc.getEnvironment()).toBoolean()) {
-                    forCode.run(new ArrayList<Variable>());
+                    forCode.run(new ArrayList<Variable>(), hasReturned, returnValue);
+                    if (hasReturned.toBoolean()) {
+                        return returnValue;
+                    }
                     afterFunc.run(new ArrayList<Variable>());
                 }
                 env.updateVariable(afterFunc.getEnvironment());
@@ -361,15 +366,19 @@ public class Function {
 
                 //initialize while loop
                 while (StaticMethods.eval(whileCondition, whileCode.getEnvironment()).toBoolean()) {
-                    whileCode.run(new ArrayList<Variable>());
+                    whileCode.run(new ArrayList<Variable>(), hasReturned, returnValue);
+                    if (hasReturned.toBoolean()) {
+                        return returnValue;
+                    }
                 }
                 
                 env.updateVariable(whileCode.getEnvironment());
             }
             else {
+                System.out.println(line);
                 StaticMethods.interpretExpression(line, env);
             }
-
+            }
 
             } catch (Error e) {
                 e.printStackTrace();
