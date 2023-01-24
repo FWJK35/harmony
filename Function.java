@@ -89,7 +89,7 @@ public class Function {
                     Keywords.COMMENT_KEYWORD.length()).equals(Keywords.COMMENT_KEYWORD)) {
                 //ignore line
             }
-            //fisrtly, check if should be multi line statement
+            //firstly, check if should be multi line statement
             else if (line.charAt(line.length() - 1) == Keywords.LINE_JOINER_KEYWORD) {
                 while (line.charAt(line.length()) == Keywords.LINE_JOINER_KEYWORD) {
                     if (l + 1 >= lines.length) {

@@ -1,14 +1,26 @@
-Johnny:
-    unit converter
+Function run
+Implement slicing
 
-Calvin:
-    Function run
-    System functions
-        -lengths (str and arr and list)
-        -casting
-    Implement slicing
-Esther:
-    eval:
-        eval arrays
-        eval slicing
-    notepad indentation
+comments don't work I think (?) :(((
+crtl + f "TODO" I suppose through all the files get rid of shit
+Boolean evalutation is computed before evaluation of its components ?
+    ie. lmao (num % i) is 0 :) IS DIFFERENT FROM lmao num % i is 0 :)
+        latter doesn't work, assuming that it only checks if i == 0
+        run each of the variables through eval before chucking them into interpretBooleanExpression ig ??
+            eval scary scary I don't want to touch it
+Review presentation and powerpoint
+Try to get the jar file working ? 
+    Still haven't done the system print properly T^T so will have to run from terminal
+Double check that the test files we're using run properly
+    If you make more, check that extension is .hrm ; might implement functionality that Notepad throws out anything that doesn't later on
+    Make sure you know what explicit prompts you're giving the thing, like don't ask audience for prompts
+    I checked Tango's code and there were so many errors, dunno if I caught them all
+System functions ?
+CHANGE DECREMENT_KEYWORD 
+Function header comment
+
+Low Priority:
+Implement arrayInitialize and arraySplit if you have time T^T
+Add comments, embellish header comments a bit more
+Clean up files, make a .gitignore, update README.md, add License, Security Policy, etc. whatever's in Github's Community Standards
+Delete writeFile() in Compiler (?) if unused
