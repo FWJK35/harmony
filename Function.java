@@ -239,8 +239,10 @@ public class Function {
                         if (hasReturned.toBoolean()) {
                             return returnValue;
                         }
+                        env.updateVariable(elseStatement.getEnvironment());
                     }
                 }
+                env.updateVariable(ifStatement.getEnvironment());
             }
             //finds else statement
             else if (tokens.length > TokenIndex.ELSE_STATEMENT_TOKEN && tokens[TokenIndex.ELSE_STATEMENT_TOKEN].equals(Keywords.ELSE_KEYWORD)) {
@@ -315,7 +317,7 @@ public class Function {
                     forCode.run(new ArrayList<Variable>());
                     afterFunc.run(new ArrayList<Variable>());
                 }
-
+                env.updateVariable(afterFunc.getEnvironment());
             }
 
             else if (tokens.length > TokenIndex.WHILE_STATEMENT_TOKEN && tokens[TokenIndex.WHILE_STATEMENT_TOKEN].equals(Keywords.WHILE_KEYWORD)) {
@@ -361,7 +363,8 @@ public class Function {
                 while (StaticMethods.eval(whileCondition, whileCode.getEnvironment()).toBoolean()) {
                     whileCode.run(new ArrayList<Variable>());
                 }
-
+                
+                env.updateVariable(whileCode.getEnvironment());
             }
             else {
                 StaticMethods.interpretExpression(line, env);

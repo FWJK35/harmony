@@ -53,6 +53,18 @@ public class Environment {
         return new Environment(new HashMap<String, Variable>(variables), new ArrayList<Function>(functions));
     }
 
+    // merges updates from child to parent environment
+    public void updateVariable(Environment child) {
+        for (String key : variables.keySet()) {
+            if (child.containsVariable(key)) {
+                variables.put(key, child.getVariable(key));
+            }
+            else {
+                throw new Error("Missing variable");
+            }
+        }
+    }
+
     // returns true if environment has a variable/function corresponding to name
     public boolean containsVariable(String name) {
         return variables.containsKey(name);
