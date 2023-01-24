@@ -3,7 +3,7 @@
  * Can by any of following types
  * Int - Integer
  * Dbl - Double
- * Chr - Character
+ * Chr - Character (no way to initialize in .hrm at the moment)
  * Str - String
  * Boo - Boolean
  * Arr - Array

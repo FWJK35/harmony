@@ -1,3 +1,8 @@
+/**
+ * Environment holds a map of String names to Variable variables
+ * and a list of Function objects. 
+ */
+
 import java.util.*;
 
 public class Environment {

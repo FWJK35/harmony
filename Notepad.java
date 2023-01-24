@@ -25,10 +25,6 @@ public class Notepad implements ActionListener
     private JMenuItem cutItem, copyItem, pasteItem, selectAll;
     private JTextArea textArea;  
 
-    public static void main(String[] args) {
-        Main.main(null);
-    }
-
     // constructors
     public Notepad() {
         this(promptFile());
@@ -50,7 +46,7 @@ public class Notepad implements ActionListener
         runItem = new JMenuItem("runItem");
         runItem.addActionListener(this);
         fileMenu.add(runItem);
-
+        
         editMenu = new JMenu("Edit");
         cutItem = new JMenuItem("cutItem");
         editMenu.add(cutItem);
@@ -71,7 +67,7 @@ public class Notepad implements ActionListener
         textArea.setBounds(5,30,460,460);
         textArea.setFont(new Font("Courier", Font.PLAIN, 12));
 
-        JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroll.setBounds(0, 20, 500, 500);
         scroll.getVerticalScrollBar().setPreferredSize(new Dimension(15, 0));
         scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 15));
@@ -122,7 +118,7 @@ public class Notepad implements ActionListener
             new Notepad();
         }
 
-        // saves text to file
+        // saves text to file, line by line
         else if (ae.getSource() == saveItem || ae.getSource() == runItem) {
             try {
                 Scanner in = new Scanner(textArea.getText());
@@ -136,7 +132,7 @@ public class Notepad implements ActionListener
                 out.close();
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("idk what happened this should've been fine");
+                throw new Error("Save unsuccessful");
             }
 
             // compiles and runs saved file for action runItem
@@ -146,7 +142,7 @@ public class Notepad implements ActionListener
                     compiler.runCode();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    System.out.println("lol code bad");
+                    throw new Error("Run unsuccessful");
                 }
             }
         }
@@ -165,7 +161,6 @@ public class Notepad implements ActionListener
                 i++;
             }
         }
-
         try {
             File file = new File(fileName);
             if (file.createNewFile()) {
@@ -174,14 +169,12 @@ public class Notepad implements ActionListener
                     return null;
                 }
             }
-            
             if (!file.exists()) {
-                System.out.println("Error: Bad file name");
-                return null;
+                throw new Error("Bad file name");
             }
         } catch (IOException e) {
             e.getStackTrace();
-            System.out.println("Error: Invalid File");
+            throw new Error("Invalid file");
         }
         return fileName;
     }

@@ -1,15 +1,12 @@
 /**
- *
- *
- *
- *
+ * SystemFunction is a child class of Function
+ * They are globally implemented Functions, including
+ * finding length, casting, and random double from 0 to 1 
  */
 
 import java.util.List;
 
 public class SystemFunction extends Function {
-    //TODO these functions as well
-    //TODO add to environment
     public static String[] systemFunctionHeaders = {
         "wdym len str toFind :)",
         "wdym len arr toFind :)",

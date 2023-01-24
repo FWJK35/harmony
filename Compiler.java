@@ -1,16 +1,16 @@
 /**
- * Compiler
+ * Compiler class holds a private Environment and File object
+ * so that each Environment is unique to a File; ie. variables
+ * would not be globally shared across files. It can compile
+ * (initalize variables and functions), and run .hrm code. 
  */
 
 import java.io.*;
 import java.util.*;
 
-
-
 public class Compiler {
     private Environment env;
     private File file;
-    // public static List<Function> functions = env.getFunctions();
     
     // constructor
     public Compiler(File file) {

@@ -1,16 +1,18 @@
-// main method
 wdym main :)
-    // user inputs a number 
     xd #type a number to see if it is prime!#
-    // variables
-    num aka 13
-    flag aka bad
-    // the code to test
+    num aka hmu
+    flag aka good
     lmfao i aka 2 ? i less num ^ 0.5 ? ily i :)
-        lmao num % i is 0 :)
-            flag aka good
+        xd i
+        lmao (num % i) is 0 :)
+            flag aka bad
 
-    lmao flag is bad :)
-        xd num # is a prime number#
+    lmao flag :)
+        lmao num more 1 :)
+            xd num # is a prime number#
+        afk lmao num less 1 :)
+            xd num # is out of bounds#
+        afk 
+            xd num # is not a prime number (nor a composite for that matter)#
     afk :)
         xd num # is not a prime number#
