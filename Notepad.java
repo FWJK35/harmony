@@ -153,7 +153,7 @@ public class Notepad implements ActionListener
     public static String promptFile() {
         String fileName = JOptionPane.showInputDialog("Input File Name: ");
         fileName = fileName.trim();
-        if (fileName.isBlank()) {
+        if (StaticMethods.isBlank(fileName)) {
             int i = 2;
             fileName = "Untitled 1.hrm";
             while(new File(fileName).exists()) {

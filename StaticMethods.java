@@ -283,6 +283,7 @@ public class StaticMethods {
                 for (String word : Keywords.BOOLEAN_KEYWORDS) {
                     if (idName.equals(word)) {
                         boolKeyword = true;
+                        break;
                     }
                 }
                 if (boolKeyword) {
@@ -404,11 +405,15 @@ public class StaticMethods {
                 finalVariables.add(currentVariable);
                 finalTypes.add(FinalType.Operator);
             }
+
+            else if (currentType == TokenType.BoolOperator) {
+                finalVariables.add(currentVariable);
+                finalTypes.add(FinalType.BoolOperator);
+            }
         }
         if (finalTypes.size() > 0 && finalTypes.get(finalTypes.size() - 1) == FinalType.Operator) {
             throw new Error("Must have expression after operator");
         }
-
         //parse for number expressions
         List<Variable> vars = new ArrayList<Variable>();
         List<Character> ops = new ArrayList<Character>();
@@ -443,6 +448,7 @@ public class StaticMethods {
                     //longer, number expression
                     else {
                         Variable evaluatedNumber = interpretNumberExpression(vars, ops);
+                        f--;
                         while (f != expStart) {
                             finalTypes.remove(f);
                             finalVariables.remove(f);
@@ -452,7 +458,6 @@ public class StaticMethods {
                         vars.clear();
                         ops.clear();
                         isNumberExpression = false;
-                        f--;
                     }
                 }
                 else if (finalTypes.get(f) == FinalType.Operator) {
@@ -524,7 +529,7 @@ public class StaticMethods {
         if (finalVariables.size() == 1) {
             return finalVariables.get(0);
         }
-
+        
         return new Variable(interpretBooleanExpression(finalVariables, boolOps));
     }
 
@@ -778,11 +783,9 @@ public class StaticMethods {
 
     // evaluates a boolean expression, returns a boolean
     // takes an expression separated into a Variable list and String list of boolean operators and (in)equalities (<, >, ==)
-    //TODO is doesnt work properly
     public static boolean interpretBooleanExpression(List<Variable> variables, List<String> operators) {
         List<Variable> vars = new ArrayList<Variable>(variables);
         List<String> ops = new ArrayList<String>(operators);
-        
         if (variables.size() != operators.size() + 1) {
             throw new Error("Mismatched variables and operators: " + variables.size() + " Variables, " + operators.size() + " Operators");
         }

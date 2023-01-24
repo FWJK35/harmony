@@ -381,7 +381,7 @@ public class Function {
             }
 
             } catch (Error e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 for (int c = 0; c < lines.length; c++) {
                     if (lines[c].contains(line)) {
                         StaticMethods.print("Possible error on line " + (c + 1 + startLine) + ": " + e.getMessage());
