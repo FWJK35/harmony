@@ -135,6 +135,9 @@ public class Function {
 
             //TODO if
             if (tokens.length > TokenIndex.IF_STATEMENT_TOKEN && tokens[TokenIndex.IF_STATEMENT_TOKEN].equals(Keywords.IF_KEYWORD)) {
+                if (!line.endsWith(Keywords.COLON_KEYWORD)) {
+                    throw new Error("Code is not happy enough!");
+                }
                 //get all code inside the if statement
                 //get condition statement
                 String ifCondition = line.substring(line.indexOf(Keywords.IF_KEYWORD) + Keywords.IF_KEYWORD.length(), 
@@ -177,6 +180,9 @@ public class Function {
                 }
                 //next line is else or elif
                 if (!endOfFile && lineAfter.split(" ")[TokenIndex.ELSE_STATEMENT_TOKEN].equals(Keywords.ELSE_KEYWORD)) {
+                    if (!line.endsWith(Keywords.COLON_KEYWORD)) {
+                        throw new Error("Code is not happy enough!");
+                    }
                     l += 2;
                     //check line after
                     if (l >= lines.length) {
@@ -238,6 +244,9 @@ public class Function {
             }
             //finds else statement
             if (tokens.length > TokenIndex.ELSE_STATEMENT_TOKEN && tokens[TokenIndex.ELSE_STATEMENT_TOKEN].equals(Keywords.ELSE_KEYWORD)) {
+                if (!line.endsWith(Keywords.COLON_KEYWORD)) {
+                    throw new Error("Code is not happy enough!");
+                }
                 //should have already run or is elif, skip over it
                 String nextLine = lines[l + 1];
                 int blockIndent = StaticMethods.countIndent(line);
@@ -252,6 +261,10 @@ public class Function {
                 l--;
             }
             //TODO for
+            if (tokens.length > TokenIndex.FOR_STATEMENT_TOKEN && tokens[TokenIndex.FOR_STATEMENT_TOKEN].equals(Keywords.FOR_KEYWORD)) {
+
+            }
+
             //TODO while
 
 

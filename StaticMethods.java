@@ -41,8 +41,6 @@ public class StaticMethods {
 
     public static Variable eval(String line, Environment env) {
         line = stripSpaces(line);
-        //System.out.println(line);
-        Variable result = new Variable();
         List<TokenType> tokenTypes = new ArrayList<TokenType>();
         List<Variable> tokenVariables = new ArrayList<Variable>();
         Stack<ExpressionType> tokenStack = new Stack<ExpressionType>();
