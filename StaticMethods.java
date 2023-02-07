@@ -8,7 +8,7 @@
  */
 
 import java.util.*;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 public class StaticMethods {
     //types of expressions used in token types
@@ -348,7 +348,7 @@ public class StaticMethods {
                     //eval keyword
                     if (Keywords.isIllegalIdentifier(idName) && !Keywords.isIllegalEvalIdentifier(idName)) {
                         if (idName.equals(Keywords.INPUT_KEYWORD)) {
-                            finalVariables.add(new Variable(input()));
+                            finalVariables.add(new Variable(input(env.getTerminal())));
                             finalTypes.add(FinalType.Evaluated);
                         }
                         else if (idName.equals(Keywords.TRUE_KEYWORD)) {
@@ -767,7 +767,8 @@ public class StaticMethods {
         }
     }
 
-    public static String input() {
+    public static String input(JTextArea terminal) {
+        // Scanner scan = new Scanner(terminal.getText());
         return JOptionPane.showInputDialog("");
     }
 
@@ -935,14 +936,6 @@ public class StaticMethods {
         }
         return c;
     } 
-
-    public static void print(Variable var) {
-        print(var.toString());
-    }
-    public static void print(String line) {
-        // temporary print replacement
-        System.out.println(line);
-    }
 
     public static boolean isAlpha(char c) {
         String alpha = "abcdefghijklmnopqrstuvwxyz";

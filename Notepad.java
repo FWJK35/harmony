@@ -12,7 +12,7 @@ import java.io.*;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;  
-import javax.swing.*;  
+import javax.swing.*;
 
 public class Notepad implements ActionListener
 {  
@@ -23,7 +23,11 @@ public class Notepad implements ActionListener
     private JMenu fileMenu, editMenu;  
     private JMenuItem openItem, saveItem, runItem;
     private JMenuItem cutItem, copyItem, pasteItem, selectAll;
-    private JTextArea textArea;  
+    private JTextArea textArea, terminalArea;  
+
+    public static void main(String[] args) {
+        Main.main(null);
+    }
 
     // constructors
     public Notepad() {
@@ -31,7 +35,6 @@ public class Notepad implements ActionListener
     }
     public Notepad(String fileName) {
         file = new File(fileName);
-        compiler = new Compiler(file);
         frame = new JFrame(fileName);
         menuBar = new JMenuBar();
         menuBar.setBounds(0, 0, 500, 20);
@@ -63,29 +66,42 @@ public class Notepad implements ActionListener
         
         menuBar.add(fileMenu);  
         menuBar.add(editMenu);
-        textArea = new JTextArea(400, 400);  
-        textArea.setBounds(5,30,460,460);
+        textArea = new JTextArea();  
         textArea.setFont(new Font("Courier", Font.PLAIN, 12));
 
-        JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scroll.setBounds(0, 20, 500, 500);
-        scroll.getVerticalScrollBar().setPreferredSize(new Dimension(15, 0));
-        scroll.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 15));
+        JScrollPane scrollText = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollText.getVerticalScrollBar().setPreferredSize(new Dimension(15, 0));
+        scrollText.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 15));
+        scrollText.setBounds(0, menuBar.getHeight(), 500-15, 400-15);
+        
+        terminalArea = new JTextArea();  
+        terminalArea.setFont(new Font("Courier", Font.PLAIN, 12));
 
+        JScrollPane scrollTerminal = new JScrollPane(terminalArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollTerminal.setBounds(0, menuBar.getHeight() + scrollText.getHeight(), 500-15, 200-15);
+        scrollTerminal.getVerticalScrollBar().setPreferredSize(new Dimension(15, 0));
+        scrollTerminal.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 15));
+        
         frame.add(menuBar);
-        frame.add(scroll);
+        frame.add(scrollText);
+        frame.add(scrollTerminal);
         frame.setLayout(null);  
-        frame.setSize(500, 500);
+        frame.setSize(500, 600);
         frame.setResizable(true);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent componentEvent) {
-                scroll.setBounds(0, menuBar.getHeight(), frame.getWidth()-scroll.getVerticalScrollBar().getWidth(), frame.getHeight()-menuBar.getHeight()-38);
+                scrollText.setBounds(0, menuBar.getHeight(), frame.getWidth() - scrollText.getVerticalScrollBar().getWidth(), 
+                    frame.getHeight() - menuBar.getHeight() - scrollTerminal.getHeight() - scrollText.getHorizontalScrollBar().getHeight());
+                scrollTerminal.setBounds(0, menuBar.getHeight() + scrollText.getHeight(), 
+                    menuBar.getWidth() - scrollTerminal.getVerticalScrollBar().getWidth(), scrollTerminal.getHeight());
                 menuBar.setBounds(0, 0, frame.getWidth(), 20);
             }
         }); 
+
+        compiler = new Compiler(file, terminalArea);
 
         try {
             file = new File(fileName);
@@ -96,7 +112,7 @@ public class Notepad implements ActionListener
             scan.close();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("the file tastes bad :(");
+            throw new Error("this file tastes bad :(");
         }
     }  
     
@@ -160,6 +176,9 @@ public class Notepad implements ActionListener
                 fileName = "Untitled" + i + ".hrm"; 
                 i++;
             }
+        }
+        else if (!fileName.substring(fileName.length() - 4).equals(".hrm")) {
+            fileName += ".hrm";
         }
         try {
             File file = new File(fileName);

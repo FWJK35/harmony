@@ -5,15 +5,18 @@
  */
 
 import java.util.*;
+import javax.swing.JTextArea;
 
 public class Environment {
     private Map<String, Variable> variables;
     private List<Function> functions;
+    private JTextArea terminal;
 
     // constructors
-    public Environment() {
+    public Environment(JTextArea terminal) {
         this.variables = new HashMap<String, Variable>();
         this.functions = new ArrayList<Function>();
+        this.terminal = terminal;
     }
     public Environment(Map<String, Variable> variables) {
         this.variables = variables;
@@ -23,17 +26,21 @@ public class Environment {
         this.variables = new HashMap<String, Variable>();
         this.functions = functions;
     }
-    public Environment(Map<String, Variable> variables, List<Function> functions) {
+    public Environment(Map<String, Variable> variables, List<Function> functions, JTextArea terminal) {
         this.variables = variables;
         this.functions = functions;
+        this.terminal = terminal;
     }
 
-    // get methods for private variables
+    // accessors
     public Map<String, Variable> getVariables() {
         return variables;
     }
     public List<Function> getFunctions() {
         return functions;
+    }
+    public JTextArea getTerminal() {
+        return terminal;
     }
 
     public Variable getVariable(String name) {
@@ -46,7 +53,7 @@ public class Environment {
         return Function.getFunction(functions, name, param);
     }
 
-    // put methods for private variables
+    // mutators
     public void putVariable(String name, Variable value) {
         variables.put(name, value);
     }
@@ -54,9 +61,9 @@ public class Environment {
         functions.add(function);
     }
 
-    // returns Environment with new variables and new 
+    // returns a separate, duplicate instance of Environment
     public Environment copyEnvironment() {
-        return new Environment(new HashMap<String, Variable>(variables), new ArrayList<Function>(functions));
+        return new Environment(new HashMap<String, Variable>(variables), new ArrayList<Function>(functions), terminal);
     }
 
     // merges updates from child to parent environment
@@ -85,6 +92,11 @@ public class Environment {
         return false;
     }
 
+    public void print(String line) {
+        terminal.append(line + "\n");
+    }
+
+    @Override
     public String toString() {
         String out = "";
         for (String var : variables.keySet()) {

@@ -7,15 +7,18 @@
 
 import java.io.*;
 import java.util.*;
+import javax.swing.*;
 
 public class Compiler {
     private Environment env;
     private File file;
+    private JTextArea terminal;
     
     // constructor
-    public Compiler(File file) {
+    public Compiler(File file, JTextArea terminal) {
         this.file = file;
-        this.env = new Environment();
+        this.terminal = terminal;
+        this.env = new Environment(terminal);
     }
 
     // accessors
@@ -25,7 +28,7 @@ public class Compiler {
 
     //adds global variables and all functions
     public void compile() {
-        env = new Environment();
+        env = new Environment(terminal);
         for (String sysfunc : SystemFunction.systemFunctionHeaders) {
             StaticMethods.defineSystemFunction(env, sysfunc);
         }
@@ -84,10 +87,6 @@ public class Compiler {
         catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void writeFile(File file) {
-        new Notepad(file.getName());
     }
 
     public Variable runCode() {

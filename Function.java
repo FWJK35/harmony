@@ -145,7 +145,7 @@ public class Function {
 
             //print line
             else if (tokens.length > TokenIndex.PRINT_TOKEN && tokens[TokenIndex.PRINT_TOKEN].equals(Keywords.PRINT_KEYWORD)) {
-                StaticMethods.print(StaticMethods.eval(line.substring(line.indexOf(Keywords.PRINT_KEYWORD) + Keywords.PRINT_KEYWORD.length() + 1), env).toString());
+                env.print(StaticMethods.eval(line.substring(line.indexOf(Keywords.PRINT_KEYWORD) + Keywords.PRINT_KEYWORD.length() + 1), env).toString());
             }
 
             else if (tokens.length > TokenIndex.IF_STATEMENT_TOKEN && tokens[TokenIndex.IF_STATEMENT_TOKEN].equals(Keywords.IF_KEYWORD)) {
@@ -390,7 +390,7 @@ public class Function {
                 //e.printStackTrace();
                 for (int c = 0; c < lines.length; c++) {
                     if (lines[c].contains(line)) {
-                        StaticMethods.print("Possible error on line " + (c + 1 + startLine) + ": " + e.getMessage());
+                        env.print("Possible error on line " + (c + 1 + startLine) + ": " + e.getMessage());
                     }
                 }
                 break;
